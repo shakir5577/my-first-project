@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Hmart - Admin</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="" />
+    <meta property="og:type" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="" />
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Template CSS -->
+    <link href="assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    <script defer src="https://cdn.crop.guide/loader/l.js?c=GVSXPY"></script>
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="index.html" class="brand-wrap">
+                <img src="assets/imgs/theme/logo.svg" class="logo" alt="Nest Dashboard" />
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"><i
+                        class="text-muted material-icons md-menu_open"></i></button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/dashboard">
+                        <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/users">
+                        <i class="icon material-icons md-person"></i>
+                        <span class="text">Users</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/orders">
+                        <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/products">
+                        <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/categories">
+                        <i class="icon material-icons md-category"></i>
+                        <span class="text">Categories</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/salesReport">
+                        <i class="icon material-icons md-business"></i>
+                        <span class="text">Sales Reports</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/offers">
+                        <i class="icon material-icons md-local_offer"></i>
+                        <span class="text">Offers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/coupons">
+                        <i class="icon material-icons md-card_giftcard"></i>
+                        <span class="text">Coupons</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <form class="searchform"></form>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"><i
+                        class="material-icons md-apps"></i></button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"><i class="material-icons md-nights_stay"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Products List</h2>
+                </div>
+                <div>
+                    <a href="/admin/createProducts" class="btn btn-primary btn-sm rounded">Create new</a>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="col-4">Name</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Status</th>
+                                <th scope="col" class="text-center">Quantity</th>
+                                <th scope="col" class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% allProducts.forEach(product=> { %>
+
+                                <tr>
+                                    <td>
+                                        <a class="itemside d-flex align-items-center" href="#">
+                                            <div class="left me-3">
+                                                <img src="<%= product.images[0] %>" class="img-sm img-thumbnail"
+                                                    alt="Item" />
+                                            </div>
+                                            <div class="info">
+                                                <h6 class="mb-0">
+                                                    <%= product.productName%>
+                                                </h6>
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td><span>
+                                            <%= product.category %>
+                                        </span></td>
+                                    <td><span>
+                                            <%= product.price %>
+                                        </span></td>
+                                        <% if(!product.isBlock) {%>
+                                            <td>
+                                                <span class="badge badge-pill badge-soft-success"
+                                                    style="height: 20px; width: 60px;"
+                                                    id="unlist-status-<%= product.id%>">Listed</span>
+                                            </td>
+                                            <% }else{ %>
+
+
+                                                <td>
+                                                    <span class="badge badge-pill badge-soft-danger"
+                                                        style="height: 20px; width: 60px;"
+                                                        id="unlist-status-<%= product.id%>">Unlisted</span>
+                                                </td>
+                                                <% } %>
+                                    <td class="text-center"><span>
+                                            <%= product.stock %>
+                                        </span></td>
+                                    <td class="text-center">
+                                        <% if(!product.isBlock){ %>
+                                            <button class="btn btn-outline-danger btn-sm justify-content-center"
+                                                style="height: 31px; width: 80px;"
+                                                onclick="unlistProduct('<%= product.id%>')"
+                                                id="unlist-button-<%= product.id%>">
+                                                <i class="fas fa-ban"></i> Unlist
+                                            </button>
+
+                                            <% }else{ %>
+                                                <button class="btn btn-brand btn-sm justify-content-center"
+                                                    style="height: 31px; width: 80px;"
+                                                    onclick="unlistProduct('<%= product.id%>')"
+                                                    id="unlist-button-<%= product.id%>">
+                                                    <i class="fas fa-ban"></i> List
+                                                </button>
+                                                <% } %>
+                                                    <a href="/admin/editProduct?id=<%= product.id%>"?><button
+                                                            class="btn btn-brand btn-sm ms-2">
+                                                            <i class="fas fa-edit"></i> Edit info
+                                                        </button></a>
+                                    </td>
+                                </tr>
+
+                                <% }) %>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item">
+                            <a class="page-link" href="#"><i class="material-icons md-chevron_left"></i></a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="#">01</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                        document.write(new Date().getFullYear());
+                    </script>
+                    &copy; Nest - HTML Ecommerce Template.
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">All rights reserved</div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendors/select2.min.js"></script>
+    <script src="assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="assets/js/main.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <!--  unlist product -->
+
+    <script>
+
+        function unlistProduct(productId) {
+
+            // console.log(productId)
+
+            const productData = { productId: productId }
+
+            Swal.fire({
+                icon: "question",
+                title: "<span style='color: black;'>Do you want to save changes?</span>",
+                showCancelButton: true,
+                confirmButtonColor: '#3BB77E',
+                confirmButtonText: 'Yes',
+            }).then(res => {
+
+                if (res.isConfirmed) {
+
+                    fetch('/admin/blockProduct', {
+
+                        method: "post",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+
+                        body: JSON.stringify(productData)
+                    })
+
+                        .then(response => response.json())
+                        .then(data => {
+
+                            if(data.success){
+
+                                Swal.fire({
+                                    title: "<span style='color: #3BB77E;'>Success!</span>",
+                                    html: "<span style='color: black;'>Your changes have been saved successfully.</span>",
+                                    icon: "success",
+                                    confirmButtonColor: "#3BB77E",
+                                    confirmButtonText: "OK"
+                                });
+
+                                let button = document.getElementById(`unlist-button-${productId}`);
+                                let status = document.getElementById(`unlist-status-${productId}`);
+
+                                if (button.classList.contains('btn-outline-danger')) {
+                                    button.classList.remove('btn-outline-danger');
+                                    button.classList.add('btn-brand');
+                                    button.innerHTML = '<i class="fas fa-check"></i> List';
+
+                                    status.classList.remove('badge-soft-success');
+                                    status.classList.add('badge-soft-danger');
+                                    status.innerHTML = 'Unlisted';
+
+                                } else {
+                                    button.classList.remove('btn-brand');
+                                    button.classList.add('btn-outline-danger');
+                                    button.innerHTML = '<i class="fas fa-ban"></i> Unlist';
+
+                                    status.classList.remove('badge-soft-danger');
+                                    status.classList.add('badge-soft-success');
+                                    status.innerHTML = 'Listed';
+
+                                }
+                            }
+                        })
+                }
+            })
+
+
+        }
+    </script>
+</body>
+
+</html>

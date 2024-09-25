@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Hmart - Admin</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="" />
+    <meta property="og:type" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="" />
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Template CSS -->
+    <link href="assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    <script defer src="https://cdn.crop.guide/loader/l.js?c=GVSXPY"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet" />
+
+    <style>
+        .cropper-container {
+            width: 100%;
+            max-height: 400px;
+            /* margin-bottom: 1px; */
+        }
+
+        .modal-content {
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            background-color: #363636;
+        }
+    </style>
+
+</head>
+
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="index.html" class="brand-wrap">
+                <img src="assets/imgs/theme/logo.svg" class="logo" alt="Nest Dashboard" />
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"><i
+                        class="text-muted material-icons md-menu_open"></i></button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/dashboard">
+                        <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/users">
+                        <i class="icon material-icons md-person"></i>
+                        <span class="text">Users</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/orders">
+                        <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/products">
+                        <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/category">
+                        <i class="icon material-icons md-category"></i>
+                        <span class="text">Categories</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/salesReport">
+                        <i class="icon material-icons md-business"></i>
+                        <span class="text">Sales Reports</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/offers">
+                        <i class="icon material-icons md-local_offer"></i>
+                        <span class="text">Offers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/coupons">
+                        <i class="icon material-icons md-card_giftcard"></i>
+                        <span class="text">Coupons</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <form class="searchform">
+                    <!-- <div class="input-group">
+                            <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                            <button class="btn btn-light bg" type="button"> <i
+                                    class="material-icons md-search"></i></button>
+                        </div> -->
+                </form>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i
+                        class="material-icons md-apps"></i> </button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <section class="content-main">
+            <div class="row">
+                <div class="col-6">
+                    <div class="content-header">
+                        <h2 class="content-title">Add New Product</h2>
+                        <div>
+                            <button class="btn btn-md rounded font-sm hover-up" onclick="productDetails()">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>1. General info</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Product title</label>
+                                        <div id="errorMessagesName" class="text-danger"></div>
+                                        <input type="text" id="productTitle" placeholder="Type here"
+                                            class="form-control" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Description</label>
+                                        <div id="errorMessagesDescription" class="text-danger"></div>
+
+                                        <textarea id="productDescription" placeholder="Type here" class="form-control"
+                                            rows="4" required></textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">category</label>
+                                        <!-- You can uncomment and use this select if needed -->
+                                        <select id="category" class="form-select">
+                                            <% allCategories.forEach(category=> { %>
+
+                                                <option>
+                                                    <%= category.categoryName%>
+                                                </option>
+
+                                                <% }); %>
+                                                    <!-- <option></option> -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>2. Pricing</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Cost in INR</label>
+                                        <div id="errorMessagesPrice" class="text-danger"></div>
+
+                                        <input type="text" id="productCost" placeholder="₹00.0" class="form-control"
+                                            required>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>3. Category</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                       
+                                    </div>
+                                </div>
+
+                            </div> -->
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <h6>4. Stock Information</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Quantity</label>
+                                        <div id="errorMessagesStock" class="text-danger"></div>
+
+                                        <input type="number" id="productQuantity" placeholder="Enter quantity"
+                                            class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>5. Media</h6>
+                                </div>
+
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Images</label>
+                                        <div id="errorMessagesImage" class="text-danger"></div>
+                                        <input class="form-control" type="file" id="image1" name="images"
+                                            onchange="triggerCropModal(event, 'preview1')" required>
+                                        <img id="preview1"
+                                            style="width: 100px; height: 100px; margin-top: 10px; display: none;"
+                                            alt="Image Preview" onclick="startCrop('preview1')" src="" />
+                                        <input class="form-control" type="file" id="image2" name="images"
+                                            onchange="triggerCropModal(event, 'preview2')">
+                                        <img id="preview2"
+                                            style="width: 100px; height: 100px; margin-top: 10px; display: none;"
+                                            alt="Image Preview" src="" />
+                                        <input class="form-control" type="file" id="image3" name="images"
+                                            onchange="triggerCropModal(event, 'preview3')">
+                                        <img id="preview3"
+                                            style="width: 100px; height: 100px; margin-top: 10px; display: none;"
+                                            alt="Image Preview" src="" />
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                        document.write(new Date().getFullYear())
+                    </script> &copy; Nest - HTML Ecommerce Template .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Modal for cropping -->
+        <!-- <div id="cropperModal" class="modal">
+            <div class="modal-content">
+                <div class="cropper-container">
+                    <img id="cropperImage" src="" alt="Image for cropping" />
+                </div>
+                <button class="btn-brand btn-sm justify-content-center btn mt-1" onclick="cropImage()">Crop</button>
+                <button class="btn-outline-danger btn-sm justify-content-center btn mt-1"
+                    onclick="closeModal()">Cancel</button>
+            </div>
+        </div> -->
+
+    </main>
+    <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendors/select2.min.js"></script>
+    <script src="assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="assets/js/main.js?v=1.1" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/cropperjs"></script>
+
+</body>
+
+<script>
+
+    function validateProductDetails() {
+        let title = document.getElementById('productTitle').value.trim();
+        let description = document.getElementById('productDescription').value.trim();
+        let cost = document.getElementById('productCost').value.trim();
+        let stock = document.getElementById('productQuantity').value.trim();
+        let image_one = document.getElementById('image1').files[0]
+        let image_two = document.getElementById('image2').files[0]
+        let image_three = document.getElementById('image3').files[0]
+
+        document.getElementById('errorMessagesName').innerHTML = '';
+        document.getElementById('errorMessagesDescription').innerHTML = '';
+        document.getElementById('errorMessagesPrice').innerHTML = '';
+        document.getElementById('errorMessagesStock').innerHTML = '';
+        document.getElementById('errorMessagesImage').innerHTML = '';
+
+
+        const allowedCharacters = /^[a-zA-Z0-9\s]+$/; // Regular expression to allow alphanumeric characters and spaces
+
+        //product name validation
+        if (title === '') {
+            displayErrorName('*Product name is required.')
+            return false;
+        } else if (title.length < 3) {
+            displayErrorName(`*Product name must be at least 3 characters long.`);
+            return false;
+        } else if (title.length > 30) {
+            displayErrorName(`*Product name must be less than 30 characters long.`);
+            return false;
+        } else if (!allowedCharacters.test(title)) {
+            displayErrorName("*Product name can only contain letters, numbers, and spaces.");
+            return false
+        }
+
+        //product description validation
+        if (description === '') {
+            displayErrorDescription('*Product description is required.')
+            return false;
+        }
+
+        //product price validation
+        var minPrice = 0;
+        var maxPrice = 200000;
+
+        if (cost === '') {
+            displayErrorPrice('*Product price is required.')
+            return false;
+        } else if (isNaN(cost) || cost <= 0) {
+            displayErrorPrice('*Product price must be a positive number.')
+            return false;
+        } else if (cost < minPrice) {
+            displayErrorPrice(`*Product price must be at least $${minPrice.toFixed(2)}.`)
+            return false;
+        } else if (cost > maxPrice) {
+            displayErrorPrice(`*Product price must be less than or equal to $${maxPrice.toFixed(2)}.`)
+            return false;
+        }
+
+        //product quantity validation
+        var minQuantity = 0;
+        var maxQuantity = 100
+
+        if (stock == '') {
+            displayErrorStock('*Product quantity is required.')
+            return false
+        } else if (isNaN(stock) || stock < 0) {
+            displayErrorStock('*Product quantity must be a positive integer.');
+            return false;
+        } else if (stock < minQuantity) {
+            displayErrorStock(`*Product quantity must be at least ${minQuantity}.`);
+            return false;
+        } else if (stock > maxQuantity) {
+            displayErrorStock(`*Product quantity must be less than or equal to ${maxQuantity}.`);
+            return false;
+        }
+    }
+
+    function displayErrorName(errorMessage) {
+        const errorDiv = document.getElementById('errorMessagesName');
+        const errorParagraph = document.createElement('p');
+        errorParagraph.textContent = errorMessage;
+        errorDiv.appendChild(errorParagraph);
+    }
+
+    function displayErrorDescription(errorMessage) {
+        const errorDiv = document.getElementById('errorMessagesDescription');
+        const errorParagraph = document.createElement('p');
+        errorParagraph.textContent = errorMessage;
+        errorDiv.appendChild(errorParagraph);
+    }
+
+    function displayErrorPrice(errorMessage) {
+        const errorDiv = document.getElementById('errorMessagesPrice');
+        const errorParagraph = document.createElement('p');
+        errorParagraph.textContent = errorMessage;
+        errorDiv.appendChild(errorParagraph);
+    }
+
+    function displayErrorStock(errorMessage) {
+        const errorDiv = document.getElementById('errorMessagesStock');
+        const errorParagraph = document.createElement('p');
+        errorParagraph.textContent = errorMessage;
+        errorDiv.appendChild(errorParagraph);
+    }
+
+    document.getElementById('productTitle').addEventListener('input', validateProductDetails)
+    document.getElementById('productDescription').addEventListener('input', validateProductDetails)
+    document.getElementById('productCost').addEventListener('input', validateProductDetails)
+    document.getElementById('productQuantity').addEventListener('input', validateProductDetails)
+
+    function productDetails() {
+
+        if (validateProductDetails) {
+
+            let title = document.getElementById("productTitle").value
+            let description = document.getElementById("productDescription").value
+            let category = document.getElementById("category").value
+            let cost = document.getElementById("productCost").value
+            let stock = document.getElementById("productQuantity").value
+            let image1 = document.getElementById('image1').files[0]
+            let image2 = document.getElementById('image2').files[0]
+            let image3 = document.getElementById('image3').files[0]
+
+            let formData = new FormData()
+
+            formData.append('productTitle', title)
+            formData.append('productDescription', description)
+            formData.append('category', category)
+            formData.append('cost', cost)
+            formData.append('stock', stock)
+            formData.append('productImage', image1);
+            formData.append('productImage', image2);
+            formData.append('productImage', image3);
+
+            for (const [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
+            }
+
+
+
+            fetch('/admin/createProducts', {
+
+                method: "POST",
+                body: formData
+            })
+
+                .then(Response => Response.json())
+                .then(data => {
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "<span style='color: black;'>update successfully!</span>",
+                            // showCancelButton: true,
+                            confirmButtonColor: '#3BB77E',
+                            confirmButtonText: 'Ok',
+
+                        }).then(res => {
+
+                            if (res.isConfirmed) {
+
+                                window.location.href = '/admin/products'
+                            }
+                        })
+                    }
+                })
+
+
+
+
+        }
+
+
+    }
+
+
+</script>
+
+</html>

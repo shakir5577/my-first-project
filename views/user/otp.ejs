@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Validation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .otp-container {
+            display: flex;
+            width: 800px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px #000;
+        }
+
+        .otp-image {
+            flex: 1;
+            background-image: url('images/item-13.jpg');
+            /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .otp-form {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-group input {
+            width: 45px;
+            height: 45px;
+            font-size: 24px;
+            text-align: center;
+            border-radius: 5px;
+        }
+
+        .btn-validate {
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .resend-otp {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .resend-otp a {
+            color: #007bff;
+        }
+
+        .resend-otp a.disabled {
+            pointer-events: none;
+            color: gray;
+        }
+
+        #countdown {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="otp-container">
+        <div class="otp-image"></div>
+        <div class="otp-form">
+            <h3 class="text-center">OTP Validation</h3>
+            <form id="otpForm" onsubmit="handleOtpSubmit(event)">
+                <div class="form-group">
+                    <input type="text" maxlength="1" class="form-control otp-input" name="otp1" required>
+                    <input type="text" maxlength="1" class="form-control otp-input" name="otp2" required>
+                    <input type="text" maxlength="1" class="form-control otp-input" name="otp3" required>
+                    <input type="text" maxlength="1" class="form-control otp-input" name="otp4" required>
+                    <input type="text" maxlength="1" class="form-control otp-input" name="otp5" required>
+                    <input type="text" maxlength="1" class="form-control otp-input" name="otp6" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-validate">Validate OTP</button>
+            </form>
+            <div class="resend-otp">
+                <a href="#" id="resendOtpLink" class="disabled" onclick="resendOtp()">Resend OTP</a>
+            </div>
+            <div id="countdown">Resend OTP in <span id="timer">60</span> seconds</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+        // Function to handle auto-jumping between input boxes
+        document.querySelectorAll('.otp-input').forEach((input, index, inputs) => {
+            input.addEventListener('input', function () {
+                if (this.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Backspace' && index > 0 && this.value.length === 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        function handleOtpSubmit(event) {
+            event.preventDefault();
+
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const otp = Array.from(otpInputs).map(input => input.value.trim()).join('');
+
+            if (otp.length === otpInputs.length) {
+                axios.post('/verifyotp', { otp: otp })
+                    .then(res => {
+                        if (res.data.next) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Your registration is complete.",
+                                text: "now, you can login!",
+                                confirmButtonColor: '#0056b3',
+                                confirmButtonText: "login",
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '/login'
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "It seems like the OTP you entered is incorrect. Please double-check and try again.",
+                                showCancelButton: true,
+                                showConfirmButton: false,
+                                cancelButtonText: "OK",
+                            }).then((result) => {
+                                if (result.dismiss === Swal.DismissReason.cancel) {
+                                    otpInputs.forEach(input => input.value = '');
+                                    otpInputs[0].focus();
+                                }
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+            }
+        }
+
+        // Timer logic
+        let timerDuration = 60;
+        const timerElement = document.getElementById('timer');
+        const resendOtpLink = document.getElementById('resendOtpLink');
+
+        function startTimer() {
+            let timeLeft = timerDuration;
+            resendOtpLink.classList.add('disabled'); // Disable resend link
+
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    timerElement.textContent = "0";
+                    resendOtpLink.classList.remove('disabled'); // Enable resend link
+                }
+            }, 1000);
+        }
+
+        function resendOtp() {
+            if (!resendOtpLink.classList.contains('disabled')) {
+                alert('OTP has been resent!');
+                startTimer(); // Restart the timer
+            }
+        }
+
+        // Start the timer on page load
+        startTimer();
+    </script>
+
+    <script>
+       function resendOtp() {
+    if (!resendOtpLink.classList.contains('disabled')) {
+        // Send the resend OTP request to the server
+        axios.get('/resendOtp')
+            .then(response => {
+                if (response.data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "OTP Resent",
+                        text: "A new OTP has been sent to your email.",
+                        confirmButtonColor: '#0056b3',
+                        confirmButtonText: "OK",
+                    }).then(() => {
+                        startTimer(); // Restart the timer after resending OTP
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "There was an issue resending the OTP. Please try again.",
+                        confirmButtonColor: '#d33',
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error resending OTP:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Something went wrong. Please try again.",
+                    confirmButtonColor: '#d33',
+                });
+            });
+    }
+}
+
+    </script>
+</body>
+
+</html>

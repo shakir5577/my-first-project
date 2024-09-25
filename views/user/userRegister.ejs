@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Footwear</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-container {
+            display: flex;
+            width: 800px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px #000;
+        }
+
+        .register-image {
+            flex: 1;
+            background-image: url('images/item-11.jpg');
+            background-size: cover;
+            background-position: center;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .register-form {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-group input {
+            border-radius: 5px;
+        }
+
+        .btn-register {
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+
+        /* Password visibility toggle icon */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 40px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 68%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #007bff;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="register-container">
+        <div class="register-image"></div>
+        <div class="register-form">
+            <h3 class="text-center">Register for Footwear</h3>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">Name</label>
+                    <div id="nameError" class="text-danger"></div>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <div id="mailError" class="text-danger"></div>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile Phone</label>
+                    <div id="numberError" class="text-danger"></div>
+                    <input type="tel" class="form-control" id="mobile" name="mobile" maxlength="10" pattern="[0-9]*" required>
+                </div>
+                <div class="form-group password-wrapper">
+                    <label for="password">Password</label>
+                    <div id="passwordError" class="text-danger"></div>
+                    <input type="password" class="form-control" id="password" name="password" minlength="6" required>
+                    <span class="toggle-password" onclick="togglePassword()">
+                        <i class="fa fa-eye" id="eyeIcon"></i>
+                    </span>
+                </div>
+                <button class="btn btn-primary btn-block btn-register">Register</button>
+            </form>
+            <div class="text-center mt-3">
+                <p>Already have an account? <a href="login">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- JavaScript to handle form submission and password visibility toggle -->
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        function formValidation() {
+            // Clear previous error messages
+            document.getElementById('nameError').innerText = "";
+            document.getElementById('mailError').innerText = "";
+            document.getElementById('numberError').innerText = "";
+            document.getElementById('passwordError').innerText = "";
+
+            // Get form values
+            const name = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const mobile = document.getElementById('mobile').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            let isValid = true;
+
+            // Username validation
+            if (!name) {
+                document.getElementById('nameError').innerText = "Username is required";
+                isValid = false;
+            } else if (name.length < 3) {
+                document.getElementById('nameError').innerText = "Username must be at least 3 characters long";
+                isValid = false;
+            }
+
+            // Email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                document.getElementById('mailError').innerText = "Email is required";
+                isValid = false;
+            } else if (!emailPattern.test(email)) {
+                document.getElementById('mailError').innerText = "Please enter a valid email address";
+                isValid = false;
+            }
+
+            // Mobile phone validation
+            const mobilePattern = /^[0-9]{10}$/;
+            if (!mobile) {
+                document.getElementById('numberError').innerText = "Mobile phone is required";
+                isValid = false;
+            } else if (!mobilePattern.test(mobile)) {
+                document.getElementById('numberError').innerText = "Please enter a valid 10-digit mobile number";
+                isValid = false;
+            }
+
+            // Password validation
+            if (!password) {
+                document.getElementById('passwordError').innerText = "Password is required";
+                isValid = false;
+            } else if (password.length < 6) {
+                document.getElementById('passwordError').innerText = "Password must be at least 6 characters long";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        document.getElementById('registerForm').addEventListener('input', formValidation);
+
+        document.getElementById('registerForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            if (!formValidation()) {
+                return; // Stop submission if form is not valid
+            }
+
+            const formData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                mobile: document.getElementById('mobile').value,
+                password: document.getElementById('password').value,
+            };
+
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    if (data.error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: data.error,
+                            confirmButtonText: "Ok",
+                        });
+                    }
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            showCancelButton: true,
+                            confirmButtonText: "Verify OTP",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/otp';
+                            } else if (result.isDenied) {
+                                Swal.fire("Changes are not saved", "", "info");
+                            }
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>
