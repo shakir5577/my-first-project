@@ -241,7 +241,7 @@
                                 </li>
                                 <li><a href="about.html">About</a></li>
                                 <li class="active"><a href="contact.html">my account</a></li>
-                                <li class="cart"><a href="cart.html"><i class="icon-shopping-cart"></i> Cart [0]</a>
+                                <li class="cart"><a href="cart"><i class="icon-shopping-cart"></i> Cart [0]</a>
                                 </li>
                             </ul>
                         </div>
@@ -297,7 +297,7 @@
                                 <li><a href="/accountDetails">account details</a></li>
                                 <li><a href="logout.html">coupons</a></li>
                                 <li><a href="logout.html">wallet</a></li>
-                                <li><a href="logout.html">Logout</a></li>
+                                <li><a href="#" id="logout-btn">Logout</a></li>
                                 <!-- <li><a href="logout.html">Logout</a></li> -->
                             </ul>
                         </div>
@@ -637,6 +637,29 @@
         }
 
 
+    </script>
+
+    <!-- logout -->
+
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default action
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user confirms, redirect to logout route
+                    window.location.href = '/logout';
+                }
+            });
+        });
     </script>
 
 

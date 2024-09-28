@@ -236,8 +236,8 @@
 									<a href="/shop">shop</a>
 								</li>
 								<li><a href="about.html">About</a></li>
-								<li class="active"><a href="contact.html">my account</a></li>
-								<li class="cart"><a href="cart.html"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+								<li class="active"><a href="myAccount">my account</a></li>
+								<li class="cart"><a href="cart"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
 							</ul>
 						</div>
 					</div>
@@ -271,7 +271,7 @@
 			<div class="container">
 				<div class="row">
 					<div class="col">
-						<p class="bread"><span><a href="index.html">Home</a></span> / <span>Contact</span></p>
+						<p class="bread"><span><a href="myAccount">my account</a></span> / <span>orders</span></p>
 					</div>
 				</div>
 			</div>
@@ -292,7 +292,7 @@
                                 <li><a href="logout.html">account details</a></li>
                                 <li><a href="logout.html">coupons</a></li>
                                 <li><a href="logout.html">wallet</a></li>
-                                <li><a href="logout.html">Logout</a></li>
+                                <li><a href="#" id="logout-btn">Logout</a></li>
                                 <!-- <li><a href="logout.html">Logout</a></li> -->
                             </ul>
                         </div>
@@ -441,6 +441,32 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	<script src="js/google_map.js"></script>
 	<!-- Main -->
 	<script src="js/main.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- jQuery -->
+
+    <!-- logout -->
+
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default action
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user confirms, redirect to logout route
+                    window.location.href = '/logout';
+                }
+            });
+        });
+    </script>
 
 	</body>
 
