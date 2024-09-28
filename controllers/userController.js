@@ -6,6 +6,7 @@ const nodemailer = require("nodemailer")
 const otpModel = require("../models/otpModel")
 const productModel = require('../models/productModel')
 const cartModel = require('../models/cartModel')
+const addressModel = require("../models/addressModel")
 
 require('dotenv').config();
 
@@ -14,9 +15,7 @@ const loadHome = async (req, res) => {
 
     const allProducts = await productModel.find({ isBlock: false })
 
-
-
-    res.render('user/home', { products: allProducts })
+    res.render('user/home', { products: allProducts, user: req.session.userId ?? null })
 }
 
 
@@ -147,7 +146,7 @@ const userVerifyOtp = async (req, res, next) => {
 
                 // req.session.userId = saving.id;
                 console.log("user saved successfully...");
-                res.send({ next:1 })
+                res.send({ next: 1 })
             }
 
         } else {
@@ -161,15 +160,15 @@ const userVerifyOtp = async (req, res, next) => {
     }
 }
 
-const resendOtp = async (req,res) => {
+const resendOtp = async (req, res) => {
 
-    try{
+    try {
 
         // console.log(req.session.user)
         const user = req.session.user
 
-         // Generate a new OTP
-         function generateOTP() {
+        // Generate a new OTP
+        function generateOTP() {
             return Math.floor(100000 + Math.random() * 900000);
         }
         const newOtp = await generateOTP();
@@ -212,7 +211,7 @@ const resendOtp = async (req,res) => {
 
         return res.json({ success: true, message: "OTP resent successfully!" });
 
-    }catch(error){
+    } catch (error) {
         console.error("Error in resending OTP:", error.message);
         res.status(500).json({ error: "Something went wrong" });
     }
@@ -269,7 +268,7 @@ const verifyLogin = async (req, res) => {
         }
         if (checkEmail.isBlock == true) {
 
-            return console.log("user blocked")
+            return res.send({ success: false , message: 'Your account has been blocked.'})
 
         }
 
@@ -317,7 +316,14 @@ const loadCart = async (req, res) => {
             return res.render('user/cart', { cart: null, message: 'Your cart is empty' })
         }
 
+        const totalCartPrice = cart.items.reduce((acc, item) => {
+            return acc + (item.price * item.quantity);
+        }, 0);
+
+        cart.totalprice = totalCartPrice
+
         res.render('user/cart', { cart: cart })
+
 
     } catch (error) {
         console.log(error)
@@ -453,48 +459,81 @@ const decrementQuantity = async (req, res) => {
 
 const incrementQuantity = async (req, res) => {
     try {
-        const { productId, quantity } = req.body;  
-        const { userId } = req.session;  
+        const { productId, quantity } = req.body;
+        const { userId } = req.session;
 
         const cart = await cartModel.findOne({ userId: userId });
+        const product = await productModel.findById(productId);  // Fetch product details for stock checking
 
         let updatedQuantity;
         let itemTotalPrice;
-        cart.items.forEach(val => {
-            if (val.productId.toString() === productId) {
-           
-                val.quantity = parseInt(quantity) + 1 ;
-                updatedQuantity = val.quantity;
-                itemTotalPrice = val.price * updatedQuantity;
+
+        cart.items.forEach(item => {
+            if (item.productId.toString() === productId) {
+                // Increment quantity only if it is less than available stock
+                if (item.quantity < product.stock) {
+                    item.quantity = parseInt(quantity) + 1;
+                }
+                updatedQuantity = item.quantity;
+                itemTotalPrice = item.price * updatedQuantity;
             }
         });
+
         const totalCartPrice = cart.items.reduce((acc, item) => {
             return acc + (item.price * item.quantity);
         }, 0);
-        cart.totalprice = totalCartPrice;   
-        await cart.save();  
+
+        cart.totalprice = totalCartPrice;
+        await cart.save();
+
         res.send({
             success: true,
             updatedQuantity: updatedQuantity,
-            itemTotalPrice: itemTotalPrice.toFixed(2), 
-            totalCartPrice: totalCartPrice.toFixed(2)  
+            itemTotalPrice: itemTotalPrice.toFixed(2),
+            totalCartPrice: totalCartPrice.toFixed(2)
         });
-
     } catch (error) {
         console.error(error);
         res.status(500).send({ success: false, message: 'Error updating quantity' });
     }
 };
 
-const showCheckOut = async (req,res) =>{
 
-    try{
+const showCheckOut = async (req, res) => {
 
-        res.render('user/checkOut')
+    try {
 
-    }catch(error){
-        console.log(error);
+        // console.log(req.session)
+
+        const {userId} = req.session
+        if(!userId){
+            return console.log("user is not found in checkout")
+        }
+        const findAddress = await addressModel.findOne({userId:userId})
+
+        const findUsercart = await cartModel.findOne({ userId : userId}).populate('items.productId')
+        // console.log(findUsercart.items[0])
+
+        // console.log(findAddress)
         
+        let address
+
+        if (!findAddress) {
+            address = []
+        } else {
+            address = findAddress.address
+        }
+
+        const totalCartPrice = findUsercart.items.reduce((acc, item) => {
+            return acc + (item.price * item.quantity);
+        }, 0);
+
+
+        res.render('user/checkOut',{address:address, userCartItems: findUsercart.items,totalCartPrice:totalCartPrice})
+
+    } catch (error) {
+        console.log(error);
+
     }
 }
 

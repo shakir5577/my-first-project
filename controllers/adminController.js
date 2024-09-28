@@ -3,6 +3,7 @@
 const userModel = require('../models/userModel')
 const categoryModel = require('../models/categoryModel')
 const productModel = require('../models/productModel')
+const orderModel = require('../models/orderModel')
 const bcrypt = require("bcrypt")
 
 
@@ -58,7 +59,36 @@ const showEditproduct = async (req, res) => {
 
 const showOrders = async(req,res) => {
 
-    res.render('admin/orders')
+    try{
+
+        const orders = await orderModel.find()
+        res.render('admin/orders',{orders: orders})
+    }catch(error){
+        console.log(error)
+    }
+
+}
+
+const orderDetails = async (req,res) => {
+
+    try{
+
+        console.log(req.query)
+
+        const { orderId } = req.query
+
+        if (!orderId) {
+            return console.log("can't get order id at load order details")
+        }
+
+        const findOrder = await orderModel.findOne({ _id: orderId }).populate('user').populate('products.product')
+
+        res.render('admin/orderDetails', {orderDetails: findOrder})
+
+
+    }catch(error){
+        console.log(error)
+    }
 }
 
 
@@ -281,6 +311,31 @@ const updateProduct = async (req, res) => {
     }
 }
 
+const changeStatus = async (req, res) => {
+
+    try{
+        const { productId, newStatus, orderId } = req.body
+
+        const findOrder = await orderModel.findById(orderId)
+
+        // findOrder.products.forEach(val => console.log(val.product.toString()))
+
+        const find = findOrder.products.find(val => val.product.toString() == productId)
+
+        find.productStatus = newStatus
+
+        const allCancelled = findOrder.products.every(p => p.productStatus === newStatus);
+
+        if (allCancelled) {
+            findOrder.orderStatus = newStatus;
+        }
+
+        await findOrder.save()
+
+    }catch(error){
+        console.log(error)
+    }
+}
 
 
 
@@ -302,5 +357,7 @@ module.exports = {
     blockProduct,
     showEditproduct,
     updateProduct,
-    showOrders
+    showOrders,
+    orderDetails,
+    changeStatus
 }

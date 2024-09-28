@@ -308,26 +308,23 @@
                                         <tr>
                                             <th>Order ID</th>
                                             <th>Date</th>
-                                            <th>Status</th>
+                                            <th>Total Products</th>
                                             <th>Total</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <% if(typeof orders !='undefined' ) {%>
+                                            <% orders.forEach((val, ind)=> { %>
                                         <tr>
-                                            <td>#12345</td>
-                                            <td>September 1, 2024</td>
-                                            <td>Completed</td>
-                                            <td>$250.00</td>
-                                            <td><a href="#" class="btn btn-primary">View</a></td>
+                                            <td><%= ind + 1 %></td>
+                                            <td><%= val.date.toLocaleDateString() %></td>
+                                            <td class="text-center"><%= val.products.length %></td>
+                                            <td>$<%= val.totalAmount %></td>
+                                            <td><a href="/orderDetailes?id=<%= val.id %>" class="btn btn-primary">View</a></td>
                                         </tr>
-                                        <tr>
-                                            <td>#12346</td>
-                                            <td>August 10, 2024</td>
-                                            <td>Processing</td>
-                                            <td>$150.00</td>
-                                            <td><a href="#" class="btn btn-primary">View</a></td>
-                                        </tr>
+                                        <% }) %>
+                                        <% } %>
                                     </tbody>
                                 </table>
                             </div>

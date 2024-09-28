@@ -1,5 +1,6 @@
 const userModel = require('../models/userModel')
 const addressModel = require('../models/addressModel')
+const orderModel = require('../models/orderModel')
 const bcrypt = require("bcrypt")
 
 
@@ -21,8 +22,73 @@ const showOrders = async (req, res) => {
 
     try {
 
-        res.render('user/myaccountOrders')
+        const {userId} = req.session
+        const findOrder = await orderModel.find({user: userId})
+        // console.log(findOrder)
 
+        res.render('user/myaccountOrders',{orders:findOrder})
+
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+}
+
+const orderDetailes = async (req,res) => {
+
+    try{
+
+        console.log(req.query)
+        const { id } = req.query
+
+        const findOrder = await orderModel.findById(id).populate('products.product')
+
+        res.render('user/orderDetailes',{order:findOrder})
+
+    }catch(error){
+        console.log(error)
+    }
+}
+
+
+const cancelOrder = async (req, res) => {
+
+    try {
+
+        const { orderId, productId } = req.body
+
+        const { userId } = req.session
+
+        if (!orderId || !productId) {
+            return console.log("can't get order id and product id at cancel single product")
+        }
+
+        const findOrder = await orderModel.findById(orderId )
+
+        if (!findOrder) {
+            return console.log("can't find order at cancel single products")
+        }
+
+        const product = findOrder.products.find(val => val.product == productId)
+
+        if (!product) {
+            return console.log("can't find product at cancel single products")
+        }
+
+        product.productStatus = 'Cancelled'
+
+        const allCancelled = findOrder.products.every(p => p.productStatus === 'Cancelled');
+        if (allCancelled) {
+            findOrder.orderStatus = 'Cancelled';
+        }
+
+        const saveCancel = await findOrder.save()
+
+    if(saveCancel){
+        res.send({success: true})
+    }
 
     } catch (error) {
 
@@ -262,6 +328,17 @@ const changePassword = async (req,res) => {
     }
 }
 
+const logout = async (req,res,next) => {
+
+    try{
+
+        const des = req.session.destroy();
+        res.redirect('/login')
+    }catch(error){
+        next(error)
+    }
+}
+
 
 module.exports = {
     showMyaccount,
@@ -272,5 +349,8 @@ module.exports = {
     deleteAddress,
     showAccountDetails,
     editAccount,
-    changePassword
+    changePassword,
+    logout,
+    orderDetailes,
+    cancelOrder
 }

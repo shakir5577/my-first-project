@@ -59,6 +59,7 @@ app.use(express.static('public/admin'));
 app.use('/admin',express.static('public/admin'))
 app.use('/public', express.static('public/admin'));
 app.use('/public', express.static('public'))
+// app.use('/', express.static('public'))
 
 
 //---------------------------------------------

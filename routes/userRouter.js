@@ -6,6 +6,7 @@ const passport = require('passport')
 const userController = require('../controllers/userController')
 const accountController = require('../controllers/accountController')
 const passportController = require('../controllers/passportControlller')
+const orderController = require('../controllers/orderController')
 const session = require('../middlewares/sessionCheck')
 
 
@@ -26,10 +27,11 @@ router.post('/addToCartSinglePro',userController.addToCartSinglePro)
 router.post('/removeFromCart',userController.removeFromCart)
 router.post('/decrementQuantity',userController.decrementQuantity)
 router.post('/incrementQuantity',userController.incrementQuantity)
-router.get('/checkOut',userController.showCheckOut)    
+router.get('/checkOut',session.isLogin,userController.showCheckOut)    
 
 router.get('/myAccount',session.isLogin,accountController.showMyaccount)
 router.get('/orders',session.isLogin,accountController.showOrders)
+router.get('/orderDetailes',accountController.orderDetailes)
 router.get('/address',session.isLogin,accountController.showAddress)
 router.post('/addAddress',accountController.createAddress)
 router.post('/editAddress',accountController.editAddress)
@@ -37,6 +39,12 @@ router.post('/deleteAddress',accountController.deleteAddress)
 router.get('/accountDetails',session.isLogin,accountController.showAccountDetails)
 router.post('/editAccount',accountController.editAccount)
 router.post('/changePassword',accountController.changePassword)
+router.get('/logout',session.isLogin,accountController.logout)
+
+router.post('/placeOrder',orderController.placeOrder)
+router.get('/orderComplete',orderController.orderComplete)
+router.post('/cancelOrder',accountController.cancelOrder)
+
 
 router.get('/success', passportController.successGoogleLogin); 
 router.get('/failure', passportController.failureGoogleLogin);

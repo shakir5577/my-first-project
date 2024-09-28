@@ -1,7 +1,17 @@
+const userModel = require('../models/userModel')
+
 const isLogin = async (req, res, next) => {
     try{
         if(req.session.userId){
-            next()
+
+            const findUser = await userModel.findById(req.session.userId)
+
+            if(findUser.isBlock){
+               res.render('user/userLogin',{messsage: "Your account has been blocked."})
+            }else{
+
+                next()
+            }
         }else{
             res.redirect('/login')
         }

@@ -42,6 +42,8 @@ router.post('/blockProduct', adminController.blockProduct)
 router.get('/editProduct', adminController.showEditproduct)
 router.post('/updateProduct', upload.fields([{ name: 'image1' }, { name: 'image2' }, { name: 'image3' }]), adminController.updateProduct)
 router.get('/orders',adminController.showOrders)
+router.get('/orderDetails',adminController.orderDetails)
+router.post('/changeStatus',adminController.changeStatus)
 
 
 

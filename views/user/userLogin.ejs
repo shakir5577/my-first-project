@@ -103,6 +103,11 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label for="email">Email address</label>
+
+                    <% if(typeof messsage != 'undefined'){ %>
+                    <div id="mailError" class="text-danger"><%= messsage%></div>
+                    <% } %>
+
                     <div id="mailError" class="text-danger"></div>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
@@ -214,6 +219,7 @@
                         Swal.fire({
                             icon: "error",
                             title: data.error,
+                            
                             confirmButtonText: "Ok",
                         });
                     } else if (data.success) {
@@ -223,6 +229,14 @@
                             confirmButtonText: "Ok",
                         }).then(() => {
                             window.location.href = '/home';
+                        });
+                    }else if(!data.success){
+                        Swal.fire({
+                            icon: "error",
+                            title: data.message,
+                            confirmButtonText: "Ok",
+                        }).then(() => {
+                            window.location.href = '/login';
                         });
                     }
                 })

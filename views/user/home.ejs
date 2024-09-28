@@ -85,12 +85,13 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="/myAccount">my account</a>
                                 </li>
-                                
                                 <!-- Login Icon -->
                                 <li class="nav-item ml-auto">
+									<% if(!user) {%>
                                     <a class="nav-link" href="login">
                                         <i class="icon-user"></i> Login
                                     </a>
+									<% } %>
                                 </li>
                                 <!-- Cart Icon -->
                                 <li class="nav-item">

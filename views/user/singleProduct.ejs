@@ -233,12 +233,21 @@
 							</span>
 						</div>
 						<div class="row">
-							<div class="col-sm-12 text-center">
-								<p class="addtocart" onclick="addtoCartFromSinglePro(event,'<%= product.id %>')"><a href
-										class="btn btn-primary btn-addtocart"><i class="icon-shopping-cart"></i> Add to
+							<% if(product.stock > 0){ %>
+								<div class="col-sm-12 text-center">
+									<p class="addtocart" onclick="addtoCartFromSinglePro(event,'<%= product.id %>')"><a href
+										class="btn btn-primary btn-addtocart"> Add to
 										Cart</a>
-								</p>
-							</div>
+									</p>
+								</div>
+								<% }else{ %>
+									<div class="col-sm-12 text-center">
+										<p class="addtocart" onclick="outofStock(event)"><a href
+											class="btn btn-danger btn-addtocart"> out of stock
+											</a>
+										</p>
+									</div>
+								<% } %>
 						</div>
 					</div>
 				</div>
@@ -617,6 +626,10 @@
 	</script>
 
 	<script>
+		function outofStock (event){
+			event?.preventDefault()
+		}
+
 		function addtoCartFromSinglePro(event, productId) {
 			event?.preventDefault()
 
