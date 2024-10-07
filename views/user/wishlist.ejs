@@ -1,0 +1,561 @@
+<!DOCTYPE HTML>
+<html>
+
+<!-- Mirrored from themewagon.github.io/footwear/add-to-wishlist.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Aug 2024 04:17:41 GMT -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+
+<head>
+	<title>ShoeVault</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
+
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css/icomoon.css">
+	<!-- Ion Icon Fonts-->
+	<link rel="stylesheet" href="css/ionicons.min.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/magnific-popup.css">
+
+	<!-- Flexslider  -->
+	<link rel="stylesheet" href="css/flexslider.css">
+
+	<!-- Owl Carousel -->
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+
+	<!-- Date Picker -->
+	<link rel="stylesheet" href="css/bootstrap-datepicker.css">
+	<!-- Flaticons  -->
+	<link rel="stylesheet" href="fonts/flaticon/font/flaticon.css">
+
+	<!-- Theme style  -->
+	<link rel="stylesheet" href="css/style.css">
+
+	<style>
+		.empty-cart-container {
+			display: flex;
+			justify-content: center;
+			/* Centers horizontally */
+			align-items: center;
+			/* Centers vertically */
+			height: 20vh;
+			/* Full viewport height */
+			text-align: center;
+			/* Centers text inside the h1 */
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<div class="colorlib-loader"></div>
+
+	<div id="page">
+		<nav class="colorlib-nav" role="navigation">
+			<div class="top-menu">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-7 col-md-9">
+							<div id="colorlib-logo"><a href="">ShoeVault</a></div>
+						</div>
+						<div class="col-sm-5 col-md-3">
+							<form action="#" class="search-wrap">
+								<div class="form-group">
+									<input type="search" class="form-control search" placeholder="Search">
+									<button class="btn btn-primary submit-search text-center" type="submit"><i
+											class="icon-search"></i></button>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12 text-left menu-1">
+							<ul>
+								<li><a href="/">Home</a></li>
+								<li class="has-dropdown ">
+									<a href="shop">shop</a>
+								</li>
+								<li><a href="about">About</a></li>
+								<li><a href="myAccount">my account</a></li>
+								<li class="cart active"><a href="wishlist"><i class="icon-heart"></i></a>
+								<li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="sale">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-8 offset-sm-2 text-center">
+							<div class="row">
+								<div class="owl-carousel2">
+									<div class="item">
+										<div class="col">
+											<h3><a href="#">25% off (Almost) Everything! Use Code: Summer Sale</a></h3>
+										</div>
+									</div>
+									<div class="item">
+										<div class="col">
+											<h3><a href="#">Our biggest sale yet 50% off all summer shoes</a></h3>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<div class="breadcrumbs">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="bread"><span><a href=""></a></span><span>My Wishlist</span></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="colorlib-product">
+			<div class="container">
+				<!-- <div class="row row-pb-lg">
+					<div class="col-md-10 offset-md-1">
+						<div class="process-wrap">
+							<div class="process text-center active">
+								<p><span>01</span></p>
+								<h3>Shopping Cart</h3>
+							</div>
+							<div class="process text-center">
+								<p><span>02</span></p>
+								<h3>Checkout</h3>
+							</div>
+							<div class="process text-center">
+								<p><span>03</span></p>
+								<h3>Order Complete</h3>
+							</div>
+						</div>
+					</div>
+				</div> -->
+				<div class="row row-pb-lg">
+					<div class="col-md-12">
+						<% if (wishlist && wishlist.items && wishlist.items.length> 0) { %>
+							<div class="product-name d-flex">
+
+								<div class="one-forth text-left px-4">
+									<span>Product Details</span>
+								</div>
+								<div class="one-eight text-center">
+									<span></span>
+								</div>
+								<div class="one-eight text-center">
+									<span>Price</span>
+								</div>
+								<div class="one-eight text-center">
+									<span>Add to Cart</span>
+								</div>
+								<div class="one-eight text-center px-4">
+									<span>Remove</span>
+								</div>
+							</div>
+
+							<% wishlist.items.forEach(item=> { %>
+								<div class="product-cart d-flex">
+
+
+									<div class="one-forth">
+										<div class="product-img"
+											style="background-image: url('<%=item.productId.images[0] %>');"></div>
+										<div class="display-tc">
+											<h3>
+												<%= item.productId.productName %>
+											</h3>
+										</div>
+									</div>
+									<div class="one-eight text-center">
+										<div class="display-tc">
+											<span class="price"></span>
+										</div>
+									</div>
+									<div class="one-eight text-center">
+										<div class="display-tc">
+											<span class="price">
+												<%= item.productId.price %>
+											</span>
+										</div>
+									</div>
+									<% if(item.productId.stock> 0){ %>
+										<div class="one-eight text-center">
+											<div class="display-tc">
+												<button class="btn btn-primary"
+													onclick="addToCart(event, '<%= item.productId.id %>')">Add
+													toCart</button>
+											</div>
+										</div>
+										<% }else{ %>
+											<div class="col-sm-12 text-center">
+												<p class="addtocart" onclick="outofStock(event)"><a href
+														class="btn btn-danger btn-addtocart"> out of stock
+													</a>
+												</p>
+											</div>
+											<% } %>
+												<div class="one-eight text-center">
+													<div class="display-tc">
+														<a href="#" class="closed"
+															onclick="removeFromWishlist(event,'<%= item.productId.id %>')"></a>
+													</div>
+												</div>
+								</div>
+								<% }) %>
+
+									<% } else { %>
+										<div class="empty-cart-container">
+											<h1>Your wishlist is empty.</h1>
+										</div>
+										<div class="row">
+											<div class="col-lg-4">
+											</div>
+											<div class="col-lg-4">
+												<div class="grand-total"></div>
+												<div class="checkout-btn ">
+													<a href="/shop"
+														class="btn btn-outline-secondary btn-block ">continue
+														shoping
+													</a>
+												</div>
+											</div>
+											</div>
+											<div class="col-lg-4">
+											</div>
+										<% } %>
+					</div>
+				</div>
+				<!-- <div class="row">
+					<div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
+						<h2>Shop more</h2>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-3 col-lg-3 mb-4 text-center">
+						<div class="product-entry border">
+							<a href="#" class="prod-img">
+								<img src="images/item-1.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+							</a>
+							<div class="desc">
+								<h2><a href="#">Women's Boots Shoes Maca</a></h2>
+								<span class="price">$139.00</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 col-lg-3 mb-4 text-center">
+						<div class="product-entry border">
+							<a href="#" class="prod-img">
+								<img src="images/item-2.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+							</a>
+							<div class="desc">
+								<h2><a href="#">Women's Minam Meaghan</a></h2>
+								<span class="price">$139.00</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 col-lg-3 mb-4 text-center">
+						<div class="product-entry border">
+							<a href="#" class="prod-img">
+								<img src="images/item-3.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+							</a>
+							<div class="desc">
+								<h2><a href="#">Men's Taja Commissioner</a></h2>
+								<span class="price">$139.00</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 col-lg-3 mb-4 text-center">
+						<div class="product-entry border">
+							<a href="#" class="prod-img">
+								<img src="images/item-4.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+							</a>
+							<div class="desc">
+								<h2><a href="#">Russ Men's Sneakers</a></h2>
+								<span class="price">$139.00</span>
+							</div>
+						</div>
+					</div>
+				</div> -->
+			</div>
+		</div>
+
+		<footer id="colorlib-footer" role="contentinfo">
+			<div class="container">
+				<div class="row row-pb-md">
+					<div class="col footer-col colorlib-widget">
+						<h4>About Footwear</h4>
+						<p>Even the all-powerful Pointing has no control about the blind texts it is an almost
+							unorthographic life</p>
+						<p>
+						<ul class="colorlib-social-icons">
+							<li><a href="#"><i class="icon-twitter"></i></a></li>
+							<li><a href="#"><i class="icon-facebook"></i></a></li>
+							<li><a href="#"><i class="icon-linkedin"></i></a></li>
+							<li><a href="#"><i class="icon-dribbble"></i></a></li>
+						</ul>
+						</p>
+					</div>
+					<div class="col footer-col colorlib-widget">
+						<h4>Customer Care</h4>
+						<p>
+						<ul class="colorlib-footer-links">
+							<li><a href="#">Contact</a></li>
+							<li><a href="#">Returns/Exchange</a></li>
+							<li><a href="#">Gift Voucher</a></li>
+							<li><a href="#">Wishlist</a></li>
+							<li><a href="#">Special</a></li>
+							<li><a href="#">Customer Services</a></li>
+							<li><a href="#">Site maps</a></li>
+						</ul>
+						</p>
+					</div>
+					<div class="col footer-col colorlib-widget">
+						<h4>Information</h4>
+						<p>
+						<ul class="colorlib-footer-links">
+							<li><a href="#">About us</a></li>
+							<li><a href="#">Delivery Information</a></li>
+							<li><a href="#">Privacy Policy</a></li>
+							<li><a href="#">Support</a></li>
+							<li><a href="#">Order Tracking</a></li>
+						</ul>
+						</p>
+					</div>
+
+					<div class="col footer-col">
+						<h4>News</h4>
+						<ul class="colorlib-footer-links">
+							<li><a href="blog.html">Blog</a></li>
+							<li><a href="#">Press</a></li>
+							<li><a href="#">Exhibitions</a></li>
+						</ul>
+					</div>
+
+					<div class="col footer-col">
+						<h4>Contact Information</h4>
+						<ul class="colorlib-footer-links">
+							<li>291 South 21th Street, <br> Suite 721 New York NY 10016</li>
+							<li><a href="tel://1234567920">+ 1235 2355 98</a></li>
+							<li><a href="mailto:info@yoursite.com">info@yoursite.com</a></li>
+							<li><a href="#">yoursite.com</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="copy">
+				<div class="row">
+					<div class="col-sm-12 text-center">
+						<p>
+							<span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+								Copyright &copy;
+								<script>document.write(new Date().getFullYear());</script> All rights reserved | This
+								template is made with <i class="icon-heart" aria-hidden="true"></i> by <a
+									href="https://colorlib.com/" target="_blank">Colorlib</a>
+								<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+							</span>
+							<span class="block">Demo Images: <a href="http://unsplash.co/" target="_blank">Unsplash</a>
+								, <a href="http://pexels.com/" target="_blank">Pexels.com</a></span>
+						</p>
+					</div>
+				</div>
+			</div>
+		</footer>
+	</div>
+
+	<div class="gototop js-top">
+		<a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
+	</div>
+
+	<!-- Modal to show success after adding a product to cart -->
+	<div class="modal fade" id="cartSuccessModal" tabindex="-1" role="dialog" aria-labelledby="cartModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="cartModalLabel">Product Added to Cart</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-4">
+							<!-- Product image will be dynamically inserted here -->
+							<img id="cartProductImage" class="img-fluid" alt="Product Image" />
+						</div>
+						<div class="col-8">
+							<!-- Product name will be dynamically inserted here -->
+							<h6 id="cartProductName"></h6>
+							<p class="text-success">The product has been added to your cart successfully.</p>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="toShop()">Continue
+						Shopping</button>
+					<a href="/cart" class="btn btn-primary">View Cart</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<!-- popper -->
+	<script src="js/popper.min.js"></script>
+	<!-- bootstrap 4.1 -->
+	<script src="js/bootstrap.min.js"></script>
+	<!-- jQuery easing -->
+	<script src="js/jquery.easing.1.3.js"></script>
+	<!-- Waypoints -->
+	<script src="js/jquery.waypoints.min.js"></script>
+	<!-- Flexslider -->
+	<script src="js/jquery.flexslider-min.js"></script>
+	<!-- Owl carousel -->
+	<script src="js/owl.carousel.min.js"></script>
+	<!-- Magnific Popup -->
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/magnific-popup-options.js"></script>
+	<!-- Date Picker -->
+	<script src="js/bootstrap-datepicker.js"></script>
+	<!-- Stellar Parallax -->
+	<script src="js/jquery.stellar.min.js"></script>
+	<!-- Main -->
+	<script src="js/main.js"></script>
+	<!-- sweet alert -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<!-- add product to wishlist -->
+	<script>
+		function outofStock(event) {
+			event?.preventDefault()
+		}
+
+		function addToCart(event, productId) {
+			event?.preventDefault()
+
+			console.log("hello world")
+
+			const productData = {
+				productId: productId
+			}
+
+			fetch('/addToCartSinglePro', {
+
+				method: 'post',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(productData)
+
+			})
+				.then(response => response.json())
+				.then(data => {
+					console.log(data)
+					if (data.success) {
+						if (data.alReadyInCart) {
+							Swal.fire({
+								icon: 'info',
+								title: 'Product Already Added',
+								text: 'This product is already in your cart!',
+								confirmButtonText: 'OK'
+							});
+						} else {
+
+							document.getElementById('cartProductImage').src = data.product.image
+							document.getElementById('cartProductName').textContent = data.product.name
+
+							$('#cartSuccessModal').modal('show')
+						}
+
+
+					} else {
+						Swal.fire({
+							icon: 'error',
+							title: 'Failed',
+							text: 'Failed to add product to cart',
+							confirmButtonText: 'OK'
+						});
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error)
+					Swal.fire({
+						icon: 'error',
+						title: 'Error',
+						text: 'Error adding product to cart',
+						confirmButtonText: 'OK'
+					});
+				})
+		}
+	</script>
+
+	<!--remove product from wishlist  -->
+
+	<script>
+		function removeFromWishlist(event, id) {
+			event?.preventDefault()
+
+			const productId = { id: id }
+
+			Swal.fire({
+				title: "<span style='color: #3d5280;'>Are you sure?</span>",
+				// html: "<span style='color: black;'>address edited.</span>",
+				showCancelButton: true,
+				icon: "question",
+				confirmButtonColor: "#3d5280",
+				confirmButtonText: "Yes"
+			}).then((result) => {
+				if (result.isConfirmed) {
+					fetch('/removeFromWishlist', {
+						method: "post",
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(productId)
+					})
+						.then(response => response.json())
+						.then(data => {
+							console.log(data)
+							if (data.success) {
+								Swal.fire({
+									title: "<span style='color: #3BB77E;'>Success!</span>",
+									html: "<span style='color: black;'>removed from wishlist.</span>",
+									icon: "success",
+									confirmButtonColor: "#3BB77E",
+									confirmButtonText: "OK"
+								}).then((result) => {
+									if (result.isConfirmed) {
+										window.location.reload()
+									}
+								})
+							}
+						})
+				}
+			})
+		}
+	</script>
+
+</body>
+
+<!-- Mirrored from themewagon.github.io/footwear/add-to-wishlist.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Aug 2024 04:17:41 GMT -->
+
+</html>

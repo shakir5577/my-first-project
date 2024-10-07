@@ -1,16 +1,18 @@
 <!DOCTYPE HTML>
 <html>
-	
+
 <!-- Mirrored from themewagon.github.io/footwear/men.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Aug 2024 04:17:38 GMT -->
-<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+
 <head>
-	<title>Footwear - Free Bootstrap 4 Template by Colorlib</title>
-   <meta charset="utf-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>ShoeVault</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
-	
+
 	<!-- Animate.css -->
 	<link rel="stylesheet" href="css/animate.css">
 	<!-- Icomoon Icon Fonts-->
@@ -29,7 +31,7 @@
 	<!-- Owl Carousel -->
 	<link rel="stylesheet" href="css/owl.carousel.min.css">
 	<link rel="stylesheet" href="css/owl.theme.default.min.css">
-	
+
 	<!-- Date Picker -->
 	<link rel="stylesheet" href="css/bootstrap-datepicker.css">
 	<!-- Flaticons  -->
@@ -38,9 +40,13 @@
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="css/style.css">
 
-	</head>
-	<body>
-		
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+</head>
+
+<body>
+
 	<div class="colorlib-loader"></div>
 
 	<div id="page">
@@ -49,35 +55,31 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-sm-7 col-md-9">
-							<div id="colorlib-logo"><a href="index.html">Footwear</a></div>
+							<div id="colorlib-logo"><a href="#">ShoeVault</a></div>
 						</div>
 						<div class="col-sm-5 col-md-3">
-			            <form action="#" class="search-wrap">
-			               <div class="form-group">
-			                  <input type="search" class="form-control search" placeholder="Search">
-			                  <button class="btn btn-primary submit-search text-center" type="submit"><i class="icon-search"></i></button>
-			               </div>
-			            </form>
-			         </div>
-		         </div>
+							<form id="searchForm" class="search-wrap" onsubmit="combined(); return false;">
+								<div class="form-group">
+									<input type="search" id="searchInput" class="form-control search"
+										placeholder="Search">
+									<button class="btn btn-primary submit-search text-center" type="submit">
+										<i class="icon-search"></i>
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
 					<div class="row">
 						<div class="col-sm-12 text-left menu-1">
 							<ul>
 								<li><a href="/">Home</a></li>
 								<li class="has-dropdown active">
 									<a href="/shop">shop</a>
-									<!-- <ul class="dropdown">
-										<li><a href="product-detail.html">Product Detail</a></li>
-										<li><a href="cart.html">Shopping Cart</a></li>
-										<li><a href="checkout.html">Checkout</a></li>
-										<li><a href="order-complete.html">Order Complete</a></li>
-										<li><a href="add-to-wishlist.html">Wishlist</a></li>
-									</ul> -->
 								</li>
-								<!-- <li><a href="women.html">Women</a></li> -->
-								<li><a href="about.html">About</a></li>
+								<li><a href="about">About</a></li>
 								<li><a href="/myAccount">my account</a></li>
-								<li class="cart"><a href="cart"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+								<li class="cart"><a href="wishlist"><i class="icon-heart"></i></a></li>
+								<li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a></li>
 							</ul>
 						</div>
 					</div>
@@ -125,7 +127,9 @@
 							<h2>Products</h2>
 						</div>
 						<div class="menu text-center">
-							<p><a href="#">New Arrivals</a> <a href="#">Best Sellers</a> <a href="#">Extended Widths</a> <a href="#">Sale</a></p>
+							<p><a href="#">New Arrivals</a> <a href="#">Best Sellers</a> <a href="#">Extended Widths</a>
+								<a href="#">Sale</a>
+							</p>
 						</div>
 					</div>
 				</div>
@@ -169,51 +173,123 @@
 					<div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
 						<h2>View All Products</h2>
 					</div>
+				</div>`
+				<div class="row mb-4">
+					<div class="col-md-12 d-flex justify-content-between align-items-center">
+						<!-- Left Sort By Dropdown -->
+						<div class="select-shoing-wrap d-flex align-items-center">
+							<div class="shot-product me-2">
+								<p class="mb-0" style="white-space: nowrap;">categories:</p>
+							</div>
+							<div class="dropdown">
+								<select id="categoryDropdown" class="form-select" style="min-width: 150px;"
+									onchange="combined()">
+									<option value="0">All</option>
+									<option value="Men">Men</option>
+									<option value="women">Women</option>
+									<!-- <option value="3">Price, low to high</option>
+									<option value="4">Price, high to low</option> -->
+								</select>
+							</div>
+						</div>
+
+						<!-- Right Sort By Dropdown -->
+						<div class="select-shoing-wrap d-flex align-items-center">
+							<div class="shot-product me-2">
+								<p class="mb-0" style="white-space: nowrap;">Sort By:</p>
+							</div>
+							<div class="dropdown">
+								<select id="sortDropdown" class="form-select" style="min-width: 150px;"
+									onchange="combined()">
+									<option value="0">Default</option>
+									<option value="1">Name, A to Z</option>
+									<option value="2">Name, Z to A</option>
+									<option value="3">Price, low to high</option>
+									<option value="4">Price, high to low</option>
+								</select>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div class="row row-pb-md">
-					<% products.forEach(product => { %>
+
+				<div class="row row-pb-md" id="shop-list">
+					<% products.forEach(product=> { %>
 						<div class="col-lg-3 mb-4 text-center">
 							<div class="product-entry border">
 								<a href="/showProduct?id=<%= product.id %>" class="prod-img">
 									<img src="<%= product.images[0] %>" class="img-fluid" alt="Product Image">
 								</a>
 								<div class="desc">
-									<h2><a href="#"><%= product.productName %></a></h2>
+									<h2><a href="#">
+											<%= product.productName %>
+										</a></h2>
 									<span class="price">₹<%= product.price %></span>
 									<div class="icons mt-2">
 										<!-- Cart Icon -->
-										<a href="javascript:void(0);" class="icon-button" onclick="addToCartFromShop('<%= product.id %>')">
-											<!-- <i class="icon-shopping-cart"></i> -->
-										</a>
-										
-										<!-- Wishlist Icon -->
-										<a href="/addToWishlist?id=<%= product.id %>" class="icon-button ml-2">
-											<!-- <i class="icon-heart"></i> -->
-										</a>
+										<% if (product.stock> 0) { %>
+											<a href="javascript:void(0);" class="icon-button"
+												onclick="addToCartFromShop(event, '<%= product.id %>')">
+												<i class="fas fa-shopping-cart"></i> <!-- Cart Icon -->
+											</a>
+											<% } else { %>
+												<a href="javascript:void(0);" class="icon-button"
+													onclick="handleOutOfStock(event)">
+													<i class="fas fa-cart-arrow-down"></i> <!-- Out of Stock Icon -->
+												</a>
+												<span id="out-of-stock-message" style="display: none; color: red;">Out
+													of Stock</span>
+												<% } %>
+													<!-- Wishlist Icon -->
+													<a href="javascript:void(0);" class="icon-button ml-2"
+														onclick="addToWishlist(event, '<%= product.id %>')">
+														<i class="icon-heart"></i>
+													</a>
 									</div>
 								</div>
 							</div>
 						</div>
-					<% }) %>							
+						<% }) %>
 				</div>
 				<div class="row">
 					<div class="col-md-12 text-center">
 						<div class="block-27">
-		               <ul>
-			               <li><a href="#"><i class="ion-ios-arrow-back"></i></a></li>
-		                  <li class="active"><span>1</span></li>
-		                  <li><a href="#">2</a></li>
-		                  <li><a href="#">3</a></li>
-		                  <li><a href="#">4</a></li>
-		                  <li><a href="#">5</a></li>
-		                  <li><a href="#"><i class="ion-ios-arrow-forward"></i></a></li>
-		               </ul>
-		            </div>
+							<ul>
+								<!-- Previous button -->
+								<li>
+									<a href="<%= currentPage > 1 ? `?page=${currentPage - 1}` : '#' %>">
+										<i class="ion-ios-arrow-back"></i>
+									</a>
+								</li>
+
+								<!-- Page numbers -->
+								<% for (let i=1; i <=totalPages; i++) { %>
+									<li class="<%= i === currentPage ? 'active' : '' %>">
+										<% if (i===currentPage) { %>
+											<span>
+												<%= i %>
+											</span>
+											<% } else { %>
+												<a href="?page=<%= i %>">
+													<%= i %>
+												</a>
+												<% } %>
+									</li>
+									<% } %>
+
+										<!-- Next button -->
+										<li>
+											<a
+												href="<%= currentPage < totalPages ? `?page=${currentPage + 1}` : '#' %>">
+												<i class="ion-ios-arrow-forward"></i>
+											</a>
+										</li>
+							</ul>
+						</div>
 					</div>
 				</div>
+
 			</div>
 		</div>
-
 		<div class="colorlib-partner">
 			<div class="container">
 				<div class="row">
@@ -246,40 +322,41 @@
 				<div class="row row-pb-md">
 					<div class="col footer-col colorlib-widget">
 						<h4>About Footwear</h4>
-						<p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life</p>
+						<p>Even the all-powerful Pointing has no control about the blind texts it is an almost
+							unorthographic life</p>
 						<p>
-							<ul class="colorlib-social-icons">
-								<li><a href="#"><i class="icon-twitter"></i></a></li>
-								<li><a href="#"><i class="icon-facebook"></i></a></li>
-								<li><a href="#"><i class="icon-linkedin"></i></a></li>
-								<li><a href="#"><i class="icon-dribbble"></i></a></li>
-							</ul>
+						<ul class="colorlib-social-icons">
+							<li><a href="#"><i class="icon-twitter"></i></a></li>
+							<li><a href="#"><i class="icon-facebook"></i></a></li>
+							<li><a href="#"><i class="icon-linkedin"></i></a></li>
+							<li><a href="#"><i class="icon-dribbble"></i></a></li>
+						</ul>
 						</p>
 					</div>
 					<div class="col footer-col colorlib-widget">
 						<h4>Customer Care</h4>
 						<p>
-							<ul class="colorlib-footer-links">
-								<li><a href="#">Contact</a></li>
-								<li><a href="#">Returns/Exchange</a></li>
-								<li><a href="#">Gift Voucher</a></li>
-								<li><a href="#">Wishlist</a></li>
-								<li><a href="#">Special</a></li>
-								<li><a href="#">Customer Services</a></li>
-								<li><a href="#">Site maps</a></li>
-							</ul>
+						<ul class="colorlib-footer-links">
+							<li><a href="#">Contact</a></li>
+							<li><a href="#">Returns/Exchange</a></li>
+							<li><a href="#">Gift Voucher</a></li>
+							<li><a href="#">Wishlist</a></li>
+							<li><a href="#">Special</a></li>
+							<li><a href="#">Customer Services</a></li>
+							<li><a href="#">Site maps</a></li>
+						</ul>
 						</p>
 					</div>
 					<div class="col footer-col colorlib-widget">
 						<h4>Information</h4>
 						<p>
-							<ul class="colorlib-footer-links">
-								<li><a href="#">About us</a></li>
-								<li><a href="#">Delivery Information</a></li>
-								<li><a href="#">Privacy Policy</a></li>
-								<li><a href="#">Support</a></li>
-								<li><a href="#">Order Tracking</a></li>
-							</ul>
+						<ul class="colorlib-footer-links">
+							<li><a href="#">About us</a></li>
+							<li><a href="#">Delivery Information</a></li>
+							<li><a href="#">Privacy Policy</a></li>
+							<li><a href="#">Support</a></li>
+							<li><a href="#">Order Tracking</a></li>
+						</ul>
 						</p>
 					</div>
 
@@ -308,9 +385,14 @@
 					<div class="col-sm-12 text-center">
 						<p>
 							<span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com/" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></span> 
-							<span class="block">Demo Images: <a href="http://unsplash.co/" target="_blank">Unsplash</a> , <a href="http://pexels.com/" target="_blank">Pexels.com</a></span>
+								Copyright &copy;
+								<script>document.write(new Date().getFullYear());</script> All rights reserved | This
+								template is made with <i class="icon-heart" aria-hidden="true"></i> by <a
+									href="https://colorlib.com/" target="_blank">Colorlib</a>
+								<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+							</span>
+							<span class="block">Demo Images: <a href="http://unsplash.co/" target="_blank">Unsplash</a>
+								, <a href="http://pexels.com/" target="_blank">Pexels.com</a></span>
 						</p>
 					</div>
 				</div>
@@ -321,15 +403,82 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	<div class="gototop js-top">
 		<a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
 	</div>
-	
+
+	<!-- Modal to show success after adding a product to cart -->
+	<div class="modal fade" id="cartSuccessModal" tabindex="-1" role="dialog" aria-labelledby="cartModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="cartModalLabel">Product Added to Cart</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-4">
+							<!-- Product image will be dynamically inserted here -->
+							<img id="cartProductImage" class="img-fluid" alt="Product Image" />
+						</div>
+						<div class="col-8">
+							<!-- Product name will be dynamically inserted here -->
+							<h6 id="cartProductName"></h6>
+							<p class="text-success">The product has been added to your cart successfully.</p>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="toShop()">Continue
+						Shopping</button>
+					<a href="/cart" class="btn btn-primary">View Cart</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal to show success after adding a product to wishlist -->
+	<div class="modal fade" id="wishlistSuccessModal" tabindex="-1" role="dialog" aria-labelledby="wishlistModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="wishlistModalLabel">Product Added to Wishlist</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-4">
+							<!-- Product image will be dynamically inserted here -->
+							<img id="wishlistProductImage" class="img-fluid" alt="Product Image" />
+						</div>
+						<div class="col-8">
+							<!-- Product name will be dynamically inserted here -->
+							<h6 id="wishlistProductName"></h6>
+							<p class="text-success">The product has been added to your wishlist successfully.</p>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="toShop()">Continue
+						Shopping</button>
+					<a href="/wishlist" class="btn btn-primary">View Wishlist</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 	<!-- jQuery -->
 	<script src="js/jquery.min.js"></script>
-   <!-- popper -->
-   <script src="js/popper.min.js"></script>
-   <!-- bootstrap 4.1 -->
-   <script src="js/bootstrap.min.js"></script>
-   <!-- jQuery easing -->
-   <script src="js/jquery.easing.1.3.js"></script>
+	<!-- popper -->
+	<script src="js/popper.min.js"></script>
+	<!-- bootstrap 4.1 -->
+	<script src="js/bootstrap.min.js"></script>
+	<!-- jQuery easing -->
+	<script src="js/jquery.easing.1.3.js"></script>
 	<!-- Waypoints -->
 	<script src="js/jquery.waypoints.min.js"></script>
 	<!-- Flexslider -->
@@ -346,8 +495,220 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	<!-- Main -->
 	<script src="js/main.js"></script>
 
-	</body>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<script>
+
+		function addToCartFromShop(event, productId) {
+			event?.preventDefault()
+
+
+
+			// const quantity = document.getElementById('quantity').value
+			// console.log(quantity)
+
+			const productData = {
+				productId: productId,
+				// quantity: quantity
+			}
+			console.log(productData)
+
+
+			fetch('/addToCartSinglePro', {
+
+				method: 'post',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(productData)
+
+			})
+				.then(response => response.json())
+				.then(data => {
+					console.log(data)
+					if (data.success) {
+						if (data.alReadyInCart) {
+							Swal.fire({
+								icon: 'info',
+								title: 'Product Already Added',
+								text: 'This product is already in your cart!',
+								confirmButtonText: 'OK'
+							});
+						} else {
+
+							document.getElementById('cartProductImage').src = data.product.image
+							document.getElementById('cartProductName').textContent = data.product.name
+
+							$('#cartSuccessModal').modal('show')
+						}
+
+
+					} else {
+						Swal.fire({
+							icon: 'error',
+							title: 'Failed',
+							text: 'Failed to add product to cart',
+							confirmButtonText: 'OK'
+						});
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error)
+					Swal.fire({
+						icon: 'error',
+						title: 'Error',
+						text: 'Error adding product to cart',
+						confirmButtonText: 'OK'
+					});
+				})
+		}
+	</script>
+
+	<script>
+		function toShop() {
+			window.location.href = '/shop'
+		}
+	</script>
+
+	<script>
+		function handleOutOfStock(event) {
+			const button = event.currentTarget;
+			button.style.display = 'none'; // Hide the out-of-stock button
+			const message = document.getElementById('out-of-stock-message');
+			message.style.display = 'inline'; // Show the out-of-stock message
+		}
+
+	</script>
+
+	<script>
+		function displayProducts(products) {
+			let list = document.getElementById('shop-list');
+			list.innerHTML = '';
+
+			products.forEach(product => {
+				list.innerHTML += `
+            <div class="col-lg-3 mb-4 text-center">
+                <div class="product-entry border">
+                    <a href="/showProduct?id=${product.id}" class="prod-img">
+                        <img src="${product.images[0]}" class="img-fluid" alt="Product Image">
+                    </a>
+                    <div class="desc">
+                        <h2><a href="#">${product.productName}</a></h2>
+                        <span class="price">₹${product.price}</span>
+                        <div class="icons mt-2">
+                            <!-- Cart Icon -->
+                            ${product.stock > 0 ? `
+                                <a href="javascript:void(0);" class="icon-button" onclick="addToCartFromShop(event, '${product.id}')">
+                                    <i class="fas fa-shopping-cart"></i> <!-- Cart Icon -->
+                                </a>
+                            ` : `
+                                <a href="javascript:void(0);" class="icon-button" onclick="handleOutOfStock(event)">
+                                    <i class="fas fa-cart-arrow-down"></i> <!-- Out of Stock Icon -->
+                                </a>
+                                <span id="out-of-stock-message" style="display: none; color: red;">Out of Stock</span>
+                            `}
+                            <!-- Wishlist Icon -->
+                            <a href="/addToWishlist?id=${product.id}" class="icon-button ml-2">
+                                <i class="icon-heart"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+			});
+		}
+
+	</script>
+
+
+	<script>
+		function combined() {
+
+			const searchQuery = document.getElementById('searchInput').value;
+			// console.log(searchQuery)
+			const category = document.getElementById('categoryDropdown').value;
+			// console.log(category)
+			const sortBy = document.getElementById('sortDropdown').value;
+			// console.log(sortBy)
+
+			const url = `/search-products?search=${encodeURIComponent(searchQuery)}&category=${category}&sort=${sortBy}`;
+			// console.log(url)
+
+			fetch(url)
+				.then(response => response.json())
+				.then(data => {
+					console.log(data)
+					displayProducts(data.products);
+					// console.log(product)
+				})
+				.catch(error => {
+					console.error('Error fetching products:', error);
+				});
+
+		}
+	</script>
+
+	<script>
+		function addToWishlist(event, productId) {
+
+			const productData = {
+				productId: productId
+			}
+			console.log(productData)
+
+
+			fetch('/addToWishlist', {
+
+				method: 'post',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(productData)
+
+			}).then(response => response.json())
+				.then(data => {
+					console.log(data)
+					if (data.success) {
+						if (data.alReadyInWishlist) {
+							Swal.fire({
+								icon: 'info',
+								title: 'Product Already Added',
+								text: 'This product is already in your wishlist!',
+								confirmButtonText: 'OK'
+							});
+						} else {
+
+							document.getElementById('wishlistProductImage').src = data.product.image;
+							document.getElementById('wishlistProductName').textContent = data.product.name;
+
+							$('#wishlistSuccessModal').modal('show');
+						}
+
+
+					} else {
+						Swal.fire({
+							icon: 'error',
+							title: 'Failed',
+							text: 'Failed to add product to wishlist',
+							confirmButtonText: 'OK'
+						});
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error)
+					Swal.fire({
+						icon: 'error',
+						title: 'Error',
+						text: 'Error adding product to wishlist',
+						confirmButtonText: 'OK'
+					});
+				})
+		}
+	</script>
+
+</body>
 
 <!-- Mirrored from themewagon.github.io/footwear/men.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Aug 2024 04:17:39 GMT -->
-</html>
 
+</html>

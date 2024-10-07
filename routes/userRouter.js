@@ -7,6 +7,7 @@ const userController = require('../controllers/userController')
 const accountController = require('../controllers/accountController')
 const passportController = require('../controllers/passportControlller')
 const orderController = require('../controllers/orderController')
+const wishlistController = require('../controllers/wishlistController')
 const session = require('../middlewares/sessionCheck')
 
 
@@ -27,11 +28,13 @@ router.post('/addToCartSinglePro',userController.addToCartSinglePro)
 router.post('/removeFromCart',userController.removeFromCart)
 router.post('/decrementQuantity',userController.decrementQuantity)
 router.post('/incrementQuantity',userController.incrementQuantity)
-router.get('/checkOut',session.isLogin,userController.showCheckOut)    
+router.get('/checkOut',session.isLogin,userController.showCheckOut)
+router.get('/about',userController.showAbout)
+router.get('/search-products',userController.searchSortFilter)    
 
 router.get('/myAccount',session.isLogin,accountController.showMyaccount)
 router.get('/orders',session.isLogin,accountController.showOrders)
-router.get('/orderDetailes',accountController.orderDetailes)
+router.get('/orderDetailes',session.isLogin,accountController.orderDetailes)
 router.get('/address',session.isLogin,accountController.showAddress)
 router.post('/addAddress',accountController.createAddress)
 router.post('/editAddress',accountController.editAddress)
@@ -42,8 +45,12 @@ router.post('/changePassword',accountController.changePassword)
 router.get('/logout',session.isLogin,accountController.logout)
 
 router.post('/placeOrder',orderController.placeOrder)
-router.get('/orderComplete',orderController.orderComplete)
+router.get('/orderComplete',session.isLogin,orderController.orderComplete)
 router.post('/cancelOrder',accountController.cancelOrder)
+
+router.get('/wishlist',session.isLogin,wishlistController.loadWishlist)
+router.post('/addToWishlist',wishlistController.addToWishlist)
+router.post('/removeFromWishlist',wishlistController.removeFromWishlist)
 
 
 router.get('/success', passportController.successGoogleLogin); 

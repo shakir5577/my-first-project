@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
 const otpModel = require("../models/otpModel")
 const productModel = require('../models/productModel')
+const categoryModel = require('../models/categoryModel')
 const cartModel = require('../models/cartModel')
 const addressModel = require("../models/addressModel")
 
@@ -283,14 +284,40 @@ const verifyLogin = async (req, res) => {
 
 const loadShop = async (req, res) => {
     try {
+        // Get the current page from query parameters (default to page 1)
+        const currentPage = parseInt(req.query.page) || 1;
 
-        const allProducts = await productModel.find()
+        // Set the number of products per page
+        const limit = 8;
 
-        res.render('user/shop', { products: allProducts })
+        // Calculate the number of products to skip based on the current page
+        const skip = (currentPage - 1) * limit;
+
+        // Get the total count of all products (to calculate total pages)
+        const totalProducts = await productModel.countDocuments({ isBlock: false });
+
+        // Fetch the products for the current page
+        const products = await productModel
+            .find({ isBlock: false })
+            .skip(skip)
+            .limit(limit);
+
+        // Calculate the total number of pages
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        // Render the shop page with products, current page, and total pages
+        res.render('user/shop', {
+            products: products,
+            currentPage: currentPage,
+            totalPages: totalPages
+        });
+
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        res.status(500).send('Server Error');
     }
-}
+};
+
 
 const loadSingleProduct = async (req, res) => {
     try {
@@ -302,7 +329,7 @@ const loadSingleProduct = async (req, res) => {
         res.render('user/singleProduct', { product: product })
     } catch (err) {
         console.log(err)
-    }
+    } 
 }
 
 const loadCart = async (req, res) => {
@@ -356,10 +383,6 @@ const addToCartSinglePro = async (req, res) => {
         const product = await productModel.findById(productId)
         // console.log(product)
 
-        if (!product) {
-
-            return res.status(404).json({ success: false, message: 'product not found' })
-        }
 
         const existingProduct = cart.items.findIndex(item => item.productId.equals(productId))
         // console.log(existingProduct)
@@ -537,6 +560,79 @@ const showCheckOut = async (req, res) => {
     }
 }
 
+const showAbout = async (req,res) => {
+
+    try{
+        
+        res.render('user/about')
+
+    }catch(error){
+        console.log(error)
+    }
+}
+
+const searchSortFilter = async (req, res) => {
+
+    try{
+
+        const { search = '', category = '0', sort = '0' } = req.query;
+        // console.log(search, category, sort);
+        
+        let query = {};
+        query.isBlock = false
+        
+        // Apply search filter
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            query.productName = searchRegex;
+            // console.log('search product:', searchRegex);
+        }
+        
+        // Apply category filter
+        if (category !== '0') {
+            query.category = category;
+        }
+        
+        // Build the Mongoose query
+        let findProduct = productModel.find(query);
+        
+        // Apply sorting directly within the query
+        if (sort !== '0') {
+            switch (parseInt(sort)) {
+                case 1: // Name A-Z
+                    findProduct = findProduct.sort({ productName: 1 });
+                    break;
+                case 2: // Name Z-A
+                    findProduct = findProduct.sort({ productName: -1 });
+                    break;
+                case 3: // Price low to high
+                    findProduct = findProduct.sort({ price: 1 });
+                    break;
+                case 4: // Price high to low
+                    findProduct = findProduct.sort({ price: -1 });
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        // Fetch the sorted and filtered products
+        const products = await findProduct;
+        
+        // console.log(products);
+        res.json({ products });
+        
+
+        // res.send("Search and filtering worked!");
+
+
+    }catch(error){
+        console.log('error:',error)
+        res.status(500).send('something went wrong')
+    }
+};
+
+
 
 
 
@@ -558,5 +654,7 @@ module.exports = {
     decrementQuantity,
     incrementQuantity,
     showCheckOut,
-    resendOtp
+    resendOtp,
+    showAbout,
+    searchSortFilter
 }

@@ -6,7 +6,7 @@
 <meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
 
 <head>
-	<title>Footwear - Free Bootstrap 4 Template by Colorlib</title>
+	<title>ShoeVault</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -45,6 +45,22 @@
 		body {
 			overflow-x: hidden;
 		}
+
+		.stock-status {
+			font-weight: bold;
+		}
+
+		.in-stock {
+			color: green;
+		}
+
+		.low-stock {
+			color: orange;
+		}
+
+		.out-of-stock {
+			color: red;
+		}
 	</style>
 
 </head>
@@ -59,7 +75,7 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-sm-7 col-md-9">
-							<div id="colorlib-logo"><a href="index.html">Footwear</a></div>
+							<div id="colorlib-logo"><a href="index.html">ShoeVault</a></div>
 						</div>
 						<div class="col-sm-5 col-md-3">
 							<form action="#" class="search-wrap">
@@ -77,18 +93,10 @@
 								<li><a href="/">Home</a></li>
 								<li class="has-dropdown active">
 									<a href="/shop">shop</a>
-									<!-- <ul class="dropdown">
-										<li><a href="product-detail.html">Product Detail</a></li>
-										<li><a href="cart.html">Shopping Cart</a></li>
-										<li><a href="checkout.html">Checkout</a></li>
-										<li><a href="order-complete.html">Order Complete</a></li>
-										<li><a href="add-to-wishlist.html">Wishlist</a></li>
-									</ul>
-								</li> -->
-									<!-- <li><a href="women.html">Women</a></li> -->
-								<li><a href="about.html">About</a></li>
+								<li><a href="about">About</a></li>
 								<li><a href="myAccount">my account</a></li>
-								<li class="cart"><a href="cart"><i class="icon-shopping-cart"></i> Cart [0]</a>
+								<li class="cart"><a href="wishlist"><i class="icon-heart"></i></a>
+								<li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a>
 								</li>
 							</ul>
 						</div>
@@ -186,8 +194,14 @@
 								<%= product.description %>
 							</p>
 							<p>
-							<h2>stock: <%= product.stock %>
-							</h2>
+								<% if (product.stock > 10) { %>
+									<h4 class="stock-status in-stock">In Stock</h4>
+								<% } else if (product.stock > 0 && product.stock <= 10) { %>
+									<h4 class="stock-status low-stock">Low Stock: Only <%= product.stock %> left! Order soon.</h4>
+								<% } else { %>
+									<h4 class="stock-status out-of-stock">Out of Stock</h4>
+								<% } %>								
+
 							</p>
 							<!-- <div class="size-wrap">
 								<div class="block-26 mb-2">
@@ -233,21 +247,21 @@
 							</span>
 						</div>
 						<div class="row">
-							<% if(product.stock > 0){ %>
+							<% if(product.stock> 0){ %>
 								<div class="col-sm-12 text-center">
-									<p class="addtocart" onclick="addtoCartFromSinglePro(event,'<%= product.id %>')"><a href
-										class="btn btn-primary btn-addtocart"> Add to
-										Cart</a>
+									<p class="addtocart" onclick="addtoCartFromSinglePro(event,'<%= product.id %>')"><a
+											href class="btn btn-primary btn-addtocart"> Add to
+											Cart</a>
 									</p>
 								</div>
 								<% }else{ %>
 									<div class="col-sm-12 text-center">
 										<p class="addtocart" onclick="outofStock(event)"><a href
-											class="btn btn-danger btn-addtocart"> out of stock
+												class="btn btn-danger btn-addtocart"> out of stock
 											</a>
 										</p>
 									</div>
-								<% } %>
+									<% } %>
 						</div>
 					</div>
 				</div>
@@ -550,7 +564,8 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="toShop()">Continue Shopping</button>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="toShop()">Continue
+						Shopping</button>
 					<a href="/cart" class="btn btn-primary">View Cart</a>
 				</div>
 			</div>
@@ -626,7 +641,7 @@
 	</script>
 
 	<script>
-		function outofStock (event){
+		function outofStock(event) {
 			event?.preventDefault()
 		}
 
@@ -693,7 +708,7 @@
 	</script>
 
 	<script>
-		function toShop(){
+		function toShop() {
 			window.location.href = '/shop'
 		}
 	</script>
