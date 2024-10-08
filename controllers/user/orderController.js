@@ -1,8 +1,8 @@
-const orderModel = require('../models/orderModel')
-const userModel = require('../models/userModel')
-const productModel = require('../models/productModel')
-const addressModel = require('../models/addressModel')
-const cartModel = require('../models/cartModel')
+const orderModel = require('../../models/orderModel')
+const userModel = require('../../models/userModel')
+const productModel = require('../../models/productModel')
+const addressModel = require('../../models/addressModel')
+const cartModel = require('../../models/cartModel')
 
 const placeOrder = async (req, res) => {
 

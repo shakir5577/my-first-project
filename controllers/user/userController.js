@@ -1,13 +1,13 @@
 
 const mongoose = require("mongoose")
-const userModel = require("../models/userModel")
+const userModel = require("../../models/userModel")
 const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
-const otpModel = require("../models/otpModel")
-const productModel = require('../models/productModel')
-const categoryModel = require('../models/categoryModel')
-const cartModel = require('../models/cartModel')
-const addressModel = require("../models/addressModel")
+const otpModel = require("../../models/otpModel")
+const productModel = require('../../models/productModel')
+const categoryModel = require('../../models/categoryModel')
+const cartModel = require('../../models/cartModel')
+const addressModel = require("../../models/addressModel")
 
 require('dotenv').config();
 

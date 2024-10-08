@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
-const userModel = require("../models/userModel")
-const wishlistModel = require("../models/wishlistModel")
-const productModel = require("../models/productModel")
+const userModel = require("../../models/userModel")
+const wishlistModel = require("../../models/wishlistModel")
+const productModel = require("../../models/productModel")
 
 
 const loadWishlist = async (req,res) => {

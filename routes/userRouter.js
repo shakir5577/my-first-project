@@ -3,11 +3,11 @@ const router = express.Router()
 const passport = require('passport')
 
 
-const userController = require('../controllers/userController')
-const accountController = require('../controllers/accountController')
-const passportController = require('../controllers/passportControlller')
-const orderController = require('../controllers/orderController')
-const wishlistController = require('../controllers/wishlistController')
+const userController = require('../controllers/user/userController')
+const accountController = require('../controllers/user/accountController')
+const passportController = require('../controllers/user/passportControlller')
+const orderController = require('../controllers/user/orderController')
+const wishlistController = require('../controllers/user/wishlistController')
 const session = require('../middlewares/sessionCheck')
 
 
