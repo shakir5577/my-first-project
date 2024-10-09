@@ -23,6 +23,7 @@ const upload = multer({
 
 
 const adminController = require('../controllers/admin/adminController')
+const couponController = require('../controllers/admin/couponController')
 
 
 
@@ -44,6 +45,13 @@ router.post('/updateProduct', upload.fields([{ name: 'image1' }, { name: 'image2
 router.get('/orders',adminController.showOrders)
 router.get('/orderDetails',adminController.orderDetails)
 router.post('/changeStatus',adminController.changeStatus)
+
+router.get('/Coupon',couponController.showCoupon)
+router.get('/createCoupon',couponController.showCreateCoupon)
+router.post('/createCoupon',couponController.createCoupon)
+router.post('/deleteCoupon',couponController.deleteCoupon)
+router.get('/editCoupon',couponController.loadEditCoupon)
+router.post('/editCoupon',couponController.editCoupon)
 
 
 
