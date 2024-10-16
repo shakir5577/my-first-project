@@ -291,8 +291,8 @@
                                 <li><a href="/orders">Orders</a></li>
                                 <li><a href="/address">address</a></li>
                                 <li><a href="logout.html">account details</a></li>
-                                <li><a href="logout.html">coupons</a></li>
-                                <li><a href="logout.html">wallet</a></li>
+                                <li><a href="/coupon">coupons</a></li>
+                                <li><a href="wallet">wallet</a></li>
                                 <li><a href="#" id="logout-btn">Logout</a></li>
                                 <!-- <li><a href="logout.html">Logout</a></li> -->
                             </ul>
@@ -321,7 +321,7 @@
                                             <td><%= ind + 1 %></td>
                                             <td><%= val.date.toLocaleDateString() %></td>
                                             <td class="text-center"><%= val.products.length %></td>
-                                            <td>$<%= val.totalAmount %></td>
+                                            <td><%= val.totalAmount %></td>
                                             <td><a href="/orderDetailes?id=<%= val.id %>" class="btn btn-primary">View</a></td>
                                         </tr>
                                         <% }) %>

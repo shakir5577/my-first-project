@@ -206,6 +206,35 @@
         .colorlib-footer-links a:hover {
             color: #f1c40f;
         }
+
+        .dashboard-content {
+        height: 100%; /* Makes the content fill the available space */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+    }
+
+    .coupon-item {
+        height: 300px; /* Fixed height for consistency */
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+
+    .row.equal-height > [class*='col-'] {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .row.equal-height .dashboard-content {
+        flex-grow: 1;
+    }
     </style>
 
 </head>
@@ -277,7 +306,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col">
-                        <p class="bread"><span><a href="index.html">my account</a></span> / <span>address</span></p>
+                        <p class="bread"><span><a href="index.html">my account</a></span> / <span>coupons</span></p>
                     </div>
                 </div>
             </div>
@@ -296,179 +325,42 @@
                                 <li><a href="/orders">Orders</a></li>
                                 <li><a href="/address">address</a></li>
                                 <li><a href="/accountDetails">account details</a></li>
-                                <li><a href="/coupon">coupons</a></li>
+                                <li><a href="coupon">coupons</a></li>
                                 <li><a href="wallet">wallet</a></li>
                                 <li><a href="#" id="logout-btn">Logout</a></li>
                             </ul>
                         </div>
                     </div>
 
-                    <!-- User Dashboard Content -->
                     <div class="col-md-9">
                         <div class="profile-content">
-                            <!-- Button to Open the Modal -->
-                            <button class="btn btn-primary btn-sm" data-toggle="modal"
-                                data-target="#addAddressModal">Add</button>
-
-                            <!-- Address Section -->
                             <div class="row">
-                                <% address.forEach(address=> { %>
-                                    <!-- First Address Block -->
-
-                                    <div class="col-md-4 mt-4">
-                                        <div class="dashboard-content position-relative">
-                                            <!-- Close Button (Top Right) -->
-                                            <button type="button" class="close" aria-label="Close"
-                                                style="position: absolute; top: 10px; right: 10px;"
-                                                onclick="deleteAddress('<%= address.id %>')">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-
-                                            <h4>User Profile</h4>
-                                            <hr>
-                                            <h6 class="mb-3">Name: <%= address.name %>
-                                            </h6>
-                                            <h6 class="mb-3">Number: <%= address.number %>
-                                            </h6>
-                                            <h6 class="mb-3">Street: <%= address.street %>
-                                            </h6>
-                                            <h6 class="mb-3">City: <%= address.city %>
-                                            </h6>
-                                            <h6 class="mb-3">State: <%= address.state %>
-                                            </h6>
-                                            <h6 class="mb-3">Pin: <%= address.pin %>
-                                            </h6>
-                                            <h6 class="mb-3">Country: <%= address.country %>
-                                            </h6>
-                                            <hr>
-
-                                            <!-- Edit Button -->
-                                            <button class="btn btn-primary btn-sm"
-                                                onclick="triggerModal('<%= address.id %>','<%= address.name %>','<%= address.number %>','<%= address.street %>','<%= address.city %>','<%= address.state %>','<%= address.pin %>','<%= address.country %>',)">Edit</button>
+                                <% if (typeof coupons != 'undefined' && coupons.length > 0) { %>
+                                    <% coupons.forEach((val, index) => { %>
+                                        <!-- Coupon Block -->
+                                        <div class="col-md-4 mt-4">
+                                            <div class="card h-100 position-relative"> <!-- Card with relative positioning -->
+                                                <div class="card-body">
+                                                    <button class="btn btn-primary btn-sm position-absolute" style="top: 10px; right: 10px;" onclick="copyCode('<%= val.code %>')">Copy</button>
+                                                    <h4 class="card-title">Coupon</h4>
+                                                    <hr>
+                                                    <h6 class="mb-3">Name: <%= val.name %></h6>
+                                                    <h6 class="mb-3">Code: <%= val.code %></h6>
+                                                    <h6 class="mb-3">End Date: <%= val.endDate.toLocaleDateString('en-GB') %></h6>
+                                                    <h6 class="mb-3">Discount Amount: <%= val.discountAmount %></h6>
+                                                    <h6 class="mb-3">Description: <%= val.description %></h6>
+                                                    <hr>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
                                     <% }) %>
-
-
-
+                                <% } %>
                             </div>
-
-                            <!-- Add more address blocks by repeating the structure above -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Modal Structure -->
-        <!-- add address modal -->
-        <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Add Address Form -->
-                        <form>
-                            <div class="form-group">
-                                <label for="name">Name</label>
-                                <input type="text" class="form-control" id="name" placeholder="Enter your name">
-                            </div>
-                            <div class="form-group">
-                                <label for="number">Number</label>
-                                <input type="text" class="form-control" id="number" placeholder="Enter your number">
-                            </div>
-                            <div class="form-group">
-                                <label for="street">Street</label>
-                                <input type="text" class="form-control" id="street" placeholder="Enter your street">
-                            </div>
-                            <div class="form-group">
-                                <label for="city">City</label>
-                                <input type="text" class="form-control" id="city" placeholder="Enter your city">
-                            </div>
-                            <div class="form-group">
-                                <label for="state">State</label>
-                                <input type="text" class="form-control" id="state" placeholder="Enter your state">
-                            </div>
-                            <div class="form-group">
-                                <label for="pin">Pin</label>
-                                <input type="text" class="form-control" id="pin" placeholder="Enter your pin code">
-                            </div>
-                            <div class="form-group">
-                                <label for="country">Country</label>
-                                <input type="text" class="form-control" id="country" placeholder="Enter your country">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="addAddress()">Add</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2nd modal -->
-        <!-- edit modal -->
-        <div class="modal fade" id="editaddressmodal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addAddressModalLabel">Edit Address</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Add Address Form -->
-                        <form>
-                            <div class="form-group">
-                                <input type="hidden" id="editid">
-                                <label for="name">Name</label>
-                                <input type="text" class="form-control" id="editname" placeholder="Enter your name">
-                            </div>
-                            <div class="form-group">
-                                <label for="number">Number</label>
-                                <input type="text" class="form-control" id="editnumber" placeholder="Enter your number">
-                            </div>
-                            <div class="form-group">
-                                <label for="street">Street</label>
-                                <input type="text" class="form-control" id="editstreet" placeholder="Enter your street">
-                            </div>
-                            <div class="form-group">
-                                <label for="city">City</label>
-                                <input type="text" class="form-control" id="editcity" placeholder="Enter your city">
-                            </div>
-                            <div class="form-group">
-                                <label for="state">State</label>
-                                <input type="text" class="form-control" id="editstate" placeholder="Enter your state">
-                            </div>
-                            <div class="form-group">
-                                <label for="pin">Pin</label>
-                                <input type="text" class="form-control" id="editpin" placeholder="Enter your pin code">
-                            </div>
-                            <div class="form-group">
-                                <label for="country">Country</label>
-                                <input type="text" class="form-control" id="editcountry"
-                                    placeholder="Enter your country">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="editAddress()">edit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
 
         <footer id="colorlib-footer" role="contentinfo">
             <div class="container">
@@ -557,183 +449,29 @@
         <a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
     </div>
 
-    <!-- add address -->
+
     <script>
-        function addAddress() {
+    function copyCode(code) {
+        // Create a temporary text area to copy the code
+        const tempInput = document.createElement("input");
+        tempInput.value = code;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        tempInput.setSelectionRange(0, 99999); // For mobile devices
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
 
-            const userName = document.getElementById('name').value
-            const userNumber = document.getElementById('number').value
-            const userStreet = document.getElementById('street').value
-            const userCity = document.getElementById('city').value
-            const userState = document.getElementById('state').value
-            const userPin = document.getElementById('pin').value
-            const userCountry = document.getElementById('country').value
+        // SweetAlert to confirm the copy action
+        Swal.fire({
+            icon: 'success',
+            title: 'Copied!',
+            text: 'Coupon code "' + code + '" has been copied to clipboard.',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+</script>
 
-            // console.log(userName,userNumber,userStreet,userCity,userState,userPin,userCountry)
-
-            const addressData = {
-
-                userName: userName,
-                userNumber: userNumber,
-                userStreet: userStreet,
-                userCity: userCity,
-                userState: userState,
-                userPin: userPin,
-                userCountry: userCountry
-
-            }
-
-            fetch('/addAddress', {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(addressData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-
-                        Swal.fire({
-                            title: "<span style='color: #3BB77E;'>Success!</span>",
-                            html: "<span style='color: black;'>new address added.</span>",
-                            icon: "success",
-                            confirmButtonColor: "#3BB77E",
-                            confirmButtonText: "OK"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload()
-                            }
-                        })
-                    }
-                })
-        }
-    </script>
-
-    <!-- trigger modal -->
-    <script>
-        function triggerModal(id, name, number, street, city, state, pin, country) {
-
-            console.log(id, name, number, street, city, state, pin, country)
-
-
-
-            const a = document.getElementById('editname').value = name
-            const b = document.getElementById('editnumber').value = number
-            const c = document.getElementById('editstreet').value = street
-            const d = document.getElementById('editcity').value = city
-            const e = document.getElementById('editstate').value = state
-            const f = document.getElementById('editpin').value = pin
-            const g = document.getElementById('editcountry').value = country
-            const h = document.getElementById('editid').value = id
-
-
-
-            const mymodal = new bootstrap.Modal(document.getElementById('editaddressmodal'))
-            // const mymodal = document.getElementById('editaddressmodal')
-
-            mymodal.show()
-
-        }
-    </script>
-
-    <!-- edit address -->
-    <script>
-        function editAddress() {
-
-            const addressId = document.getElementById('editid').value
-            const userName = document.getElementById('editname').value
-            const userNumber = document.getElementById('editnumber').value
-            const userStreet = document.getElementById('editstreet').value
-            const userCity = document.getElementById('editcity').value
-            const userState = document.getElementById('editstate').value
-            const userPin = document.getElementById('editpin').value
-            const userCountry = document.getElementById('editcountry').value
-
-
-            const newAddressData = {
-
-                addressId: addressId,
-                userName: userName,
-                userNumber: userNumber,
-                userStreet: userStreet,
-                userCity: userCity,
-                userState: userState,
-                userPin: userPin,
-                userCountry: userCountry
-
-            }
-
-            fetch('/editAddress', {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newAddressData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-
-                        Swal.fire({
-                            title: "<span style='color: #3BB77E;'>Success!</span>",
-                            html: "<span style='color: black;'>address edited.</span>",
-                            icon: "success",
-                            confirmButtonColor: "#3BB77E",
-                            confirmButtonText: "OK"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload()
-                            }
-                        })
-                    }
-                })
-
-        }
-    </script>
-
-    <!-- delete address -->
-    <script>
-        function deleteAddress(id) {
-
-            const addressId = { id: id }
-            
-            Swal.fire({
-                title: "<span style='color: #3d5280;'>Are you sure?</span>",
-                // html: "<span style='color: black;'>address edited.</span>",
-                showCancelButton: true,
-                icon: "question",
-                confirmButtonColor: "#3d5280",
-                confirmButtonText: "Yes"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/deleteAddress', {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(addressId)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.success){
-                        Swal.fire({
-                            title: "<span style='color: #3BB77E;'>Success!</span>",
-                            html: "<span style='color: black;'>address removed.</span>",
-                            icon: "success",
-                            confirmButtonColor: "#3BB77E",
-                            confirmButtonText: "OK"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload()
-                            }
-                        })
-                    }
-                })
-                }
-            })
-        }
-    </script>
 
     <!-- logout -->
 

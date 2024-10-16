@@ -38,6 +38,7 @@ const orderSchema = new mongoose.Schema({
 
     paymentMethod : {type: String},
     totalAmount : {type: Number, required:true},
+    orginalAmount : { type: Number, required:true},
     status: {type: String},
     date: {type: Date, default: Date.now }
     

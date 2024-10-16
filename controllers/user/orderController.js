@@ -3,6 +3,7 @@ const userModel = require('../../models/userModel')
 const productModel = require('../../models/productModel')
 const addressModel = require('../../models/addressModel')
 const cartModel = require('../../models/cartModel')
+const couponModel = require('../../models/couponModel')
 
 const placeOrder = async (req, res) => {
 
@@ -11,6 +12,7 @@ const placeOrder = async (req, res) => {
         // console.log(req.body)
         const { addressId } = req.body
         // console.log(addressId)
+        const { coupon } = req.body
 
         if (!addressId) {
             return console.log("can't find address id")
@@ -58,7 +60,24 @@ const placeOrder = async (req, res) => {
             productStatus: 'Pending'
         }));
 
-        const totalAmount = productsDetails.reduce((acc, val) => acc + (val.quantity * val.price), 0);
+        let totalAmount = productsDetails.reduce((acc, val) => acc + (val.quantity * val.price), 0);
+        let orginalAmount = productsDetails.reduce((acc, val) => acc + (val.quantity * val.price), 0);
+
+        if(coupon.length > 0) {
+
+            const fetchCoupon = await couponModel.findOne({ code: coupon })
+
+            if(!fetchCoupon) {
+
+                return console.log('cant find coupon, maybe code is invalid')
+            }
+
+            totalAmount -= fetchCoupon.discountAmount
+
+            fetchCoupon.userList.push({ userId })
+            
+            await fetchCoupon.save()
+        }
 
 
         const newOrder = new orderModel({
@@ -79,6 +98,7 @@ const placeOrder = async (req, res) => {
             },
             paymentMethod : 'cod',
             totalAmount : totalAmount ,
+            orginalAmount:orginalAmount,
             status: 'Pending'
             
         })

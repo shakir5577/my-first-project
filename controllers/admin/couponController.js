@@ -42,7 +42,7 @@ const createCoupon = async (req,res) => {
 
         if(existingCoupon) {
             console.log("this coupon already exist...")
-            return res.send({success: false})
+            return res.send({error: true})
         }
 
         const code = otpGenerator.generate(6, { lowerCaseAlphabets: false, specialChars: false, upperCaseAlphabets: false })

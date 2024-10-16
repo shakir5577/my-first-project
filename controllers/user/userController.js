@@ -8,6 +8,7 @@ const productModel = require('../../models/productModel')
 const categoryModel = require('../../models/categoryModel')
 const cartModel = require('../../models/cartModel')
 const addressModel = require("../../models/addressModel")
+const couponModel = require('../../models/couponModel')
 
 require('dotenv').config();
 
@@ -551,8 +552,14 @@ const showCheckOut = async (req, res) => {
             return acc + (item.price * item.quantity);
         }, 0);
 
+        const findCoupon = await couponModel.find()
 
-        res.render('user/checkOut',{address:address, userCartItems: findUsercart.items,totalCartPrice:totalCartPrice})
+        if(!findCoupon){
+            console.log("can't find coupons in checkout")
+        }
+
+
+        res.render('user/checkOut',{address:address, userCartItems: findUsercart.items,totalCartPrice:totalCartPrice,coupons: findCoupon})
 
     } catch (error) {
         console.log(error);

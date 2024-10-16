@@ -57,21 +57,59 @@
 			max-height: 1000px;
 			/* Enough height for the content to fully expand */
 		}
-
-		
 	</style>
 
-<style>
-    .close-icon {
+	<style>
+		.close-icon {
+			cursor: pointer;
+			font-size: 1.2rem;
+			color: rgb(141, 138, 138);
+			margin-left: 10px;
+		}
+
+		.close-icon:hover {
+			color: rgb(74, 0, 139);
+		}
+
+		/* Modal Background */
+		.modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    /* Smaller Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 15px;
+        border-radius: 10px;
+        width: 35%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
         cursor: pointer;
-        font-size: 1.2rem;
-        color: rgb(141, 138, 138);
-        margin-left: 10px;
     }
-    .close-icon:hover {
-        color: rgb(74, 0, 139);
-    }
-</style>
+
+	</style>
 
 
 </head>
@@ -188,9 +226,10 @@
 										<div class="form-group">
 											<input type="radio" id="address<%= address.id %>" name="address"
 												value="<%= address.id %>" onclick="disableOtherSelections(this)">
-											
+
 											<!-- Close Icon -->
-											<i class="fas fa-times close-icon" style="margin-left: 260px;" onclick="removeAddress('<%= address.id %>')"></i>
+											<i class="fas fa-times close-icon" style="margin-left: 260px;"
+												onclick="removeAddress('<%= address.id %>')"></i>
 										</div>
 
 
@@ -316,29 +355,80 @@
 						<div class="row">
 							<div class="col-md-12">
 								<div class="cart-detail">
-									<h2>Cart Total</h2>
-									<ul>
-										<li>
-											<span><strong>product</strong></span> <span><strong>amount</strong></span>
-											<ul>
-												<% if(typeof userCartItems !='undefined' ) { %>
-													<% userCartItems.forEach(item=> { %>
-
-
-														<li><span><%= item.quantity%> x <%= item.productId.productName %></span> <span><%= item.productId.price%></span></li>
-
+									<h2>Use Coupon Code</h2>
+									<div class="discount-code-wrapper mb-4 p-4">
+										<div class="discount-code">
+											<p class="mb-0">
+												<a id="openModal" class="text-primary" href="#">Available Coupons</a>
+											</p>
+											<div class="text-success" id="coupon-success"></div>
+							
+											<!-- Coupon Modal -->
+											<div id="couponModal" class="modal">
+												<div class="modal-content">
+													<span class="close">&times;</span>
+													<h2>Coupon Details</h2>
+													<% if (typeof coupons != 'undefined') { %>
+														<p style="color: rgb(43, 109, 81);" >Here are some great coupons for you:</p>
+														<hr>
+														<% coupons.forEach(val => { %>
+															<ul>
+																<li>Coupon name: <%= val.name %></li>
+																<li>Code: <a id="couponCode<%= val.id %>"><%= val.code %></a></li>
+																<li>Discount: <%= val.discountAmount %></li>
+																<li>End Date: <%= val.endDate.toLocaleDateString('en-GB') %></li>
+																<li>Min Purchase Amount: <%= val.minPurchaseAmount %></li>
+																<li><a style="color: rgb(80, 80, 251);" onclick="copyCode(event, '<%= val.id %>')" href="#">Copy Code</a></li>
+															</ul>
+															<hr>
 														<% }) %>
-                                                     <% } %>
-												<!-- <li><span>1 x Product Name</span> <span>$78.00</span></li> -->
-											</ul>
-										</li>
-										<!-- <li><span>Shipping</span> <span>$0.00</span></li> -->
-										<li><span>Order Total</span> <span><%= totalCartPrice %></span></li>
-									</ul>
+													<% } else { %>
+														<p>No coupons available at the moment.</p>
+													<% } %>
+												</div>
+											</div>
+							
+											<form class="d-flex flex-column">
+												<input type="text" required id="coupon-code" class="mb-2" placeholder="Enter Coupon Code" />
+												<div class="d-flex justify-content-between">
+													<button class="cart-btn-2 btn btn-primary" onclick="applycoupon(event)" type="button">Apply Coupon</button>
+													<button onclick="reload(event)" class="cart-btn-2 bg-secondary btn btn-secondary" type="button">Cancel</button>
+												</div>
+											</form>
+										</div>
+									</div>
 								</div>
 							</div>
 
-							<div class="w-100"></div>
+							<div class="col-md-12">
+								<div class="cart-detail">
+									<h2>Cart Total</h2>
+									<ul>
+										<li>
+											<span><strong>Product</strong></span> <span><strong>Amount</strong></span>
+											<ul>
+												<% if (typeof userCartItems !='undefined' ) { %>
+													<% userCartItems.forEach(item=> { %>
+														<li><span>
+																<%= item.quantity %> x <%= item.productId.productName %>
+															</span> 
+															<span>
+																<%= item.productId.price %>
+															</span></li>
+														<% }) %>
+															<% } %>
+											</ul>
+										</li>
+										<li hidden id="discount-div"><span>Discount</span> 
+										<span id="discount-price-div">
+											
+										</span></li>
+										<li><span>Order Total</span> <span id="ordertotal">
+												<%= totalCartPrice %>
+											</span></li>
+									</ul>
+								</div>
+							</div>
 
 							<div class="col-md-12">
 								<div class="cart-detail">
@@ -350,20 +440,6 @@
 											</div>
 										</div>
 									</div>
-									<!-- <div class="form-group">
-										<div class="col-md-12">
-											<div class="radio">
-												<label><input type="radio" name="optradio"> Check Payment</label>
-											</div>
-										</div>
-									</div>
-									<div class="form-group">
-										<div class="col-md-12">
-											<div class="radio">
-												<label><input type="radio" name="optradio"> Paypal</label>
-											</div>
-										</div>
-									</div> -->
 									<div class="form-group">
 										<div class="col-md-12">
 											<div class="checkbox">
@@ -374,315 +450,434 @@
 									</div>
 								</div>
 							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12 text-center">
-								<p><a href="#" class="btn btn-primary" onclick="placeOrder(event)">Place an order</a></p>
+
+							<div class="row">
+								<div class="col-md-12 text-center">
+									<p><a href="#" class="btn btn-primary" onclick="placeOrder(event)">Place an
+											order</a></p>
+								</div>
 							</div>
 						</div>
 					</div>
+
+					<footer id="colorlib-footer" role="contentinfo">
+						<div class="container">
+							<div class="row row-pb-md">
+								<div class="col footer-col colorlib-widget">
+									<h4>About Footwear</h4>
+									<p>Even the all-powerful Pointing has no control about the blind texts it is an
+										almost
+										unorthographic life</p>
+									<p>
+									<ul class="colorlib-social-icons">
+										<li><a href="#"><i class="icon-twitter"></i></a></li>
+										<li><a href="#"><i class="icon-facebook"></i></a></li>
+										<li><a href="#"><i class="icon-linkedin"></i></a></li>
+										<li><a href="#"><i class="icon-dribbble"></i></a></li>
+									</ul>
+									</p>
+								</div>
+								<div class="col footer-col colorlib-widget">
+									<h4>Customer Care</h4>
+									<p>
+									<ul class="colorlib-footer-links">
+										<li><a href="#">Contact</a></li>
+										<li><a href="#">Returns/Exchange</a></li>
+										<li><a href="#">Gift Voucher</a></li>
+										<li><a href="#">Wishlist</a></li>
+										<li><a href="#">Special</a></li>
+										<li><a href="#">Customer Services</a></li>
+										<li><a href="#">Site maps</a></li>
+									</ul>
+									</p>
+								</div>
+								<div class="col footer-col colorlib-widget">
+									<h4>Information</h4>
+									<p>
+									<ul class="colorlib-footer-links">
+										<li><a href="#">About us</a></li>
+										<li><a href="#">Delivery Information</a></li>
+										<li><a href="#">Privacy Policy</a></li>
+										<li><a href="#">Support</a></li>
+										<li><a href="#">Order Tracking</a></li>
+									</ul>
+									</p>
+								</div>
+
+								<div class="col footer-col">
+									<h4>News</h4>
+									<ul class="colorlib-footer-links">
+										<li><a href="blog.html">Blog</a></li>
+										<li><a href="#">Press</a></li>
+										<li><a href="#">Exhibitions</a></li>
+									</ul>
+								</div>
+
+								<div class="col footer-col">
+									<h4>Contact Information</h4>
+									<ul class="colorlib-footer-links">
+										<li>291 South 21th Street, <br> Suite 721 New York NY 10016</li>
+										<li><a href="tel://1234567920">+ 1235 2355 98</a></li>
+										<li><a href="mailto:info@yoursite.com">info@yoursite.com</a></li>
+										<li><a href="#">yoursite.com</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="copy">
+							<div class="row">
+								<div class="col-sm-12 text-center">
+									<p>
+										<span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+											Copyright &copy;
+											<script>document.write(new Date().getFullYear());</script> All rights
+											reserved |
+											This
+											template is made with <i class="icon-heart" aria-hidden="true"></i> by <a
+												href="https://colorlib.com/" target="_blank">Colorlib</a>
+											<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+										</span>
+										<span class="block">Demo Images: <a href="http://unsplash.co/"
+												target="_blank">Unsplash</a>
+											, <a href="http://pexels.com/" target="_blank">Pexels.com</a></span>
+									</p>
+								</div>
+							</div>
+						</div>
+					</footer>
 				</div>
-			</div>
-		</div>
 
-		<footer id="colorlib-footer" role="contentinfo">
-			<div class="container">
-				<div class="row row-pb-md">
-					<div class="col footer-col colorlib-widget">
-						<h4>About Footwear</h4>
-						<p>Even the all-powerful Pointing has no control about the blind texts it is an almost
-							unorthographic life</p>
-						<p>
-						<ul class="colorlib-social-icons">
-							<li><a href="#"><i class="icon-twitter"></i></a></li>
-							<li><a href="#"><i class="icon-facebook"></i></a></li>
-							<li><a href="#"><i class="icon-linkedin"></i></a></li>
-							<li><a href="#"><i class="icon-dribbble"></i></a></li>
-						</ul>
-						</p>
-					</div>
-					<div class="col footer-col colorlib-widget">
-						<h4>Customer Care</h4>
-						<p>
-						<ul class="colorlib-footer-links">
-							<li><a href="#">Contact</a></li>
-							<li><a href="#">Returns/Exchange</a></li>
-							<li><a href="#">Gift Voucher</a></li>
-							<li><a href="#">Wishlist</a></li>
-							<li><a href="#">Special</a></li>
-							<li><a href="#">Customer Services</a></li>
-							<li><a href="#">Site maps</a></li>
-						</ul>
-						</p>
-					</div>
-					<div class="col footer-col colorlib-widget">
-						<h4>Information</h4>
-						<p>
-						<ul class="colorlib-footer-links">
-							<li><a href="#">About us</a></li>
-							<li><a href="#">Delivery Information</a></li>
-							<li><a href="#">Privacy Policy</a></li>
-							<li><a href="#">Support</a></li>
-							<li><a href="#">Order Tracking</a></li>
-						</ul>
-						</p>
-					</div>
-
-					<div class="col footer-col">
-						<h4>News</h4>
-						<ul class="colorlib-footer-links">
-							<li><a href="blog.html">Blog</a></li>
-							<li><a href="#">Press</a></li>
-							<li><a href="#">Exhibitions</a></li>
-						</ul>
-					</div>
-
-					<div class="col footer-col">
-						<h4>Contact Information</h4>
-						<ul class="colorlib-footer-links">
-							<li>291 South 21th Street, <br> Suite 721 New York NY 10016</li>
-							<li><a href="tel://1234567920">+ 1235 2355 98</a></li>
-							<li><a href="mailto:info@yoursite.com">info@yoursite.com</a></li>
-							<li><a href="#">yoursite.com</a></li>
-						</ul>
-					</div>
+				<div class="gototop js-top">
+					<a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
 				</div>
-			</div>
-			<div class="copy">
-				<div class="row">
-					<div class="col-sm-12 text-center">
-						<p>
-							<span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-								Copyright &copy;
-								<script>document.write(new Date().getFullYear());</script> All rights reserved | This
-								template is made with <i class="icon-heart" aria-hidden="true"></i> by <a
-									href="https://colorlib.com/" target="_blank">Colorlib</a>
-								<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-							</span>
-							<span class="block">Demo Images: <a href="http://unsplash.co/" target="_blank">Unsplash</a>
-								, <a href="http://pexels.com/" target="_blank">Pexels.com</a></span>
-						</p>
-					</div>
-				</div>
-			</div>
-		</footer>
-	</div>
-
-	<div class="gototop js-top">
-		<a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
-	</div>
 
 
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	<!-- jQuery -->
-	<script src="js/jquery.min.js"></script>
-	<!-- popper -->
-	<script src="js/popper.min.js"></script>
-	<!-- bootstrap 4.1 -->
-	<script src="js/bootstrap.min.js"></script>
-	<!-- jQuery easing -->
-	<script src="js/jquery.easing.1.3.js"></script>
-	<!-- Waypoints -->
-	<script src="js/jquery.waypoints.min.js"></script>
-	<!-- Flexslider -->
-	<script src="js/jquery.flexslider-min.js"></script>
-	<!-- Owl carousel -->
-	<script src="js/owl.carousel.min.js"></script>
-	<!-- Magnific Popup -->
-	<script src="js/jquery.magnific-popup.min.js"></script>
-	<script src="js/magnific-popup-options.js"></script>
-	<!-- Date Picker -->
-	<script src="js/bootstrap-datepicker.js"></script>
-	<!-- Stellar Parallax -->
-	<script src="js/jquery.stellar.min.js"></script>
-	<!-- Main -->
-	<script src="js/main.js"></script>
+				<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+				<!-- jQuery -->
+				<script src="js/jquery.min.js"></script>
+				<!-- popper -->
+				<script src="js/popper.min.js"></script>
+				<!-- bootstrap 4.1 -->
+				<script src="js/bootstrap.min.js"></script>
+				<!-- jQuery easing -->
+				<script src="js/jquery.easing.1.3.js"></script>
+				<!-- Waypoints -->
+				<script src="js/jquery.waypoints.min.js"></script>
+				<!-- Flexslider -->
+				<script src="js/jquery.flexslider-min.js"></script>
+				<!-- Owl carousel -->
+				<script src="js/owl.carousel.min.js"></script>
+				<!-- Magnific Popup -->
+				<script src="js/jquery.magnific-popup.min.js"></script>
+				<script src="js/magnific-popup-options.js"></script>
+				<!-- Date Picker -->
+				<script src="js/bootstrap-datepicker.js"></script>
+				<!-- Stellar Parallax -->
+				<script src="js/jquery.stellar.min.js"></script>
+				<!-- Main -->
+				<script src="js/main.js"></script>
+				<!-- axios -->
+				<!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
 
-	<script>
-		document.getElementById("toggleBillingDetails").addEventListener("click", function () {
-			var billingContent = document.getElementById("billingDetails");
-			billingContent.classList.toggle("show");
-		});
-	</script>
+				<script>
+					document.getElementById("toggleBillingDetails").addEventListener("click", function () {
+						var billingContent = document.getElementById("billingDetails");
+						billingContent.classList.toggle("show");
+					});
+				</script>
 
-	<!-- add adress -->
+				<!-- add adress -->
 
-	<script>
-		function addAddress(event) {
-			event.preventDefault()
-			const userName = document.getElementById('name').value
-			const userNumber = document.getElementById('number').value
-			const userStreet = document.getElementById('street').value
-			const userCity = document.getElementById('city').value
-			const userState = document.getElementById('state').value
-			const userPin = document.getElementById('pin').value
-			const userCountry = document.getElementById('country').value
+				<script>
+					function addAddress(event) {
+						event.preventDefault()
+						const userName = document.getElementById('name').value
+						const userNumber = document.getElementById('number').value
+						const userStreet = document.getElementById('street').value
+						const userCity = document.getElementById('city').value
+						const userState = document.getElementById('state').value
+						const userPin = document.getElementById('pin').value
+						const userCountry = document.getElementById('country').value
 
-			// console.log(userName,userNumber,userStreet,userCity,userState,userPin,userCountry)
+						// console.log(userName,userNumber,userStreet,userCity,userState,userPin,userCountry)
 
-			const addressData = {
+						const addressData = {
 
-				userName: userName,
-				userNumber: userNumber,
-				userStreet: userStreet,
-				userCity: userCity,
-				userState: userState,
-				userPin: userPin,
-				userCountry: userCountry
+							userName: userName,
+							userNumber: userNumber,
+							userStreet: userStreet,
+							userCity: userCity,
+							userState: userState,
+							userPin: userPin,
+							userCountry: userCountry
 
-			}
+						}
 
-			fetch('/addAddress', {
-				method: "post",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(addressData)
-			})
-				.then(response => response.json())
-				.then(data => {
-					if (data.success) {
+						fetch('/addAddress', {
+							method: "post",
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(addressData)
+						})
+							.then(response => response.json())
+							.then(data => {
+								if (data.success) {
+
+									Swal.fire({
+										title: "<span style='color: #3BB77E;'>Success!</span>",
+										html: "<span style='color: black;'>new address added.</span>",
+										icon: "success",
+										confirmButtonColor: "#3BB77E",
+										confirmButtonText: "OK"
+									}).then((result) => {
+										if (result.isConfirmed) {
+											window.location.reload()
+										}
+									})
+								}
+							})
+					}
+				</script>
+
+				<!-- remove address -->
+
+				<script>
+					function removeAddress(id) {
+
+						const addressId = { id: id }
 
 						Swal.fire({
-							title: "<span style='color: #3BB77E;'>Success!</span>",
-							html: "<span style='color: black;'>new address added.</span>",
-							icon: "success",
-							confirmButtonColor: "#3BB77E",
-							confirmButtonText: "OK"
+							title: "<span style='color: #3d5280;'>Are you sure?</span>",
+							// html: "<span style='color: black;'>address edited.</span>",
+							showCancelButton: true,
+							icon: "question",
+							confirmButtonColor: "#3d5280",
+							confirmButtonText: "Yes"
 						}).then((result) => {
 							if (result.isConfirmed) {
-								window.location.reload()
+								fetch('/deleteAddress', {
+									method: "post",
+									headers: {
+										'Content-Type': 'application/json'
+									},
+									body: JSON.stringify(addressId)
+								})
+									.then(response => response.json())
+									.then(data => {
+										if (data.success) {
+											Swal.fire({
+												title: "<span style='color: #3BB77E;'>Success!</span>",
+												html: "<span style='color: black;'>address removed.</span>",
+												icon: "success",
+												confirmButtonColor: "#3BB77E",
+												confirmButtonText: "OK"
+											}).then((result) => {
+												if (result.isConfirmed) {
+													window.location.reload()
+												}
+											})
+										}
+									})
 							}
 						})
 					}
-				})
-		}
-	</script>
+				</script>
 
-	<!-- remove address -->
+				<!-- place order -->
 
-	<script>
-        function removeAddress(id) {
+				<script>
+					function placeOrder(event) {
+						event.preventDefault();  // Prevent the default action of the link
 
-            const addressId = { id: id }
-            
-            Swal.fire({
-                title: "<span style='color: #3d5280;'>Are you sure?</span>",
-                // html: "<span style='color: black;'>address edited.</span>",
-                showCancelButton: true,
-                icon: "question",
-                confirmButtonColor: "#3d5280",
-                confirmButtonText: "Yes"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/deleteAddress', {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(addressId)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.success){
-                        Swal.fire({
-                            title: "<span style='color: #3BB77E;'>Success!</span>",
-                            html: "<span style='color: black;'>address removed.</span>",
-                            icon: "success",
-                            confirmButtonColor: "#3BB77E",
-                            confirmButtonText: "OK"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload()
-                            }
-                        })
-                    }
-                })
-                }
-            })
-        }
-    </script>
+						const succesMsg = document.getElementById('coupon-success');
 
-	<!-- place order -->
+						let couponApplied = ''
 
-	<script>
-		function placeOrder(event) {
-			event.preventDefault();  // Prevent the default action of the link
-	
-			// Get the selected address
-			const selectedAddress = document.querySelector('input[name="address"]:checked');
-	
-			if (!selectedAddress) {
-				// Show a SweetAlert error if no address is selected
-				Swal.fire({
-					icon: 'error',
-					title: 'No address selected',
-					text: 'Please select an address before placing the order.'
-				});
-				return;
-			}
-	
-			const addressId = selectedAddress.value;  // Get the value (address ID) of the selected address
+						if(succesMsg.innerText = '*coupon applied'){
 
-			console.log(addressId)
+							const coupon = document.getElementById('coupon-code').value
 
-			// Confirm order placement using SweetAlert
-			Swal.fire({
-				title: 'Are you sure?',
-				text: "Do you want to place the order?",
-				icon: 'warning',
-				showCancelButton: true,
-				confirmButtonColor: '#3085d6',
-				cancelButtonColor: '#d33',
-				confirmButtonText: 'Yes, place it!'
-			}).then((result) => {
-				if (result.isConfirmed) {
-					// If user confirms, proceed with order placement
-					fetch('/placeOrder', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify({ addressId: addressId })
-					})
-					.then(response => response.json())
-					.then(data => {
-						if (data.success) {
-							// Show SweetAlert success message
-							Swal.fire({
-								icon: 'success',
-								title: 'Order Placed',
-								text: 'Your order has been placed successfully!',
-								timer: 3000,
-								timerProgressBar: true,
-								willClose: () => {
-									// Redirect to order confirmation page
-									window.location.href = '/orderComplete';
-								}
-							});
-						} else {
-							// Show SweetAlert error if there's an issue
+							couponApplied = coupon
+						}
+
+						// Get the selected address
+						const selectedAddress = document.querySelector('input[name="address"]:checked');
+
+						if (!selectedAddress) {
+							// Show a SweetAlert error if no address is selected
 							Swal.fire({
 								icon: 'error',
-								title: 'Order Failed',
-								text: data.message || 'There was an error placing the order.'
+								title: 'No address selected',
+								text: 'Please select an address before placing the order.'
 							});
+							return;
 						}
-					})
-					.catch(error => {
-						console.error('Error:', error);
-						// Show SweetAlert error if the fetch request fails
+
+						const addressId = selectedAddress.value;  // Get the value (address ID) of the selected address
+
+						console.log(addressId)
+
+						// Confirm order placement using SweetAlert
 						Swal.fire({
-							icon: 'error',
-							title: 'Error',
-							text: 'An error occurred while placing the order. Please try again later.'
+							title: 'Are you sure?',
+							text: "Do you want to place the order?",
+							icon: 'warning',
+							showCancelButton: true,
+							confirmButtonColor: '#3085d6',
+							cancelButtonColor: '#d33',
+							confirmButtonText: 'Yes, place it!'
+						}).then((result) => {
+							if (result.isConfirmed) {
+								// If user confirms, proceed with order placement
+								fetch('/placeOrder', {
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json'
+									},
+									body: JSON.stringify({ addressId: addressId,coupon: couponApplied })
+								})
+									.then(response => response.json())
+									.then(data => {
+										if (data.success) {
+											// Show SweetAlert success message
+											Swal.fire({
+												icon: 'success',
+												title: 'Order Placed',
+												text: 'Your order has been placed successfully!',
+												timer: 3000,
+												timerProgressBar: true,
+												willClose: () => {
+													// Redirect to order confirmation page
+													window.location.href = '/orderComplete';
+												}
+											});
+										} else {
+											// Show SweetAlert error if there's an issue
+											Swal.fire({
+												icon: 'error',
+												title: 'Order Failed',
+												text: data.message || 'There was an error placing the order.'
+											});
+										}
+									})
+									.catch(error => {
+										console.error('Error:', error);
+										// Show SweetAlert error if the fetch request fails
+										Swal.fire({
+											icon: 'error',
+											title: 'Error',
+											text: 'An error occurred while placing the order. Please try again later.'
+										});
+									});
+							}
 						});
-					});
-				}
-			});
-		}
-	</script>
-	
+					}
+				</script>
+
+				<!-- coupon modal -->
+
+				<script>
+					// Get the modal, open button, and close button elements
+					const modal = document.getElementById('couponModal');
+					const openModal = document.getElementById('openModal');
+					const closeBtn = document.querySelector('.close');
+				
+					// Open the modal when clicking the "Available Coupons" link
+					openModal.onclick = (event) => {
+						event.preventDefault(); // Prevent the page from reloading
+						modal.style.display = 'block';
+					};
+				
+					// Close the modal when clicking the close button
+					closeBtn.onclick = () => {
+						modal.style.display = 'none';
+					};
+				
+					// Close the modal when clicking outside the modal content
+					window.onclick = (event) => {
+						if (event.target === modal) {
+							modal.style.display = 'none';
+						}
+					};
+				</script>
+
+				<!-- copy coupon code -->
+				<script>
+					function copyCode(event, couponId) {
+						event.preventDefault()
+
+						const couponCode = document.getElementById(`couponCode${couponId}`).innerText
+						let input = document.getElementById('coupon-code')
+
+						let tempInput = document.createElement('input')
+						tempInput.value = couponCode
+						document.body.appendChild(tempInput)
+
+						tempInput.select()
+						document.execCommand('copy')
+
+						input.value = couponCode
+
+						document.body.removeChild(tempInput)
+					}
+				</script>
+
+				<!-- apply coupon -->
+				<script>
+					function applycoupon(event) {
+						event.preventDefault();
+
+						const couponInput = document.getElementById('coupon-code').value;
+
+						console.log( couponInput );
+
+						fetch('/applyCoupon', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({ couponCode: couponInput })
+						})
+							.then(response => response.json())
+							.then(res => {
+								const succesMsg = document.getElementById('coupon-success');
+
+								
+								if (res.discountedAmount) {
+									const totalDiv = document.getElementById('ordertotal');
+									const discoundDiv = document.getElementById('discount-div');
+									const discountPriceDiv = document.getElementById('discount-price-div');
+
+									discoundDiv.removeAttribute('hidden');
+									discountPriceDiv.innerHTML = `${res.discount}`;
+
+									totalDiv.innerHTML = res.discountedAmount;
+									succesMsg.classList.remove('text-danger');
+									succesMsg.classList.add('text-success');
+									succesMsg.innerText = '*coupon applied';
+								} else if (res.error) {
+									succesMsg.classList.remove('text-success');
+									succesMsg.classList.add('text-danger');
+									succesMsg.innerText = res.error;
+								} else {
+									succesMsg.innerText = '';
+								}
+							})
+							.catch(err => {
+								console.error(err);
+							});
+					}
+				</script>
+
+				<script>
+					function reload(event) {
+						event.preventDefault()
+
+						window.location.reload()
+					}
+				</script>
+
 
 </body>
 

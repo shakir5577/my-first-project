@@ -395,6 +395,13 @@
                 .then(data => {
                     if (data.error) {
                         displayErrorName("*this coupon already exists")
+                        Swal.fire({
+                            title: "<span style='color: #FF4E4E;'>Error</span>",
+                            html: "<span style='color: black;'>This coupon already exists.</span>",
+                            icon: "error",
+                            confirmButtonColor: "#FF4E4E", // Bootstrap's danger color
+                            confirmButtonText: "OK"
+                        });
                     } else if (data.success) {
 
                         Swal.fire({
@@ -405,7 +412,7 @@
                             confirmButtonText: "OK"
                         }).then(result => {
                             if (result.isConfirmed) {
-                                window.location.href = '/admin/coupons';
+                                window.location.href = '/admin/coupon';
                             }
                         })
                     }

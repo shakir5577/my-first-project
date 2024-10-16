@@ -44,8 +44,12 @@ const orderDetailes = async (req,res) => {
         const { id } = req.query
 
         const findOrder = await orderModel.findById(id).populate('products.product')
+        console.log(findOrder);
+        
 
         res.render('user/orderDetailes',{order:findOrder})
+
+
 
     }catch(error){
         console.log(error)

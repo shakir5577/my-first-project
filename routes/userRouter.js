@@ -8,6 +8,7 @@ const accountController = require('../controllers/user/accountController')
 const passportController = require('../controllers/user/passportControlller')
 const orderController = require('../controllers/user/orderController')
 const wishlistController = require('../controllers/user/wishlistController')
+const couponController = require('../controllers/user/couponController')
 const session = require('../middlewares/sessionCheck')
 
 
@@ -51,6 +52,9 @@ router.post('/cancelOrder',accountController.cancelOrder)
 router.get('/wishlist',session.isLogin,wishlistController.loadWishlist)
 router.post('/addToWishlist',wishlistController.addToWishlist)
 router.post('/removeFromWishlist',wishlistController.removeFromWishlist)
+
+router.get('/coupon',couponController.showCoupon)
+router.post('/applyCoupon',couponController.applyCoupon)
 
 
 router.get('/success', passportController.successGoogleLogin); 
