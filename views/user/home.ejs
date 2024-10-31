@@ -40,6 +40,24 @@
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="css/style.css">
 
+	<style>
+		.prod-img {
+    position: relative;
+}
+
+.offer-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: rgb(255, 179, 179);
+    color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+	</style>
+
 </head>
 
 <body>
@@ -228,23 +246,42 @@
 					</div>
 				</div>
 				<div class="row row-pb-md">
-					<% products.forEach(product=> { %>
+					<% products.forEach(product => { %>
 						<div class="col-lg-3 mb-4 text-center">
 							<div class="product-entry border">
-								<a href="/showProduct?id=<%= product.id %>" class="prod-img">
-									<img src="<%= product.images[0] %>" class="img-fluid"
-										alt="Free html5 bootstrap 4 template">
+				
+								<a href="/showProduct?id=<%= product.id %>" class="prod-img position-relative">
+									<img src="<%= product.images[0] %>" class="img-fluid" alt="Product Image">
+				
+									<!-- Offer badge if the product has offers -->
+									<% if (product.offers && product.offers.length > 0) { %>
+										<span class="offer-badge badge bg-danger small position-absolute top-0 start-0 m-2">
+											Offer
+										</span>
+									<% } %>
 								</a>
+				
 								<div class="desc">
-									<h2><a href="#">
-											<%= product.productName %>
-										</a></h2>
-									<span class="price">₹<%= product.price %></span>
+									<h2><a href="#"><%= product.productName %></a></h2>
+				
+									<!-- Check if the product has offers -->
+									<% if (product.offers && product.offers.length > 0) { %>
+										<% 
+											const offer = product.offers[0]; // Assuming one active offer per product
+											const discountedPrice = product.price - offer.discount
+										%>
+										<span class="price">
+											<del>₹<%= product.price %></del> <!-- Original Price with Strikethrough -->
+											<strong>₹<%= discountedPrice.toFixed(2) %></strong> <!-- Discounted Price -->
+										</span>
+									<% } else { %>
+										<span class="price">₹<%= product.price %></span> <!-- Regular Price -->
+									<% } %>
 								</div>
 							</div>
 						</div>
-						<% }) %>
-				</div>
+					<% }) %>
+				</div>	
 				<div class="row">
 					<div class="col-md-12 text-center">
 						<p><a href="/shop" class="btn btn-primary btn-lg">Shop All Products</a></p>

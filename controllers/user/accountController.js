@@ -1,6 +1,8 @@
 const userModel = require('../../models/userModel')
 const addressModel = require('../../models/addressModel')
 const orderModel = require('../../models/orderModel')
+const productModel = require('../../models/productModel')
+const transactionModel = require('../../models/transactionSchema')
 const bcrypt = require("bcrypt")
 
 
@@ -22,11 +24,11 @@ const showOrders = async (req, res) => {
 
     try {
 
-        const {userId} = req.session
-        const findOrder = await orderModel.find({user: userId})
+        const { userId } = req.session
+        const findOrder = await orderModel.find({ user: userId })
         // console.log(findOrder)
 
-        res.render('user/myaccountOrders',{orders:findOrder})
+        res.render('user/myaccountOrders', { orders: findOrder })
 
 
     } catch (error) {
@@ -36,28 +38,32 @@ const showOrders = async (req, res) => {
     }
 }
 
-const orderDetailes = async (req,res) => {
+const orderDetailes = async (req, res) => {
 
-    try{
+    try {
 
-        console.log(req.query)
+        // console.log(req.query)
         const { id } = req.query
 
         const findOrder = await orderModel.findById(id).populate('products.product')
-        console.log(findOrder);
-        
+        // console.log(findOrder);
 
-        res.render('user/orderDetailes',{order:findOrder})
+        if (!findOrder) {
+            return console.log("can't get order details in load order details")
+        }
+
+
+        res.render('user/orderDetailes', { order: findOrder })
 
 
 
-    }catch(error){
+    } catch (error) {
         console.log(error)
     }
 }
 
 
-const cancelOrder = async (req, res) => {
+const cancelSingleProduct = async (req, res) => {
 
     try {
 
@@ -69,30 +75,68 @@ const cancelOrder = async (req, res) => {
             return console.log("can't get order id and product id at cancel single product")
         }
 
-        const findOrder = await orderModel.findById(orderId )
+        const findOrder = await orderModel.findById(orderId)
+
+        // console.log(findOrder)
 
         if (!findOrder) {
             return console.log("can't find order at cancel single products")
         }
 
         const product = findOrder.products.find(val => val.product == productId)
+       
+        
 
         if (!product) {
             return console.log("can't find product at cancel single products")
         }
 
+        const findProduct = await productModel.findById(product.product.toString())
+
+        console.log(findProduct)
+        return
+
+        if (!findProduct) {
+            return console.log("cnat find findProduct in cancel singel product")
+        }
+
+        findProduct.stock += product.quantity
+
+        await findProduct.save()
+
         product.productStatus = 'Cancelled'
 
         const allCancelled = findOrder.products.every(p => p.productStatus === 'Cancelled');
         if (allCancelled) {
-            findOrder.orderStatus = 'Cancelled';
+            findOrder.status = 'Cancelled';
         }
 
         const saveCancel = await findOrder.save()
 
-    if(saveCancel){
-        res.send({success: true})
-    }
+        if(findOrder.paymentMethod == 'Razor Pay' || findOrder.paymentMethod == 'wallet') {
+
+            const user = await userModel.findById(userId)
+            user.balance += findOrder.totalAmount
+            await user.save()
+
+            const transaction = new transactionModel({
+                userId : userId,
+                amount : findOrder.totalAmount,
+                type : 'credit'
+            })
+
+            await transaction.save()
+
+            res.send({ success: 1})
+
+        }else if(saveCancel) {
+            console.log("cancel product success")
+            res.send({ success: 2})
+        }
+
+        // if (saveCancel) {
+        //     res.send({ success: true })
+        // }
 
     } catch (error) {
 
@@ -108,7 +152,7 @@ const showAddress = async (req, res) => {
 
         const { userId } = req.session
 
-        const findAddress = await addressModel.findOne({userId : userId})
+        const findAddress = await addressModel.findOne({ userId: userId })
 
         let address
 
@@ -118,8 +162,8 @@ const showAddress = async (req, res) => {
         } else {
             address = findAddress.address
         }
-        
-        res.render('user/myaccountAddress',{address: address})
+
+        res.render('user/myaccountAddress', { address: address })
 
 
     } catch (error) {
@@ -129,15 +173,15 @@ const showAddress = async (req, res) => {
     }
 }
 
-const showAccountDetails = async (req,res) => {
+const showAccountDetails = async (req, res) => {
 
-    try{
+    try {
         const { userId } = req.session
 
         const findUser = await userModel.findById(userId)
 
-        res.render('user/accountDetails',{findUser: findUser})
-    }catch(error){
+        res.render('user/accountDetails', { findUser: findUser })
+    } catch (error) {
 
         console.log(error)
     }
@@ -178,27 +222,27 @@ const createAddress = async (req, res) => {
             const saveAddress = await createAddress.save()
             if (saveAddress) {
                 console.log("new address added")
-                res.send({success:true})
+                res.send({ success: true })
                 return
             }
 
         }
 
-            checkExistingAddress.address.push({
+        checkExistingAddress.address.push({
 
-                name: userName,
-                number: userNumber,
-                street: userStreet,
-                city: userCity,
-                state: userState,
-                pin: userPin,
-                country: userCountry
-            })
+            name: userName,
+            number: userNumber,
+            street: userStreet,
+            city: userCity,
+            state: userState,
+            pin: userPin,
+            country: userCountry
+        })
 
-            const updateAddress = await checkExistingAddress.save()
-        
+        const updateAddress = await checkExistingAddress.save()
 
-        res.send({success:true})
+
+        res.send({ success: true })
 
 
     } catch (error) {
@@ -207,46 +251,46 @@ const createAddress = async (req, res) => {
     }
 }
 
-const editAddress = async (req,res) => {
+const editAddress = async (req, res) => {
 
-    try{
+    try {
 
         // console.log(req.body)
 
 
-        const {addressId, userName, userNumber, userStreet, userCity, userState, userPin, userCountry } = req.body
+        const { addressId, userName, userNumber, userStreet, userCity, userState, userPin, userCountry } = req.body
         const { userId } = req.session
 
-        const findUser = await addressModel.findOne({userId : userId})
+        const findUser = await addressModel.findOne({ userId: userId })
 
-        if(findUser){
-           const findAddress = findUser.address.find(val => val.id == addressId)
-           findAddress.name = userName
-           findAddress.number = userNumber
-           findAddress.street = userStreet
-           findAddress.city = userCity
-           findAddress.state = userState
-           findAddress.pin = userPin
-           findAddress.country = userCountry
+        if (findUser) {
+            const findAddress = findUser.address.find(val => val.id == addressId)
+            findAddress.name = userName
+            findAddress.number = userNumber
+            findAddress.street = userStreet
+            findAddress.city = userCity
+            findAddress.state = userState
+            findAddress.pin = userPin
+            findAddress.country = userCountry
         }
 
         await findUser.save()
-        res.send({success:true})
+        res.send({ success: true })
         // console.log(findUser)
-    }catch(error){
+    } catch (error) {
 
         console.log(error)
     }
 }
 
-const deleteAddress = async(req,res) => {
+const deleteAddress = async (req, res) => {
 
-    try{
+    try {
 
         // console.log(req.session)
         // console.log(req.body)
-        
-        const {id} = req.body
+
+        const { id } = req.body
         const { userId } = req.session
 
 
@@ -260,52 +304,52 @@ const deleteAddress = async(req,res) => {
                 },
             }
         );
-        
-        res.send({success: true})
+
+        res.send({ success: true })
 
 
-    }catch(error){
+    } catch (error) {
         console.log(error)
     }
 }
 
-const editAccount = async (req,res) => {
+const editAccount = async (req, res) => {
 
-    try{
+    try {
 
-        const {userName,userNumber} = req.body
-        const {userId} = req.session
+        const { userName, userNumber } = req.body
+        const { userId } = req.session
 
-        const findAccount = await userModel.findOne({_id: userId})
+        const findAccount = await userModel.findOne({ _id: userId })
         // console.log(findAccount)
 
         findAccount.name = userName
         findAccount.number = userNumber
 
         const update = await findAccount.save()
-        res.send({success:true})
+        res.send({ success: true })
 
-        if(update){
+        if (update) {
 
             console.log("updated..")
-            
+
         }
 
         // console.log(req.body)
         // console.log(req.session)
 
 
-    }catch(error){
+    } catch (error) {
         console.log(error)
     }
 }
 
-const changePassword = async (req,res) => {
+const changePassword = async (req, res) => {
 
-    try{
+    try {
 
         // console.log(req.body)
-        const {userId,oldPassword,newPassword} = req.body
+        const { userId, oldPassword, newPassword } = req.body
         const findUser = await userModel.findById(userId)
         if (!findUser) {
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -313,32 +357,32 @@ const changePassword = async (req,res) => {
         // console.log(userId)
         // console.log(findUser)
 
-        const isMatch = await bcrypt.compare(oldPassword,findUser.password)
+        const isMatch = await bcrypt.compare(oldPassword, findUser.password)
         if (!isMatch) {
             return res.status(400).json({ success: false, message: 'Old password is incorrect' });
         }
         // console.log(isMatch)
 
-        const hashedPassword = await bcrypt.hash(newPassword,10)
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
         // console.log(hashedPassword)
 
         findUser.password = hashedPassword
         await findUser.save()
-        res.send({success:true})
+        res.send({ success: true })
 
 
-    }catch(error){
+    } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 }
 
-const logout = async (req,res,next) => {
+const logout = async (req, res, next) => {
 
-    try{
+    try {
 
         const des = req.session.destroy();
         res.redirect('/login')
-    }catch(error){
+    } catch (error) {
         next(error)
     }
 }
@@ -356,5 +400,5 @@ module.exports = {
     changePassword,
     logout,
     orderDetailes,
-    cancelOrder
+    cancelSingleProduct
 }

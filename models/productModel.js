@@ -8,10 +8,12 @@ const productSchema = new mongoose.Schema({
     description: { type: String, required: true, trim: true },
     category: { type: String, riquired: true },
     price: { type: Number, required: true, min: 0 },
+    offerPrice: { type: Number, default: 0 },
     stock: { type: Number, required: true, min: 0, default: 0 },
     images: [String],
     isBlock: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    offers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'offer'}]
 
 })
 

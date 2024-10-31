@@ -9,6 +9,8 @@ const passportController = require('../controllers/user/passportControlller')
 const orderController = require('../controllers/user/orderController')
 const wishlistController = require('../controllers/user/wishlistController')
 const couponController = require('../controllers/user/couponController')
+const razorpayController = require('../controllers/user/razorpayController')
+const walletController = require('../controllers/user/walletController')
 const session = require('../middlewares/sessionCheck')
 
 
@@ -47,7 +49,8 @@ router.get('/logout',session.isLogin,accountController.logout)
 
 router.post('/placeOrder',orderController.placeOrder)
 router.get('/orderComplete',session.isLogin,orderController.orderComplete)
-router.post('/cancelOrder',accountController.cancelOrder)
+router.post('/cancelOrder',orderController.cancelOrder)
+router.post('/cancelSingleProduct',accountController.cancelSingleProduct)
 
 router.get('/wishlist',session.isLogin,wishlistController.loadWishlist)
 router.post('/addToWishlist',wishlistController.addToWishlist)
@@ -55,6 +58,13 @@ router.post('/removeFromWishlist',wishlistController.removeFromWishlist)
 
 router.get('/coupon',couponController.showCoupon)
 router.post('/applyCoupon',couponController.applyCoupon)
+
+router.post('/createOrder',razorpayController.createOrder)
+router.post('/verifyPayment',razorpayController.verifyPayment)
+
+router.get('/walletHistory',session.isLogin,walletController.loadWallet)
+router.get('/wallet',session.isLogin,walletController.loadmyAccountWallet)
+router.post('/orderWithWallet',walletController.orderWithWallet)
 
 
 router.get('/success', passportController.successGoogleLogin); 
@@ -64,6 +74,8 @@ router.get('/auth/google/callback',
     passportController.successGoogleLogin
 );
 router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+
+
 
 
 

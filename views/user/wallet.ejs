@@ -1,10 +1,10 @@
 <!DOCTYPE HTML>
 <html>
 	
-<!-- Mirrored from themewagon.github.io/footwear/order-complete.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Aug 2024 04:17:40 GMT -->
+<!-- Mirrored from themewagon.github.io/footwear/cart.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Aug 2024 04:17:40 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
 <head>
-	<title>ShoeVault</title>
+	<title>Footwear - Free Bootstrap 4 Template by Colorlib</title>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -49,7 +49,7 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-sm-7 col-md-9">
-							<div id="colorlib-logo"><a href="index.html">ShoeVault</a></div>
+							<div id="colorlib-logo"><a href="index.html">Footwear</a></div>
 						</div>
 						<div class="col-sm-5 col-md-3">
 			            <form action="#" class="search-wrap">
@@ -60,29 +60,20 @@
 			            </form>
 			         </div>
 		         </div>
-					<div class="row">
-						<div class="col-sm-12 text-left menu-1">
-							<ul>
-								<li><a href="/">Home</a></li>
-								<li class="has-dropdown">
-									<a href="shop">shop</a>
-									<!-- <ul class="dropdown ">
-										<li><a href="product-detail.html">Product Detail</a></li>
-										<li><a href="cart.html">Shopping Cart</a></li>
-										<li><a href="checkout.html">Checkout</a></li>
-										<li><a href="order-complete.html">Order Complete</a></li>
-										<li><a href="add-to-wishlist.html">Wishlist</a></li>
-									</ul> -->
-								</li>
-								<!-- <li><a href="women.html">Women</a></li> -->
-								<!-- <li><a href="blog.html">Blog</a></li> -->
-								<li><a href="about">About</a></li>
-								<li><a href="myAccount">my account</a></li>
-								<li class="cart"><a href="wishlist"><i class="icon-heart"></i></a>
-								<li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a></li>
-							</ul>
-						</div>
-					</div>
+                 <div class="row">
+                    <div class="col-sm-12 text-left menu-1">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li class="has-dropdown ">
+                                <a href="/shop">shop</a>
+                            </li>
+                            <li><a href="about">About</a></li>
+                            <li><a href="/myAccount">my account</a></li>
+                            <li class="cart"><a href="wishlist"><i class="icon-heart"></i></a></li>
+                            <li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
 				</div>
 			</div>
 			<div class="sale">
@@ -113,7 +104,7 @@
 			<div class="container">
 				<div class="row">
 					<div class="col">
-						<p class="bread"> <span>Purchase Complete</span></p>
+						<p class="bread"><span><a href=""></a></span>  <span>Wallet</span></p>
 					</div>
 				</div>
 			</div>
@@ -123,35 +114,141 @@
 		<div class="colorlib-product">
 			<div class="container">
 				<div class="row row-pb-lg">
-					<div class="col-sm-10 offset-md-1">
+					<!-- <div class="col-md-10 offset-md-1">
 						<div class="process-wrap">
 							<div class="process text-center active">
 								<p><span>01</span></p>
 								<h3>Shopping Cart</h3>
 							</div>
-							<div class="process text-center active">
+							<div class="process text-center">
 								<p><span>02</span></p>
 								<h3>Checkout</h3>
 							</div>
-							<div class="process text-center active">
+							<div class="process text-center">
 								<p><span>03</span></p>
 								<h3>Order Complete</h3>
 							</div>
 						</div>
+					</div> -->
+				</div>
+				<div class="row row-pb-lg">
+					<div class="col-md-12">
+						<table class="table table-striped table-bordered">
+							<thead class="bg-light">
+								<tr class="text-center">
+									<th>Date</th>
+									<th>Time</th>
+									<th>Amount</th>
+									<th>Type</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if (transactions && transactions.length > 0) { %>
+									<% transactions.forEach(val => { %>
+										<tr class="text-center">
+											<td><%= new Date(val.date).toLocaleDateString('en-GB') %></td>
+											<td><%= new Date(val.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) %></td>
+											<td><span class="price"><%= val.amount %></span></td>
+											<td><span class="type"><%= val.type %></span></td>
+										</tr>
+									<% }) %>
+								<% } else { %>
+									<tr>
+										<td colspan="4" class="text-center">No transactions found.</td>
+									</tr>
+								<% } %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+                
+				<!-- <div class="row row-pb-lg">
+					<div class="col-md-12">
+						<div class="total-wrap">
+							<div class="row">
+								<div class="col-sm-8">
+									<form action="#">
+										<div class="row form-group">
+											<div class="col-sm-9">
+												<input type="text" name="quantity" class="form-control input-number" placeholder="Your Coupon Number...">
+											</div>
+											<div class="col-sm-3">
+												<input type="submit" value="Apply Coupon" class="btn btn-primary">
+											</div>
+										</div>
+									</form>
+								</div>
+								<div class="col-sm-4 text-center">
+									<div class="total">
+										<div class="sub">
+											<p><span>Subtotal:</span> <span>$200.00</span></p>
+											<p><span>Delivery:</span> <span>$0.00</span></p>
+											<p><span>Discount:</span> <span>$45.00</span></p>
+										</div>
+										<div class="grand-total">
+											<p><span><strong>Total:</strong></span> <span>$450.00</span></p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
+						<h2>Related Products</h2>
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-sm-10 offset-sm-1 text-center">
-						<p class="icon-addcart"><span><i class="icon-check"></i></span></p>
-						<h2 class="mb-4">Thank you for purchasing, Your order is complete</h2>
-						<p>
-							<a href="orders"class="btn btn-primary btn-outline-primary">view order</a>
-							<a href="shop"class="btn btn-primary btn-outline-primary"><i class="icon-shopping-cart"></i> Continue Shopping</a>
-						</p>
+					<div class="col-md-3 col-lg-3 mb-4 text-center">
+						<div class="product-entry border">
+							<a href="#" class="prod-img">
+								<img src="images/item-1.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+							</a>
+							<div class="desc">
+								<h2><a href="#">Women's Boots Shoes Maca</a></h2>
+								<span class="price">$139.00</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 col-lg-3 mb-4 text-center">
+						<div class="product-entry border">
+							<a href="#" class="prod-img">
+								<img src="images/item-2.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+							</a>
+							<div class="desc">
+								<h2><a href="#">Women's Minam Meaghan</a></h2>
+								<span class="price">$139.00</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 col-lg-3 mb-4 text-center">
+						<div class="product-entry border">
+							<a href="#" class="prod-img">
+								<img src="images/item-3.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+							</a>
+							<div class="desc">
+								<h2><a href="#">Men's Taja Commissioner</a></h2>
+								<span class="price">$139.00</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 col-lg-3 mb-4 text-center">
+						<div class="product-entry border">
+							<a href="#" class="prod-img">
+								<img src="images/item-4.jpg" class="img-fluid" alt="Free html5 bootstrap 4 template">
+							</a>
+							<div class="desc">
+								<h2><a href="#">Russ Men's Sneakers</a></h2>
+								<span class="price">$139.00</span>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 		<footer id="colorlib-footer" role="contentinfo">
 			<div class="container">
@@ -260,6 +357,6 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 
 	</body>
 
-<!-- Mirrored from themewagon.github.io/footwear/order-complete.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Aug 2024 04:17:41 GMT -->
+<!-- Mirrored from themewagon.github.io/footwear/cart.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Aug 2024 04:17:40 GMT -->
 </html>
 

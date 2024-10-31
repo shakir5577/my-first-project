@@ -126,24 +126,17 @@
 
         <div class="colorlib-product">
             <div class="container">
-                <!-- <div class="row row-pb-lg">
-					<div class="col-md-10 offset-md-1">
-						<div class="process-wrap">
-							<div class="process text-center active">
-								<p><span>01</span></p>
-								<h3>Shopping Cart</h3>
-							</div>
-							<div class="process text-center">
-								<p><span>02</span></p>
-								<h3>Checkout</h3>
-							</div>
-							<div class="process text-center">
-								<p><span>03</span></p>
-								<h3>Order Complete</h3>
-							</div>
-						</div>
-					</div>
-				</div> -->
+
+                <div class="d-flex justify-content-end mb-3" style="color: black;">
+                    <% if(order.status !=='Cancelled' && order.staus !=='Delivered' && order.status !=='Returned' ) { %>
+                        <button type="button" class="btn btn-primary"
+                            onclick="cancelBulkOrder(event,'<%= order.id %>')">Cancel order
+                        </button>
+                        <% } %>
+                            <button type="button" class="btn btn-primary">Go back
+                            </button>
+                </div>
+
                 <div class="row row-pb-lg">
                     <div class="col-md-12">
                         <div class="product-name d-flex">
@@ -180,7 +173,9 @@
                                 </div>
                                 <div class="one-eight text-center">
                                     <div class="display-tc">
-                                        <span class="price"><%= product.product.price %></span>
+                                        <span class="price">
+                                            <%= product.product.price %>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="one-eight text-center">
@@ -192,7 +187,9 @@
                                 </div>
                                 <div class="one-eight text-center">
                                     <div class="display-tc">
-                                        <span class="price"><%= product.product.price * product.quantity %></span>
+                                        <span class="price">
+                                            <%= product.product.price * product.quantity %>
+                                        </span>
                                     </div>
                                 </div>
                                 <!-- New column for Status -->
@@ -206,61 +203,53 @@
                                 <div class="one-eight text-center">
                                     <div class="display-tc">
                                         <!-- Cancel button -->
-                                         <% if(product.productStatus != 'Cancelled') {%>
+                                        <% if(product.productStatus !='Cancelled' ) {%>
 
                                             <button type="button" class="btn btn-primary"
-                                            onclick="cancelOrder(event, '<%= product.product.id %>', '<%= order.id %>')">Cancel</button>
+                                                onclick="cancelOrder(event, '<%= product.product.id %>', '<%= order.id %>')">Cancel</button>
                                             <% } else{}%>
-                                        
+
                                     </div>
                                 </div>
                             </div>
-                            <% }) %>        
+                            <% }) %>
                     </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary">Continue payment</button>
                 </div>
                 <div class="row">
                     <div class="col-md-4"></div>
                     <div class="col-md-4"></div>
-                <div class="col-md-4">
-                    <div class="cart-detail">
-                        <h2>Order Total</h2>
-                        <ul>
-                            <li>
-                                <!-- <span><strong>Product</strong></span> <span><strong>Amount</strong></span> -->
-                                <ul>
-                                    <li>
-                                        <span>Total</span>
-                                        <span><%= order.orginalAmount %></span>
-                                    </li>
-                                    <li>
-                                        <span>Discount</span>
-                                        <span><%= order.orginalAmount - order.totalAmount %></span>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!-- <li hidden id="discount-div">
-                                <span>Discount</span> 
-                                <span id="discount-price-div">₹1000</span>
-                            </li> -->
-                            <li>
-                                <span><strong>Grand Total</strong></span> <span><strong><%= order.totalAmount %></strong></span>
-                                <!-- <span id="ordertotal">₹11000</span> -->
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-                
-                <!-- <div class="row row-pb-lg">
-                    <div class="col-md-12">
-                        <div class="total-wrap">
-                            <div class="row">
-                                <div class="col-sm-8">
-                                </div>
-                            </div>
+                    <div class="col-md-4">
+                        <div class="cart-detail">
+                            <h2>Order Total</h2>
+                            <ul>
+                                <li>
+                                    <ul>
+                                        <li>
+                                            <span>Total</span>
+                                            <span>
+                                                <%= order.orginalAmount %>
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <span>Discount</span>
+                                            <span>
+                                                <%= order.orginalAmount - order.totalAmount %>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span><strong>Grand Total</strong></span> <span><strong>
+                                            <%= order.totalAmount %>
+                                        </strong></span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
 
@@ -377,7 +366,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
+    <!-- cancel single order -->
     <script>
         function cancelOrder(event, productId, orderId) {
             event.preventDefault()
@@ -400,7 +389,7 @@
                 // denyButtonText: `Don't save`
             }).then(result => {
                 if (result.isConfirmed) {
-                    fetch('/cancelOrder', {
+                    fetch('/cancelSingleProduct', {
                         method: 'post',
                         headers: {
                             'Content-Type': 'application/json'
@@ -410,7 +399,7 @@
                         .then(res => res.json())
                         .then(data => {
                             console.log(data)
-                            if (data.success) {
+                            if (data.success == 2) {
                                 Swal.fire({
                                     icon: "success",
                                     title: "order Cancelled",
@@ -421,11 +410,29 @@
                                     confirmButtonText: "ok",
                                     // denyButtonText: `Don't save`
                                 }).then(res => {
-                                    if(res.isConfirmed){
-                                        window.location.reload()
+                                    if (res.isConfirmed) {
+                                        window.location.href = '/orders'
                                     }
                                 })
-                        }
+                            } else if (data.success == 1) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Order Cancelled",
+                                    text: "you'r money added to your wallet",
+                                    // showDenyButton: true,
+                                    // showCancelButton: true,
+                                    confirmButtonColor: '#0056b3',
+                                    confirmButtonText: "Ok",
+                                    // denyButtonText: `Don't save`
+                                }).then((result) =>{
+                                    if(result.isConfirmed) {
+                                        window.location.href = '/wallet'
+                                    }
+                                })
+                            }
+                        })
+                        .catch((error)=>{
+                            console.log(error)
                         })
                 }
             })
@@ -433,6 +440,77 @@
 
 
         }
+    </script>
+
+    <!-- cancel bulk order -->
+
+    <script>
+
+        function cancelBulkOrder(event, orderId) {
+            event.preventDefault()
+
+            Swal.fire({
+                icon: "question",
+                title: "Are you sure?",
+                text: "",
+                // showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonColor: '#0056b3',
+                confirmButtonText: "ok",
+                // denyButtonText: `Don't save`
+            }).then(result => {
+                if (result.isConfirmed) {
+                    fetch('/cancelOrder', {
+                        method: 'post',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId })
+                    })
+                        .then(res => res.json())
+                        .then((data) => {
+                            if (data.success == 2) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "order Cancelled",
+                                    text: "",
+                                    // showDenyButton: true,
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#0056b3',
+                                    confirmButtonText: "ok",
+                                    // denyButtonText: `Don't save`
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '/orders'
+                                    }
+                                })
+                            } else if (data.success == 1) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Order Cancelled",
+                                    text: "you'r money added to your wallet",
+                                    // showDenyButton: true,
+                                    // showCancelButton: true,
+                                    confirmButtonColor: '#0056b3',
+                                    confirmButtonText: "Ok",
+                                    // denyButtonText: `Don't save`
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '/wallet'
+                                    }
+                                })
+                            }
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                        })
+                }
+            })
+
+
+
+        }
+
     </script>
 
 

@@ -9,6 +9,7 @@ const userSchema = mongoose.Schema({
     googleId:{type:String},
     number:{type:Number},
     password:{type:String},
+    balance:{type:Number,default:0},
     createdAt:{type:Date,default:Date.now},
     isAdmin:{type:Boolean,default:false},
     isBlock:{type:Boolean,default:false}

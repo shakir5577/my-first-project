@@ -37,6 +37,7 @@ const orderSchema = new mongoose.Schema({
     },
 
     paymentMethod : {type: String},
+    razorpayId : { type: String},
     totalAmount : {type: Number, required:true},
     orginalAmount : { type: Number, required:true},
     status: {type: String},

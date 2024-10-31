@@ -13,11 +13,23 @@ const couponModel = require('../../models/couponModel')
 require('dotenv').config();
 
 
+
+
+
 const loadHome = async (req, res) => {
 
-    const allProducts = await productModel.find({ isBlock: false })
+    try{
+        const allProducts = await productModel.find({ isBlock: false })
+        .populate({
+            path: 'offers',
+            select: 'offerType discount'
+        })
 
     res.render('user/home', { products: allProducts, user: req.session.userId ?? null })
+
+    }catch(error){
+        console.log(error)
+    }
 }
 
 
@@ -285,28 +297,25 @@ const verifyLogin = async (req, res) => {
 
 const loadShop = async (req, res) => {
     try {
-        // Get the current page from query parameters (default to page 1)
         const currentPage = parseInt(req.query.page) || 1;
 
-        // Set the number of products per page
         const limit = 8;
 
-        // Calculate the number of products to skip based on the current page
         const skip = (currentPage - 1) * limit;
 
-        // Get the total count of all products (to calculate total pages)
         const totalProducts = await productModel.countDocuments({ isBlock: false });
 
-        // Fetch the products for the current page
         const products = await productModel
             .find({ isBlock: false })
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
+            .populate({
+                path: 'offers',
+                select: 'offerType discount'
+            })
 
-        // Calculate the total number of pages
         const totalPages = Math.ceil(totalProducts / limit);
 
-        // Render the shop page with products, current page, and total pages
         res.render('user/shop', {
             products: products,
             currentPage: currentPage,
@@ -325,7 +334,10 @@ const loadSingleProduct = async (req, res) => {
 
         const { id } = req.query
 
-        const product = await productModel.findById(id)
+        const product = await productModel.findById(id).populate({
+            path: 'offers',
+            select: 'offerType discount'
+        })
 
         res.render('user/singleProduct', { product: product })
     } catch (err) {

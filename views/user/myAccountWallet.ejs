@@ -240,9 +240,10 @@
                                     <a href="/shop">shop</a>
                                 </li>
                                 <li><a href="about">About</a></li>
-                                <li class="active"><a href="/myAccount">my account</a></li>
-                                <li class="cart"><a href="wishlist"><i class="icon-heart"></i></a></li>
-                                <li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a></li>
+                                <li class="active"><a href="myAccount">my account</a></li>
+                                <li class="cart"><a href="wishlist"><i class="icon-heart"></i></a>
+                                <li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -276,7 +277,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col">
-                        <p class="bread"><span><a href="index.html">my account</a></span> <span>/</span>profile</p>
+                        <p class="bread"><span><a href="index.html">my account</a></span> / <span>account details</span></p>
                     </div>
                 </div>
             </div>
@@ -295,8 +296,8 @@
                                 <li><a href="/orders">Orders</a></li>
                                 <li><a href="/address">address</a></li>
                                 <li><a href="/accountDetails">account details</a></li>
-                                <li><a href="/coupon">coupons</a></li>
-                                <li><a href="/wallet">wallet</a></li>
+                                <li><a href="coupon">coupons</a></li>
+                                <li><a href="wallet">wallet</a></li>
                                 <li><a href="#" id="logout-btn">Logout</a></li>
                                 <!-- <li><a href="logout.html">Logout</a></li> -->
                             </ul>
@@ -304,47 +305,18 @@
                     </div>
 
                     <!-- User Dashboard Content -->
-                    <div class="col-md-9">
+                    <div class="col-md-4">
                         <div class="dashboard-content">
-                            <h4>user profile</h4>
+                            <h4>Wallet Balance</h4>
                             <hr>
-                            <h6 class="mb-3">name: <%= findUser.name %>
-                            </h6>
-                            <h6 class="mb-3">email: <%= findUser.email %>
-                            </h6>
-                            <h6 class="mb-3">number: <%= findUser.number %>
-                            </h6>
-                            <!-- <div class="dashboard-overview">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Order ID</th>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                            <th>Total</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>#12345</td>
-                                            <td>September 1, 2024</td>
-                                            <td>Completed</td>
-                                            <td>$250.00</td>
-                                            <td><a href="#" class="btn btn-primary">View</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>#12346</td>
-                                            <td>August 10, 2024</td>
-                                            <td>Processing</td>
-                                            <td>$150.00</td>
-                                            <td><a href="#" class="btn btn-primary">View</a></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div> -->
+                            <h2 class="mb-3">₹ <%= userDetails.balance %></h2>
+                            <!-- <h6 class="mb-3">Email: johndoe@example.com</h6>
+                            <h6 class="mb-3">Number: 1234567890</h6> -->
+                             <a href="walletHistory" class="btn btn-primary">view history</a>
+                            <!-- <hr>
+                            <h6>Change Password</h6> -->
                         </div>
-                    </div>
+                    </div>                                        
                 </div>
             </div>
         </div>
@@ -436,7 +408,31 @@
         <a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
     </div>
 
-    <!-- sweet alert -->
+
+    <!-- logout -->
+
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default action
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user confirms, redirect to logout route
+                    window.location.href = '/logout';
+                }
+            });
+        });
+    </script>
+
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- jQuery -->
     <script src="js/jquery.min.js"></script>
@@ -465,28 +461,6 @@
     <script src="js/google_map.js"></script>
     <!-- Main -->
     <script src="js/main.js"></script>
-
-    <!-- logout function -->
-    <script>
-        document.getElementById('logout-btn').addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent default action
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You will be logged out!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, logout!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // If user confirms, redirect to logout route
-                    window.location.href = '/logout';
-                }
-            });
-        });
-    </script>
 
 </body>
 

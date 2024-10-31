@@ -43,6 +43,24 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 
+	<style>
+				.prod-img {
+    position: relative;
+}
+
+.offer-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: rgb(255, 179, 179);
+    color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+	</style>
+
+
 </head>
 
 <body>
@@ -173,7 +191,7 @@
 					<div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
 						<h2>View All Products</h2>
 					</div>
-				</div>`
+				</div>
 				<div class="row mb-4">
 					<div class="col-md-12 d-flex justify-content-between align-items-center">
 						<!-- Left Sort By Dropdown -->
@@ -213,43 +231,63 @@
 				</div>
 
 				<div class="row row-pb-md" id="shop-list">
-					<% products.forEach(product=> { %>
+					<% products.forEach(product => { %>
 						<div class="col-lg-3 mb-4 text-center">
 							<div class="product-entry border">
-								<a href="/showProduct?id=<%= product.id %>" class="prod-img">
+				
+								<a href="/showProduct?id=<%= product.id %>" class="prod-img position-relative">
 									<img src="<%= product.images[0] %>" class="img-fluid" alt="Product Image">
+				
+									<!-- Offer badge if the product has offers -->
+									<% if (product.offers && product.offers.length > 0) { %>
+										<span class="offer-badge badge bg-danger small position-absolute top-0 start-0 m-2">
+											Offer
+										</span>
+									<% } %>
 								</a>
+				
 								<div class="desc">
-									<h2><a href="#">
-											<%= product.productName %>
-										</a></h2>
-									<span class="price">₹<%= product.price %></span>
+									<h2><a href="#"><%= product.productName %></a></h2>
+				
+									<!-- Check if the product has offers -->
+									<% if (product.offers && product.offers.length > 0) { %>
+										<% 
+											const offer = product.offers[0]; // Assuming one active offer per product
+											const discountedPrice = product.price - offer.discount;
+										%>
+										<span class="price d-block">
+											<del class="text-muted">₹<%= product.price %></del> <!-- Original Price -->
+											<strong class="text-">₹<%= discountedPrice.toFixed(2) %></strong> <!-- Discounted Price -->
+										</span>
+									<% } else { %>
+										<span class="price d-block fw-bold">₹<%= product.price %></span> <!-- Regular Price -->
+									<% } %>
+				
 									<div class="icons mt-2">
-										<!-- Cart Icon -->
-										<% if (product.stock> 0) { %>
+										<% if (product.stock > 0) { %>
 											<a href="javascript:void(0);" class="icon-button"
-												onclick="addToCartFromShop(event, '<%= product.id %>')">
+											   onclick="addToCartFromShop(event, '<%= product.id %>')">
 												<i class="fas fa-shopping-cart"></i> <!-- Cart Icon -->
 											</a>
-											<% } else { %>
-												<a href="javascript:void(0);" class="icon-button"
-													onclick="handleOutOfStock(event)">
-													<i class="fas fa-cart-arrow-down"></i> <!-- Out of Stock Icon -->
-												</a>
-												<span id="out-of-stock-message" style="display: none; color: red;">Out
-													of Stock</span>
-												<% } %>
-													<!-- Wishlist Icon -->
-													<a href="javascript:void(0);" class="icon-button ml-2"
-														onclick="addToWishlist(event, '<%= product.id %>')">
-														<i class="icon-heart"></i>
-													</a>
+										<% } else { %>
+											<a href="javascript:void(0);" class="icon-button"
+											   onclick="handleOutOfStock(event)">
+												<i class="fas fa-cart-arrow-down"></i> <!-- Out of Stock Icon -->
+											</a>
+											<span class="text-danger">Out of Stock</span>
+										<% } %>
+				
+										<a href="javascript:void(0);" class="icon-button ml-2"
+										   onclick="addToWishlist(event, '<%= product.id %>')">
+											<i class="icon-heart"></i> <!-- Wishlist Icon -->
+										</a>
 									</div>
 								</div>
 							</div>
 						</div>
-						<% }) %>
+					<% }) %>
 				</div>
+				
 				<div class="row">
 					<div class="col-md-12 text-center">
 						<div class="block-27">

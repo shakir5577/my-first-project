@@ -4,6 +4,7 @@ const productModel = require('../../models/productModel')
 const addressModel = require('../../models/addressModel')
 const cartModel = require('../../models/cartModel')
 const couponModel = require('../../models/couponModel')
+const transactionModel = require('../../models/transactionSchema')
 
 const placeOrder = async (req, res) => {
 
@@ -42,7 +43,7 @@ const placeOrder = async (req, res) => {
             return console.log("Address not found");
         }
 
-        const { id, street, city, state, pin, country} = checkedAddress
+        const { id,number, street, city, state, pin, country} = checkedAddress
         // console.log(id,street,city,state,pin,country)
 
         const products = await cartModel.findOne({ userId: userId}).populate('items.productId')
@@ -104,7 +105,8 @@ const placeOrder = async (req, res) => {
         })
 
         const saveOrder = await newOrder.save()
-        console.log(saveOrder)
+        // console.log("🚀 ~ placeOrder ~ saveOrder:", saveOrder)
+        // console.log(saveOrder)
         // console.log(newOrder)
 
         if(saveOrder){
@@ -130,8 +132,73 @@ const orderComplete = async (req,res) => {
     }
 }
 
+const cancelOrder = async(req,res) => {
+
+    try{
+
+        const { orderId } = req.body
+        const { userId } = req.session
+
+        if(!orderId){
+            return res.status(400).send("order ID is required")
+        }
+
+        const findOrder = await orderModel.findById(orderId)
+
+        if(!findOrder){
+            return res.statud(400).send("order not found")
+        }
+
+        findOrder.status = 'Cancelled'
+
+        for( const productOrder of findOrder.products) {
+            productOrder.productStatus = 'Cancelled'
+
+            //update the stock of the product
+
+            const product = await productModel.findById(productOrder.product)
+            if(product){
+                product.stock += productOrder.quantity
+                await product.save()
+
+            }else{
+                return res.status(404).send("product not found")
+            }
+        }
+
+        const updateReturn = await findOrder.save()
+
+        if( findOrder.paymentMethod === 'Razor Pay' || findOrder.paymentMethod === 'wallet'){
+
+            const user = await userModel.findById(userId)
+            user.balance += findOrder.totalAmount
+            await user.save()
+
+            const transaction = new transactionModel({
+                userId : userId,
+                amount : findOrder.totalAmount,
+                type : 'credit'
+            })
+
+            await transaction.save()
+
+            res.send({ success: 1, message: 'Order returned, balance credited, and stock updated'})
+            
+        } else if(updateReturn) {
+            res.send({ success: 2, message: 'Order returned successfully and stock updated' })
+
+        }else{
+            res.send(500).send('failed to update order status')
+        }
+        
+    }catch(error){
+        console.log(error)
+    }
+}
+
 module.exports = {
 
     placeOrder,
-    orderComplete
+    orderComplete,
+    cancelOrder
 }
