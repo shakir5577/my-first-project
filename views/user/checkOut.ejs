@@ -426,7 +426,17 @@
 																<%= item.quantity %> x <%= item.productId.productName %>
 															</span>
 															<span>
-																<%= item.productId.price %>
+																<% if(item.productId.offers && item.productId.offers.length > 0) {%>
+																	<% 
+																		const offer = item.productId.offers[0]; // Assuming one active offer per product
+																		const discountedPrice = item.productId.price - offer.discount;
+																	%>
+																	<span class="price" id="price-<%= item.productId.id %>">₹<%=
+																		item.quantity * discountedPrice %></span>
+																				<% }else{ %>
+																					<span class="price" id="price-<%= item.productId.id %>">₹<%=
+																						item.quantity * item.productId.price %></span>
+																				<% } %>
 															</span>
 														</li>
 														<% }) %>
@@ -439,7 +449,7 @@
 											</span>
 										</li>
 										<li><span>Order Total</span> <span id="ordertotal">
-												<%= totalCartPrice %>
+											₹<%= totalCartPrice %>
 											</span></li>
 									</ul>
 								</div>
@@ -844,6 +854,7 @@
 									.then(response => response.json())
 									.then(data => {
 										console.log(data)
+					
 										if (data.success) {
 											const options = {
 												key: 'rzp_test_i8191KFpq7S1w1',  // Replace with your Razorpay Key ID
@@ -863,7 +874,8 @@
 															razorpayOrderId: response.razorpay_order_id,
 															razorpaySignature: response.razorpay_signature,
 															addressId,
-															coupon
+															coupon,
+															orderId: data.orderId
 														})
 													})
 														.then(res => res.json())
@@ -895,8 +907,26 @@
 												},
 												theme: {
 													color: '#3399cc'
-												}
+												},
+												modal: {
+                                ondismiss: function ondismiss() {
+
+                                    // Redirect the user to the order details page
+                                    Swal.fire({
+                                        icon: "warning",
+                                        title: "Payment Incomplete!",
+                                        text: "Your payment was not completed. You can continue your payment from the order details page.",
+                                        confirmButtonText: "Go to Orders",
+                                        confirmButtonColor: '#266bf9'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = `/orderDetailes/?id=${data.orderId}`;
+                                        }
+                                    });
+                                }
+                            },
 											};
+											
 											const razorpay = new Razorpay(options);
 											razorpay.open();
 										} else {

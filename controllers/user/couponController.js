@@ -17,43 +17,44 @@ const showCoupon = async (req, res) => {
 }
 
 const applyCoupon = async (req, res) => {
-
     try {
-        // console.log(req.body)
-        const { couponCode } = req.body
-
+        const { couponCode } = req.body;
         if (!couponCode) {
-            console.log('cant get coupon code')
-            return res.send({ error: "cant get coupon code" })
+            console.log('Coupon code not provided');
+            return res.send({ error: "Can't get coupon code" });
         }
 
-        // console.log(req.session)
-
-        const { userId } = req.session
-
+        const { userId } = req.session;
         if (!userId) {
-
-            console.log("user not logged in...")
+            console.log("User not logged in...");
+            return res.send({ error: "User not logged in" });
         }
 
-        const fetchCoupon = await couponModel.findOne({ code: couponCode })
-
+        const fetchCoupon = await couponModel.findOne({ code: couponCode });
         if (!fetchCoupon) {
-            console.log("coupon not found");
-            return res.send({ error: "*coupon not found" });
+            console.log("Coupon not found");
+            return res.send({ error: "*Coupon not found" });
         }
 
+        // Get current date with time set to midnight for comparison
         const currentDate = new Date();
-        if (fetchCoupon.endDate && fetchCoupon.endDate < currentDate) {
-            console.log("Coupon has expired");
-            return res.send({ error: "*coupon has expired" });
-        }
+        currentDate.setHours(0, 0, 0, 0); // clear time portion
 
-        if (fetchCoupon.startDate && fetchCoupon.startDate > currentDate) {
+        // Ensure startDate and endDate are also at midnight
+        const couponStartDate = fetchCoupon.startDate ? new Date(fetchCoupon.startDate) : null;
+        const couponEndDate = fetchCoupon.endDate ? new Date(fetchCoupon.endDate) : null;
+
+        if (couponStartDate) couponStartDate.setHours(0, 0, 0, 0);
+        if (couponEndDate) couponEndDate.setHours(0, 0, 0, 0);
+
+        if (couponEndDate && couponEndDate < currentDate) {
+            console.log("Coupon has expired");
+            return res.send({ error: "*Coupon has expired" });
+        }
+        if (couponStartDate && couponStartDate > currentDate) {
             console.log("Coupon not valid yet");
             return res.send({ error: "*Coupon not valid yet" });
         }
-
         if (fetchCoupon.userList.some((user) => user.userId === userId)) {
             console.log("Coupon already used by this user");
             return res.send({ error: "*Coupon already used" });
@@ -61,37 +62,61 @@ const applyCoupon = async (req, res) => {
 
         const findCart = await cartModel
             .findOne({ userId: userId })
-            .populate("items.productId");
+            .populate({
+                path: "items.productId",
+                populate: {
+                    path: "offers",
+                    select: "offerType discount startDate endDate"
+                }
+            });
 
         if (!findCart) {
-            return console.log("cart not found for user...")
+            console.log("Cart not found for user");
+            return res.send({ error: "Cart not found for user" });
         }
 
-        const totalAmount = findCart.items.reduce(
-            (acc, val) =>
-                acc + val.productId.price *
-                val.quantity,
-            0
-        );
+        // Calculate total amount with active offers
+        const totalAmount = findCart.items.reduce((acc, item) => {
+            const product = item.productId;
+            let discountAmount = 0;
 
+            // Check for active offer on each product
+            const activeOffer = product.offers.find(offer =>
+                offer.startDate <= currentDate && offer.endDate >= currentDate
+            );
+            if (activeOffer) {
+                discountAmount = activeOffer.discount;
+            }
+
+            // Calculate effective price considering the discount
+            const effectivePrice = Math.max(0, product.price - discountAmount);
+            return acc + (effectivePrice * item.quantity);
+        }, 0);
+
+        // Check if the total meets the coupon's minimum purchase amount
         if (totalAmount < fetchCoupon.minPurchaseAmount) {
             console.log("Minimum purchase amount not met");
             return res.send({ error: "*Minimum purchase amount not met" });
         }
 
-        const lastAmount = totalAmount - fetchCoupon.discountAmount;
+        // Calculate final amount after applying coupon discount
+        const finalAmount = totalAmount - fetchCoupon.discountAmount;
 
+        // Save the coupon usage (optional, based on your flow)
+
+        fetchCoupon.userList.push({ userId }); 
         await fetchCoupon.save();
 
         res.send({
-            discountedAmount: lastAmount,
+            discountedAmount: finalAmount,
             discount: fetchCoupon.discountAmount,
-          });
-
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        res.status(500).send({ error: "Internal Server Error" });
     }
-}
+};
+
 
 module.exports = {
 

@@ -51,6 +51,7 @@ router.post('/placeOrder',orderController.placeOrder)
 router.get('/orderComplete',session.isLogin,orderController.orderComplete)
 router.post('/cancelOrder',orderController.cancelOrder)
 router.post('/cancelSingleProduct',accountController.cancelSingleProduct)
+router.post('/returnSingleOrder',accountController.returnSingleOrder)
 
 router.get('/wishlist',session.isLogin,wishlistController.loadWishlist)
 router.post('/addToWishlist',wishlistController.addToWishlist)

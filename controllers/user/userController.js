@@ -18,16 +18,16 @@ require('dotenv').config();
 
 const loadHome = async (req, res) => {
 
-    try{
+    try {
         const allProducts = await productModel.find({ isBlock: false })
-        .populate({
-            path: 'offers',
-            select: 'offerType discount'
-        })
+            .populate({
+                path: 'offers',
+                select: 'offerType discount'
+            })
 
-    res.render('user/home', { products: allProducts, user: req.session.userId ?? null })
+        res.render('user/home', { products: allProducts, user: req.session.userId ?? null })
 
-    }catch(error){
+    } catch (error) {
         console.log(error)
     }
 }
@@ -282,7 +282,7 @@ const verifyLogin = async (req, res) => {
         }
         if (checkEmail.isBlock == true) {
 
-            return res.send({ success: false , message: 'Your account has been blocked.'})
+            return res.send({ success: false, message: 'Your account has been blocked.' })
 
         }
 
@@ -342,33 +342,58 @@ const loadSingleProduct = async (req, res) => {
         res.render('user/singleProduct', { product: product })
     } catch (err) {
         console.log(err)
-    } 
+    }
 }
 
 const loadCart = async (req, res) => {
-
     try {
-
-        const { userId } = req.session
-        const cart = await cartModel.findOne({ userId: userId }).populate('items.productId')
+        const { userId } = req.session;
+        const cart = await cartModel
+            .findOne({ userId: userId })
+            .populate({
+                path: 'items.productId',
+                populate: {
+                    path: 'offers',
+                    select: 'offerType discount startDate endDate' // Include start and end dates to check active offers
+                }
+            });
 
         if (!cart) {
-            return res.render('user/cart', { cart: null, message: 'Your cart is empty' })
+            return res.render('user/cart', { cart: null, message: 'Your cart is empty' });
         }
 
         const totalCartPrice = cart.items.reduce((acc, item) => {
-            return acc + (item.price * item.quantity);
+            // Get the product and its offers
+            const product = item.productId;
+            let discountAmount = 0;
+
+            // Check for active offers
+            if (product.offers.length > 0) {
+                const currentDate = new Date();
+                const activeOffer = product.offers[0]
+
+                if (activeOffer) {
+                    discountAmount = activeOffer.discount; // Use the discount amount if an active offer is found
+                }
+            }
+
+            // Calculate the effective price considering the discount
+            const effectivePrice = Math.max(0, item.price - discountAmount);
+            return acc + (effectivePrice * item.quantity);
         }, 0);
 
-        cart.totalprice = totalCartPrice
+        // Update total price in cart object
+        cart.totalprice = totalCartPrice;
+        // console.log(totalCartPrice)
 
-        res.render('user/cart', { cart: cart })
-
+        res.render('user/cart', { cart: cart });
 
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        res.status(500).send({ success: false, message: 'Error loading cart' });
     }
-}
+};
+
 
 const addToCartSinglePro = async (req, res) => {
 
@@ -463,22 +488,40 @@ const decrementQuantity = async (req, res) => {
         const { productId, quantity } = req.body;
         const { userId } = req.session;
         const cart = await cartModel.findOne({ userId: userId });
+        const product = await productModel.findById(productId).populate('offers');  // Fetch product details and populate offers
 
         let updatedQuantity;
         let itemTotalPrice;
 
+        let offerAmount = 0;
+
+        // Check for active offers and get the discount amount
+        if (product.offers.length > 0) {
+            const activeOffer = product.offers[0]; // Assuming you're only checking the first offer
+
+            if (activeOffer) {
+                offerAmount = activeOffer.discount; // Get the discount amount if the offer is active
+            }
+        }
+
         cart.items.forEach(val => {
             if (val.productId.toString() === productId) {
                 if (val.quantity > 1) {
-                    val.quantity = parseInt(quantity) - 1;
+                    val.quantity = parseInt(quantity) - 1; // Decrement the quantity
                 }
                 updatedQuantity = val.quantity;
-                itemTotalPrice = val.price * updatedQuantity;
+
+                // Apply the discount amount, ensuring the price does not drop below zero
+                const finalPrice = Math.max(0, val.price - offerAmount);
+                itemTotalPrice = finalPrice * updatedQuantity;
             }
         });
+
         const totalCartPrice = cart.items.reduce((acc, item) => {
-            return acc + (item.price * item.quantity);
+            const finalPrice = Math.max(0, item.price - offerAmount); // Calculate the final price with discount
+            return acc + (finalPrice * item.quantity);
         }, 0);
+
         cart.totalprice = totalCartPrice;
         await cart.save();
         res.send({
@@ -492,6 +535,7 @@ const decrementQuantity = async (req, res) => {
         res.status(500).send({ success: false, message: 'Error updating quantity' });
     }
 };
+
 
 const incrementQuantity = async (req, res) => {
     try {
@@ -499,24 +543,38 @@ const incrementQuantity = async (req, res) => {
         const { userId } = req.session;
 
         const cart = await cartModel.findOne({ userId: userId });
-        const product = await productModel.findById(productId);  // Fetch product details for stock checking
+        const product = await productModel.findById(productId).populate('offers');  // Fetch product details and populate offers
 
         let updatedQuantity;
         let itemTotalPrice;
 
+        let offerAmount = 0;
+
+        // Check for active offers and get the discount amount
+        if (product.offers.length > 0) {
+            const activeOffer = product.offers[0]
+
+            if (activeOffer) {
+                offerAmount = activeOffer.discount;
+            }
+        }
+
         cart.items.forEach(item => {
             if (item.productId.toString() === productId) {
-                // Increment quantity only if it is less than available stock
                 if (item.quantity < product.stock) {
                     item.quantity = parseInt(quantity) + 1;
                 }
                 updatedQuantity = item.quantity;
-                itemTotalPrice = item.price * updatedQuantity;
+
+                // Apply the discount amount, ensuring the price does not drop below zero
+                const finalPrice = Math.max(0, item.price - offerAmount);
+                itemTotalPrice = finalPrice * updatedQuantity;
             }
         });
 
         const totalCartPrice = cart.items.reduce((acc, item) => {
-            return acc + (item.price * item.quantity);
+            const finalPrice = Math.max(0, item.price - offerAmount);
+            return acc + (finalPrice * item.quantity);
         }, 0);
 
         cart.totalprice = totalCartPrice;
@@ -533,6 +591,7 @@ const incrementQuantity = async (req, res) => {
         res.status(500).send({ success: false, message: 'Error updating quantity' });
     }
 };
+
 
 
 const showCheckOut = async (req, res) => {
@@ -541,17 +600,23 @@ const showCheckOut = async (req, res) => {
 
         // console.log(req.session)
 
-        const {userId} = req.session
-        if(!userId){
+        const { userId } = req.session
+        if (!userId) {
             return console.log("user is not found in checkout")
         }
-        const findAddress = await addressModel.findOne({userId:userId})
+        const findAddress = await addressModel.findOne({ userId: userId })
 
-        const findUsercart = await cartModel.findOne({ userId : userId}).populate('items.productId')
+        const findUsercart = await cartModel.findOne({ userId: userId }).populate('items.productId').populate({
+            path: 'items.productId',
+            populate: {
+                path: 'offers',
+                select: 'offerType discount startDate endDate' // Include start and end dates to check active offers
+            }
+        });
         // console.log(findUsercart.items[0])
 
         // console.log(findAddress)
-        
+
         let address
 
         if (!findAddress) {
@@ -560,18 +625,44 @@ const showCheckOut = async (req, res) => {
             address = findAddress.address
         }
 
+        // const totalCartPrice = findUsercart.items.reduce((acc, item) => {
+        //     return acc + (item.price * item.quantity);
+        // }, 0);
+
         const totalCartPrice = findUsercart.items.reduce((acc, item) => {
-            return acc + (item.price * item.quantity);
+            // Get the product and its offers
+            const product = item.productId;
+            let discountAmount = 0;
+
+            // Check for active offers
+            if (product.offers.length > 0) {
+                const currentDate = new Date();
+                const activeOffer = product.offers[0]
+
+                if (activeOffer) {
+                    discountAmount = activeOffer.discount; // Use the discount amount if an active offer is found
+                }
+            }
+
+            // Calculate the effective price considering the discount
+            const effectivePrice = Math.max(0, item.price - discountAmount);
+            return acc + (effectivePrice * item.quantity);
         }, 0);
+
+        // Update total price in cart object
+        findUsercart .totalprice = totalCartPrice;
+        // console.log(totalCartPrice)
+
+
 
         const findCoupon = await couponModel.find()
 
-        if(!findCoupon){
+        if (!findCoupon) {
             console.log("can't find coupons in checkout")
         }
 
 
-        res.render('user/checkOut',{address:address, userCartItems: findUsercart.items,totalCartPrice:totalCartPrice,coupons: findCoupon})
+        res.render('user/checkOut', { address: address, userCartItems: findUsercart.items, totalCartPrice: totalCartPrice, coupons: findCoupon })
 
     } catch (error) {
         console.log(error);
@@ -579,42 +670,42 @@ const showCheckOut = async (req, res) => {
     }
 }
 
-const showAbout = async (req,res) => {
+const showAbout = async (req, res) => {
 
-    try{
-        
+    try {
+
         res.render('user/about')
 
-    }catch(error){
+    } catch (error) {
         console.log(error)
     }
 }
 
 const searchSortFilter = async (req, res) => {
 
-    try{
+    try {
 
         const { search = '', category = '0', sort = '0' } = req.query;
         // console.log(search, category, sort);
-        
+
         let query = {};
         query.isBlock = false
-        
+
         // Apply search filter
         if (search) {
             const searchRegex = new RegExp(search, 'i');
             query.productName = searchRegex;
             // console.log('search product:', searchRegex);
         }
-        
+
         // Apply category filter
         if (category !== '0') {
             query.category = category;
         }
-        
+
         // Build the Mongoose query
         let findProduct = productModel.find(query);
-        
+
         // Apply sorting directly within the query
         if (sort !== '0') {
             switch (parseInt(sort)) {
@@ -634,19 +725,19 @@ const searchSortFilter = async (req, res) => {
                     break;
             }
         }
-        
+
         // Fetch the sorted and filtered products
         const products = await findProduct;
-        
+
         // console.log(products);
         res.json({ products });
-        
+
 
         // res.send("Search and filtering worked!");
 
 
-    }catch(error){
-        console.log('error:',error)
+    } catch (error) {
+        console.log('error:', error)
         res.status(500).send('something went wrong')
     }
 };

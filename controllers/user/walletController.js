@@ -23,7 +23,7 @@ const loadWallet = async (req,res) => {
             console.log("user not find...")
         }
 
-        const transactions = await transactionModel.find({ userId : userId }).sort({ createdAt: -1 })
+        const transactions = await transactionModel.find({ userId : userId }).sort({ date: -1 })
         // console.log(transactions)
 
 
@@ -50,167 +50,151 @@ const loadmyAccountWallet = async (req,res) => {
         console.log(error)
     }
 }
+const orderWithWallet = async (req, res) => {
+    try {
+        const { addressId, coupon } = req.body;
+        const { userId } = req.session;
 
-const orderWithWallet = async (req,res) => {
-
-    try{
-
-        const { addressId, coupon} = req.body
-
-        const { userId } = req.session
-
-        if(!addressId){
-            console.log("cant find addressId")
+        if (!addressId || !coupon || !userId) {
+            console.log("Required data is missing.");
+            return res.status(400).send({ error: "Invalid request data" });
         }
 
-        if(! coupon){
-            console.log("cant find coupon in wallet palceorder")
+        const findUserDetails = await userModel.findOne({ _id: userId });
+        if (!findUserDetails) {
+            return console.log("User not found.");
         }
 
-        if(!userId){
-            console.log("cant find user")
-        }
-
-        const findUserDetails = await userModel.findOne({ _id: userId})
-        // console.log(findUserDetails)
-
-        if(!findUserDetails){
-            console.log("cant find user")
-        }
-
-        const findAddress = await addressModel.findOne({ userId : userId})
-        // console.log(findAddress)
-
-        if(!findAddress){
-            console.log("cant find user address")
+        const findAddress = await addressModel.findOne({ userId: userId });
+        if (!findAddress) {
+            return console.log("User address not found.");
         }
 
         const checkedAddress = findAddress.address.find(val => val.id === addressId);
+        const { id, number, street, city, state, pin, country } = checkedAddress;
 
-        const { id,number, street, city, state, pin, country} = checkedAddress
+        const products = await cartModel.findOne({ userId: userId }).populate({
+            path: 'items.productId',
+            populate: {
+                path: 'offers',
+                select: 'offerType discount startDate endDate'
+            }
+        });
 
-        const products = await cartModel.findOne({ userId : userId}).populate('items.productId')
-        // console.log(products)
-
-        if(!products){
-            console.log("cant find products")
+        if (!products) {
+            return console.log("Products not found in cart.");
         }
 
-        const productsDetails = products.items.map(val => ({
-            product: val.productId.id,
-            name: val.productId.productName,
-            quantity: val.quantity,
-            price: val.productId.price,
-            productStatus: 'Pending'
-        }));
+        const currentDate = new Date();
+        let orginalAmount = products.items.reduce((acc, item) => acc + (item.quantity * item.price), 0);
+        const productsDetails = products.items.map(item => {
+            const product = item.productId;
+            let discountAmount = 0;
 
-        let totalAmount = productsDetails.reduce((acc, val) => acc + (val.quantity * val.price), 0);
-        let orginalAmount = productsDetails.reduce((acc, val) => acc + (val.quantity * val.price), 0);
+            // Check for active offers
+            const activeOffer = product.offers.find(offer => 
+                offer.startDate <= currentDate && offer.endDate >= currentDate
+            );
 
-        if(coupon.length > 0) {
-
-            const fetchCoupon = await couponModel.findOne({ code: coupon })
-
-            if(!fetchCoupon) {
-
-                return console.log('cant find coupon, maybe code is invalid')
+            if (activeOffer) {
+                discountAmount = activeOffer.discount;
             }
 
-            totalAmount -= fetchCoupon.discountAmount
+            const effectivePrice = Math.max(0, product.price - discountAmount);
+            return {
+                product: product.id,
+                name: product.productName,
+                quantity: item.quantity,
+                price: effectivePrice,
+                productStatus: 'Pending'
+            };
+        });
 
-            fetchCoupon.userList.push({ userId })
-            
-            await fetchCoupon.save()
+        let totalAmount = productsDetails.reduce((acc, item) => acc + (item.quantity * item.price), 0);
+
+        // Apply coupon discount if available
+        if (coupon.length > 0) {
+            const fetchCoupon = await couponModel.findOne({ code: coupon });
+            if (!fetchCoupon) {
+                console.log("Invalid coupon code.");
+            } else {
+                totalAmount -= fetchCoupon.discountAmount;
+                fetchCoupon.userList.push({ userId });
+                await fetchCoupon.save();
+            }
         }
 
-        if( totalAmount > findUserDetails.balance){
-            console.log("insufficient balance in wallet")
-            return res.send({ error: "insufficient balance"})
+        // Check wallet balance
+        if (totalAmount > findUserDetails.balance) {
+            console.log("Insufficient wallet balance.");
+            return res.send({ error: "Insufficient balance" });
         }
 
-        for( let item of productsDetails) {
-
-            const product = await productModel.findOne({ _id: item.product})
-
-            if(!product){
-                console.log("cant find products")
+        // Check stock availability
+        for (const item of productsDetails) {
+            const product = await productModel.findOne({ _id: item.product });
+            if (!product || product.stock < item.quantity) {
+                console.log("Product out of stock or insufficient quantity.");
+                return res.send({ error: "Insufficient stock" });
             }
-
-            if(product.stock < item.quantity) {
-                res.send({ error : true})
-               return console.log('product dont have enough quantity')
-            }
-
-
         }
 
         const newOrder = new orderModel({
-            user : userId,
-            products :  productsDetails,
-            shippingAddress : {
-                name : findUserDetails.name,
-                email : findUserDetails.email,
-                number : findUserDetails.number,
-                address : id,
-                street : street,
-                city : city,
-                state : state,
-                pin : pin,
-                country : country
-                
-
+            user: userId,
+            products: productsDetails,
+            shippingAddress: {
+                name: findUserDetails.name,
+                email: findUserDetails.email,
+                number: findUserDetails.number,
+                address: id,
+                street: street,
+                city: city,
+                state: state,
+                pin: pin,
+                country: country
             },
-            paymentMethod : 'wallet',
-            totalAmount : totalAmount ,
-            orginalAmount:orginalAmount,
+            paymentMethod: 'wallet',
+            totalAmount: totalAmount,
+            orginalAmount: orginalAmount,
             status: 'Pending'
-            
-        })
+        });
 
-        const saveOrder = await newOrder.save()
-        if(saveOrder){
-
-            for( let item of productsDetails) {
-
-                const product = await productModel.findOne({ _id: item.product })
-
-                if(!product){
-                    return console.log('product not found')
-                }
-
-                product.stock -= item.quantity
-                await product.save()
-
+        const saveOrder = await newOrder.save();
+        if (saveOrder) {
+            // Deduct stock for each product in the order
+            for (const item of productsDetails) {
+                const product = await productModel.findOne({ _id: item.product });
+                product.stock -= item.quantity;
+                await product.save();
             }
 
-            findUserDetails.balance -= totalAmount
+            // Deduct wallet balance
+            findUserDetails.balance -= totalAmount;
+            await findUserDetails.save();
 
-            await findUserDetails.save()
+            // Clear cart
+            products.items = [];
+            await products.save();
 
-            products.items = []
-
-            await products.save()
-
+            // Log transaction
             const transaction = new transactionModel({
                 userId: userId,
                 amount: totalAmount,
                 type: 'debit'
-            })
+            });
+            await transaction.save();
 
-            await transaction.save()
-
-            console.log("order success...")
-            res.send({ success: true, orderId: saveOrder.id})
-
-        }else{
-
-            return console.log("order placing failed")
+            console.log("Order placed successfully.");
+            res.send({ success: true, orderId: saveOrder.id });
+        } else {
+            console.log("Failed to place order.");
         }
-
-    }catch(error){
-        console.log(error)
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ error: "Internal Server Error" });
     }
-}
+};
+
 
 module.exports = {
 

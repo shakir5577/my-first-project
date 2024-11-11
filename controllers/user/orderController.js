@@ -7,118 +7,126 @@ const couponModel = require('../../models/couponModel')
 const transactionModel = require('../../models/transactionSchema')
 
 const placeOrder = async (req, res) => {
-
     try {
-
-        // console.log(req.body)
-        const { addressId } = req.body
-        // console.log(addressId)
-        const { coupon } = req.body
+        const { addressId, coupon } = req.body;
+        const { userId } = req.session;
 
         if (!addressId) {
-            return console.log("can't find address id")
+            console.log("Can't find address ID");
+            return;
         }
 
-        const { userId } = req.session
-        // console.log(userId)
-
-        const findUserDetails = await userModel.findOne({ _id: userId })
-        // console.log(findUserDetails)
-
+        const findUserDetails = await userModel.findOne({ _id: userId });
         if (!findUserDetails) {
-            return console.log("cant't find user")
+            console.log("Can't find user");
+            return;
         }
 
-        const findUserAddress = await addressModel.findOne({ userId: userId })
-        // console.log(findUserAddress)
-
-        if (!findUserAddress) {
-            return console.log("can't find user address")
-        }
-
-        const checkedAddress = findUserAddress.address.find(val => val.id === addressId);
-        // console.log(checkedAddress)
-
+        const findUserAddress = await addressModel.findOne({ userId: userId });
+        const checkedAddress = findUserAddress?.address.find(val => val.id === addressId);
         if (!checkedAddress) {
-            return console.log("Address not found");
+            console.log("Address not found");
+            return;
         }
 
-        const { id,number, street, city, state, pin, country} = checkedAddress
-        // console.log(id,street,city,state,pin,country)
+        const products = await cartModel.findOne({ userId: userId }).populate({
+            path: "items.productId",
+            populate: {
+                path: "offers",
+                select: "offerType discount startDate endDate"
+            }
+        });
 
-        const products = await cartModel.findOne({ userId: userId}).populate('items.productId')
-        // console.log(products)
-
-        if(!products){
-            return console.log('cant find products')
+        if (!products) {
+            console.log("Can't find products");
+            return;
         }
 
-        const productsDetails = products.items.map(val => ({
-            product: val.productId.id,
-            name: val.productId.productName,
-            quantity: val.quantity,
-            price: val.productId.price,
-            productStatus: 'Pending'
-        }));
+        const currentDate = new Date();
+        let originalAmount = products.items.reduce((acc, item) => acc + (item.quantity * item.price), 0);
 
-        let totalAmount = productsDetails.reduce((acc, val) => acc + (val.quantity * val.price), 0);
-        let orginalAmount = productsDetails.reduce((acc, val) => acc + (val.quantity * val.price), 0);
+        const productsDetails = products.items.map((item) => {
+            const product = item.productId;
+            let discountAmount = 0;
 
-        if(coupon.length > 0) {
+            // Check for active offers on the product
+            const activeOffer = product.offers.find(offer =>
+                offer.startDate <= currentDate && offer.endDate >= currentDate
+            );
 
-            const fetchCoupon = await couponModel.findOne({ code: coupon })
-
-            if(!fetchCoupon) {
-
-                return console.log('cant find coupon, maybe code is invalid')
+            if (activeOffer) {
+                discountAmount = activeOffer.discount;
             }
 
-            totalAmount -= fetchCoupon.discountAmount
+            const effectivePrice = Math.max(0, product.price - discountAmount);
+            return {
+                product: product.id,
+                name: product.productName,
+                quantity: item.quantity,
+                price: effectivePrice,
+                productStatus: 'Pending'
+            };
+        });
 
-            fetchCoupon.userList.push({ userId })
-            
-            await fetchCoupon.save()
+        let totalAmount = productsDetails.reduce((acc, item) => acc + (item.quantity * item.price), 0);
+        // console.log(totalAmount)
+        // const originalAmount = totalAmount;
+
+        // Apply coupon discount if provided
+        if (coupon?.length > 0) {
+            const fetchCoupon = await couponModel.findOne({ code: coupon });
+            if (!fetchCoupon) {
+                console.log("Invalid coupon code");
+            } else {
+                totalAmount -= fetchCoupon.discountAmount;
+                fetchCoupon.userList.push({ userId });
+                await fetchCoupon.save();
+            }
         }
-
 
         const newOrder = new orderModel({
-            user : userId,
-            products :  productsDetails,
-            shippingAddress : {
-                name : findUserDetails.name,
-                email : findUserDetails.email,
-                number : findUserDetails.number,
-                address : id,
-                street : street,
-                city : city,
-                state : state,
-                pin : pin,
-                country : country
-                
-
+            user: userId,
+            products: productsDetails,
+            shippingAddress: {
+                name: findUserDetails.name,
+                email: findUserDetails.email,
+                number: findUserDetails.number,
+                address: checkedAddress.id,
+                street: checkedAddress.street,
+                city: checkedAddress.city,
+                state: checkedAddress.state,
+                pin: checkedAddress.pin,
+                country: checkedAddress.country
             },
-            paymentMethod : 'cod',
-            totalAmount : totalAmount ,
-            orginalAmount:orginalAmount,
+            paymentMethod: 'cod',
+            totalAmount: totalAmount,
+            orginalAmount: originalAmount,
             status: 'Pending'
-            
-        })
+        });
 
-        const saveOrder = await newOrder.save()
-        // console.log("🚀 ~ placeOrder ~ saveOrder:", saveOrder)
-        // console.log(saveOrder)
-        // console.log(newOrder)
+        const saveOrder = await newOrder.save();
 
-        if(saveOrder){
-            res.send({success:true})
+        if (saveOrder) {
+            for (const item of productsDetails) {
+                const product = await productModel.findOne({ _id: item.product });
+                if (!product) {
+                    console.log("Product not found");
+                    continue;
+                }
+                product.stock -= item.quantity;
+                await product.save();
+            }
+
+            products.items = [];
+            await products.save();
+            res.send({ success: true });
         }
-
-        
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        res.status(500).send({ error: "Internal Server Error" });
     }
-}
+};
+
 
 const orderComplete = async (req,res) => {
 

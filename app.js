@@ -57,6 +57,7 @@ app.set('views',path.join(__dirname,'views'))
 app.use(express.static('public/user'));
 app.use(express.static('public/admin'));
 app.use('/admin',express.static('public/admin'))
+app.use('/orderDetailes',express.static('public/user'))
 app.use('/public', express.static('public/admin'));
 app.use('/public', express.static('public'))
 // app.use('/', express.static('public'))

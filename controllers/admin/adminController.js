@@ -4,6 +4,7 @@ const userModel = require('../../models/userModel')
 const categoryModel = require('../../models/categoryModel')
 const productModel = require('../../models/productModel')
 const orderModel = require('../../models/orderModel')
+const transactionModel = require('../../models/transactionSchema')
 const bcrypt = require("bcrypt")
 
 
@@ -19,9 +20,15 @@ const adminDashboard = async (req, res) => {
 
 const showUsers = async (req, res) => {
 
-    const allUsers = await userModel.find()
+    const page = parseInt(req.query.page) || 1
+    const limit = 5
+    const skip = (page - 1) * limit
 
-    res.render('admin/users', { allUsers: allUsers })
+    const allUsers = await userModel.find().sort({ createdAt: -1 }).limit(limit).skip(skip);
+    const totalUsers = await userModel.countDocuments();
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    res.render('admin/users', { allUsers: allUsers,currentPage: page, totalPages })
 }
 
 const showCategories = async (req, res) => {
@@ -32,8 +39,14 @@ const showCategories = async (req, res) => {
 
 const showProducts = async (req, res) => {
 
-    const allProducts = await productModel.find()
-    res.render('admin/products', { allProducts: allProducts })
+    const page = parseInt(req.query.page) || 1
+    const limit = 8
+    const skip = (page - 1) * limit
+
+    const allProducts = await productModel.find().sort({ createdAt: -1 }).limit(limit).skip(skip);
+    const totalProducts = await userModel.countDocuments();
+    const totalPages = Math.ceil(totalProducts / limit);
+    res.render('admin/products', { allProducts: allProducts,currentPage: page, totalPages })
 }
 
 const loadCreateProduct = async (req, res) => {
@@ -61,8 +74,22 @@ const showOrders = async(req,res) => {
 
     try{
 
-        const orders = await orderModel.find()
-        res.render('admin/orders',{orders: orders})
+        const page = parseInt(req.query.page) || 1
+        const limit = 5
+        const skip = (page - 1) * limit
+
+        const orders = await orderModel.find().sort({ date: -1 }).limit(limit).skip(skip);
+        const totalOrders = await orderModel.countDocuments();
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        const returnRequests = await orderModel.find({ 'products.returnRequested': true }).sort({ createdAt: -1})
+        .populate('products.product') // Populate product details
+
+        const returnRequestsCount = await orderModel.find({ 'products.returnRequested': true }).countDocuments();
+
+
+        res.render('admin/orders',{orders: orders,currentPage: page, totalPages , reqCount: returnRequestsCount, returns: returnRequests })
+
     }catch(error){
         console.log(error)
     }
@@ -90,6 +117,77 @@ const orderDetails = async (req,res) => {
         console.log(error)
     }
 }
+
+const updateReturnRequest = async (req, res, next) => {
+    try {
+        console.log('hhhhhha')
+        const { orderId, productId, status } = req.body;
+
+        if (!orderId || !productId || !status) {
+            return res.status(400).json({ message: 'Order ID, Product ID, and Status are required' });
+        }
+
+        const order = await orderModel.findOne({ _id: orderId, 'products.product': productId });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        const product = order.products.find(val => val.product.toString() === productId);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found in the order' });
+        }
+
+        const findUser = await userModel.findById(order.user);
+
+        if (!findUser) {
+            return console.log("User not found at updateReturnRequest");
+        }
+
+        product.returnStatus = status;
+
+        if (status === 'Approved') {
+            product.productStatus = 'Returned';
+
+            // Return the user's money regardless of the reason
+            findUser.balance += product.price * product.quantity; // Increment balance by the total price of the returned products
+
+            // Create a transaction record
+            const transaction = new transactionModel({
+                userId: findUser.id,
+                amount: product.price * product.quantity, // Total amount credited back to the user
+                type: 'credit'
+            });
+
+            await transaction.save();
+
+            // Update stock only if the return reason is not 'Product is damaged'
+            if (product.returnReason !== 'Product is damaged') {
+                const productToUpdate = await productModel.findById(productId);
+                if (productToUpdate) {
+                    productToUpdate.stock += product.quantity; // Increment stock by the quantity returned
+                    await productToUpdate.save();
+                } else {
+                    return res.status(404).json({ message: 'Product not found in the inventory' });
+                }
+            }
+        }
+
+        const allReturned = order.products.every(p => p.returnStatus === 'Approved');
+
+        if (allReturned) {
+            order.orderStatus = 'Returned';
+        }
+
+        await order.save();
+
+        res.status(200).json({ success: 'Return request updated successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 
 
@@ -311,7 +409,7 @@ const updateProduct = async (req, res) => {
     }
 }
 
-const changeStatus = async (req, res) => {
+const changeProductStatus = async (req, res) => {
 
     try{
         const { productId, newStatus, orderId } = req.body
@@ -331,6 +429,47 @@ const changeStatus = async (req, res) => {
         }
 
         await findOrder.save()
+
+    }catch(error){
+        console.log(error)
+    }
+}
+
+const changeOrderStatus = async (req,res) => {
+
+    try{
+
+        const { orderId, newStatus} = req.body
+
+        if( newStatus.length <= 0 ){
+            return console.log('there is no new status to change at change order status')
+        }
+
+        if(!orderId){
+            return console.log(' cant get order id here at change order status')
+        }
+
+        const findOrder = await orderModel.findById(orderId)
+        // console.log(findOrder)
+
+        if(!findOrder){
+            console.log('cant find the order at change order status')
+        }
+
+        findOrder.status = newStatus
+
+        findOrder.products.forEach( val =>{
+
+            val.productStatus = newStatus
+        })
+
+        const saveOrder = await findOrder.save()
+        // console.log(saveOrder)
+
+        if(saveOrder){
+            res.send({ success: true})
+        }
+
 
     }catch(error){
         console.log(error)
@@ -359,5 +498,7 @@ module.exports = {
     updateProduct,
     showOrders,
     orderDetails,
-    changeStatus
+    changeOrderStatus,
+    changeProductStatus,
+    updateReturnRequest
 }

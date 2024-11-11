@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Hmart - Admin</title>
+    <title>ShoeVault Admin</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -192,21 +192,41 @@
                     </table>
                 </div>
             </div>
-            <div class="pagination-area mt-30 mb-50">
+            <div class="pagination-area mt-15 mb-50">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-start">
-                        <li class="page-item">
-                            <a class="page-link" href="#"><i class="material-icons md-chevron_left"></i></a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">01</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
-                        </li>
+
+                        <% if (currentPage> 1) { %>
+                            <!-- Previous Page Link -->
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<%= currentPage - 1 %>&limit=5">
+                                    <i class="material-icons md-chevron_left"></i>
+                                </a>
+                            </li>
+                            <% } %>
+
+                                <% for (let i=1; i <=totalPages; i++) { %>
+                                    <!-- Page Number Links -->
+                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="?page=<%= i %>&limit=5">
+                                            <%= i < 10 ? '0' + i : i %>
+                                        </a>
+                                    </li>
+                                    <% } %>
+
+                                        <% if (currentPage < totalPages) { %>
+                                            <!-- Next Page Link -->
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<%= currentPage + 1 %>&limit=5">
+                                                    <i class="material-icons md-chevron_right"></i>
+                                                </a>
+                                            </li>
+                                            <% } %>
+
                     </ul>
                 </nav>
             </div>
+
         </section>
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">

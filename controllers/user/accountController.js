@@ -25,7 +25,7 @@ const showOrders = async (req, res) => {
     try {
 
         const { userId } = req.session
-        const findOrder = await orderModel.find({ user: userId })
+        const findOrder = await orderModel.find({ user: userId }).sort({date: -1})
         // console.log(findOrder)
 
         res.render('user/myaccountOrders', { orders: findOrder })
@@ -37,30 +37,62 @@ const showOrders = async (req, res) => {
 
     }
 }
-
 const orderDetailes = async (req, res) => {
-
     try {
+        const { id } = req.query;
 
-        // console.log(req.query)
-        const { id } = req.query
-
-        const findOrder = await orderModel.findById(id).populate('products.product')
-        // console.log(findOrder);
+        const findOrder = await orderModel.findById(id)
+            .populate({
+                path: 'products.product',
+                populate: { path: 'offers' }
+            });
 
         if (!findOrder) {
-            return console.log("can't get order details in load order details")
+            return console.log("can't get order details in load order details");
         }
 
 
-        res.render('user/orderDetailes', { order: findOrder })
+        // Initialize amounts for calculation
+        let originalAmount = 0;
+        let discount = 0;
+        let totalAmount = 0;
 
+        findOrder.products.forEach(item => {
+            const productOriginalPrice = item.price * item.quantity;
+            originalAmount += productOriginalPrice;
 
+            // Calculate the total discount for this item
+            let itemDiscount = 0;
 
+            // Apply offer discount if available
+            if (item.product.offers && item.product.offers.length > 0) {
+                item.product.offers.forEach(offer => {
+                    itemDiscount += offer.discount * item.quantity;
+                });
+            }
+
+            // Apply coupon discount if a coupon is applied to the order
+            if (findOrder.coupon) {
+                itemDiscount += findOrder.coupon.discountAmount;
+            }
+
+            discount += itemDiscount;
+            totalAmount += productOriginalPrice - itemDiscount;
+        });
+
+        const grandTotal = totalAmount;
+
+        res.render('user/orderDetailes', {
+            order: findOrder,
+            originalAmount,
+            discount,
+            grandTotal,
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
-}
+};
+
 
 
 const cancelSingleProduct = async (req, res) => {
@@ -85,7 +117,7 @@ const cancelSingleProduct = async (req, res) => {
 
         const product = findOrder.products.find(val => val.product == productId)
        
-        
+        // console.log(product)
 
         if (!product) {
             return console.log("can't find product at cancel single products")
@@ -94,7 +126,7 @@ const cancelSingleProduct = async (req, res) => {
         const findProduct = await productModel.findById(product.product.toString())
 
         console.log(findProduct)
-        return
+        
 
         if (!findProduct) {
             return console.log("cnat find findProduct in cancel singel product")
@@ -116,7 +148,7 @@ const cancelSingleProduct = async (req, res) => {
         if(findOrder.paymentMethod == 'Razor Pay' || findOrder.paymentMethod == 'wallet') {
 
             const user = await userModel.findById(userId)
-            user.balance += findOrder.totalAmount
+            user.balance += findProduct.price
             await user.save()
 
             const transaction = new transactionModel({
@@ -144,6 +176,43 @@ const cancelSingleProduct = async (req, res) => {
 
     }
 }
+
+const returnSingleOrder = async (req, res, next) => {
+    try {
+        const { orderId, productId, reason } = req.body;
+
+        console.log("This is reason: ", reason)
+
+        if (!orderId || !productId) {
+            return console.log("Order ID and Product ID are required.");
+        }
+
+        const findOrder = await orderModel.findById(orderId);
+        if (!findOrder) {
+            return console.log("Order not found.");
+        }
+
+        const product = findOrder.products.find(val => val.product == productId);
+        if (!product) {
+            return console.log("Product not found in order.");
+        }
+
+        if (product.returnRequested) {
+            return console.log("Return request already submitted for this product.");
+        }
+
+        // Mark the product as return requested
+        product.returnRequested = true;
+        product.returnStatus = 'Pending';
+        product.returnReason = reason
+
+        await findOrder.save();
+
+        res.send({ success: 7, message: "Return request submitted. Awaiting admin approval." });
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 const showAddress = async (req, res) => {
@@ -400,5 +469,6 @@ module.exports = {
     changePassword,
     logout,
     orderDetailes,
-    cancelSingleProduct
+    cancelSingleProduct,
+    returnSingleOrder
 }

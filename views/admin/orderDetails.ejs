@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Nest Dashboard</title>
+    <title>ShoeVault Admin</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -161,15 +161,16 @@
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                             <% if(orderDetails.status=='Pending' ) {%>
-                                <!-- <select class="form-select d-inline-block mb-lg-0 mr-5 mw-200" id="status">
-                                        <option value="">Change status</option>
-                                        <option>Pending</option>
-                                        <option>Delivered</option>
-                                        <option>Cancelled</option>
-                                        <option>Returned</option>
+                                <select class="form-select d-inline-block mb-lg-0 mr-5 mw-200" id="status">
+                                    <option value="">Change status</option>
+                                    <option>Pending</option>
+                                    <option>Delivered</option>
+                                    <option>Cancelled</option>
+                                    <option>Returned</option>
 
-                                    </select> -->
-                                <a class="btn btn-primary" onclick="saveOrder(event)">Save</a>
+                                </select>
+                                <a class="btn btn-primary"
+                                    onclick="changeStatus(event,'<%= orderDetails.id %>')">Save</a>
                                 <% } %>
                                     <a class="btn btn-danger ms-2" href="/admin/orders">back</a>
                                     <!-- <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> -->
@@ -377,10 +378,10 @@
 
     <!-- bulk order change status -->
     <script>
-        function saveOrder(event) {
+        function changeStatus(event, orderId) {
 
             event.preventDefault();
-            // const status = document.getElementById('status').value
+            const status = document.getElementById('status').value
 
             Swal.fire({
                 icon: "question",
@@ -394,17 +395,34 @@
             }).then((res) => {
                 if (res.isConfirmed) {
 
-                    Swal.fire({
-                        title: "<span style='color: #3BB77E;'>Success!</span>",
-                        html: "<span style='color: black;'>Your changes have been saved successfully.</span>",
-                        icon: "success",
-                        confirmButtonColor: "#3BB77E", // Bootstrap's success color
-                        confirmButtonText: "OK"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = `/admin/orders`
-                        }
+                    fetch('/admin/changeOrderStatus', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId: orderId, newStatus: status })
                     })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: "<span style='color: #3BB77E;'>Success!</span>",
+                                    html: "<span style='color: black;'>Your changes have been saved successfully.</span>",
+                                    icon: "success",
+                                    confirmButtonColor: "#3BB77E", // Bootstrap's success color
+                                    confirmButtonText: "OK"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = `/admin/orders`
+                                    }
+                                })
+
+                            }
+                        })
+                        .catch(err =>{
+                            console.log(err)
+                        })
+
 
                 }
             })
@@ -417,7 +435,7 @@
     </script>
 
     <!--show single product status -->
-    <!-- <script>
+    <script>
             document.addEventListener('DOMContentLoaded', (event) => {
                 const productElements = document.querySelectorAll('[id^="productStatusOption"]');
 
@@ -433,7 +451,7 @@
                     }
                 });
             });
-        </script> -->
+        </script>
 
     <!-- change status of single product -->
     <script>
@@ -448,7 +466,7 @@
                 orderId: orderId
             }
 
-            fetch('/admin/changeStatus', {
+            fetch('/admin/changeProductStatus', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
