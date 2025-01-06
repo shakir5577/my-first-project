@@ -461,26 +461,23 @@
 										<h2>Payment Method</h2>
 										<div class="form-group">
 											<div class="col-md-12">
+												<% if (totalCartPrice <= 2000) { %>
 												<div class="radio">
-													<label><input type="radio" name="payment-method"
-															value="cashOnDelivery"> Cash on Delivery</label>
+													<label><input type="radio" name="payment-method" value="cashOnDelivery"> Cash on Delivery</label>
+												</div>
+												<% } %>
+												<div class="radio">
+													<label><input type="radio" name="payment-method" value="razorPay"> Razor pay</label>
 												</div>
 												<div class="radio">
-													<label><input type="radio" name="payment-method" value="razorPay">
-														Razor pay</label>
-												</div>
-												<div class="radio">
-													<label><input type="radio" name="payment-method" value="wallet">
-														Wallet</label>
+													<label><input type="radio" name="payment-method" value="wallet"> Wallet</label>
 												</div>
 											</div>
 										</div>
 										<div class="form-group">
 											<div class="col-md-12">
 												<div class="checkbox">
-													<label><input type="checkbox" value=""> I have read and accept the
-														terms
-														and conditions</label>
+													<label><input type="checkbox" value=""> I have read and accept the terms and conditions</label>
 												</div>
 											</div>
 										</div>

@@ -181,7 +181,7 @@ const returnSingleOrder = async (req, res, next) => {
     try {
         const { orderId, productId, reason } = req.body;
 
-        console.log("This is reason: ", reason)
+        console.log("This is reason: ", reason);
 
         if (!orderId || !productId) {
             return console.log("Order ID and Product ID are required.");
@@ -204,15 +204,25 @@ const returnSingleOrder = async (req, res, next) => {
         // Mark the product as return requested
         product.returnRequested = true;
         product.returnStatus = 'Pending';
-        product.returnReason = reason
+        product.returnReason = reason;
+
+        // Add product amount to user's wallet
+        const user = await userModel.findById(findOrder.user); // Assuming `userId` is stored in `findOrder`
+        if (!user) {
+            return console.log("User not found.");
+        }
+
+        user.balance += product.price; // Add the product price to user's balance
+        await user.save();
 
         await findOrder.save();
 
-        res.send({ success: 7, message: "Return request submitted. Awaiting admin approval." });
+        res.send({ success: true, message: "Return request submitted. Awaiting admin approval." });
     } catch (error) {
         next(error);
     }
 };
+
 
 
 const showAddress = async (req, res) => {
