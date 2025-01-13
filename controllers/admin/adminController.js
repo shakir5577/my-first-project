@@ -15,8 +15,151 @@ const adminLogin = async (req, res) => {
 
 const adminDashboard = async (req, res) => {
 
-    res.render('admin/adminDashboard')
+    try{
+
+        const salesdata = await orderModel.aggregate([
+
+            {
+                $match: { status : 'Delivered' }
+            },
+            {
+                $group: {
+                    _id: { $month: "$date"},
+                    totalSales: { $sum: '$orginalAmount'}
+                }
+            },
+            {
+                $sort: { _id:1 }
+            }
+        ])
+
+        //initiles all months
+        const monthNames = ["Jan","Feb","Mar","Apr","May","Jun",'Jul',"Aug","Sep","Oct","Nov","Dec"]
+        const salesValues = new Array(12).fill(0)
+
+        //populate sales values based on data
+        salesdata.forEach(item => {
+            salesValues[item._id - 1] = item.totalSales
+        })
+
+        //count total delivered orders
+        const totalOrders = await orderModel.countDocuments({
+            status : 'Delivered'
+        })
+
+        //calculate total revenue
+        const totalRevenue = salesValues.reduce((sum, value) => sum + value, 0)
+
+        //count total products
+        const totalProducts = await productModel.countDocuments({})
+
+        //get best selling products
+        const bestSellingProducts = await orderModel.aggregate([
+
+            {
+                $match: { status: 'Delivered' }
+            },
+            {
+                $unwind: '$products'
+            },
+            {
+                $group: {
+                    _id: '$products.product',
+                    totalSold: { $sum: '$products.quantity' }
+                }
+            },
+            {
+                $sort: { totalSold: -1 }
+            },
+            {
+                $limit: 5
+            }
+        ])
+
+        //fetch products details for best selling products
+        const productIds = bestSellingProducts.map(p => p._id)
+        const products = await productModel.find({ _id: { $in: productIds } }).select('productName')
+
+        //map product details to best selling data
+        const bestSellingDetails = bestSellingProducts.map(selling => {
+            const product = products.find(p => p._id.toString() === selling._id.toString())
+            return{
+                name: product ? product.productName : "Unknown Product",
+                count : selling.totalSold
+            }
+        })
+
+        const topCategories = await orderModel.aggregate([
+            {
+                $match: { status: 'Delivered' }
+            },
+            {
+                $unwind: "$products"
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'products.product',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $group: {
+                    _id: "$productDetails.category", // Assuming `category` is a field in your `products` collection
+                    totalSold: { $sum: "$products.quantity" }
+                }
+            },
+            {
+                $sort: { totalSold: -1 }
+            },
+            {
+                $limit: 5
+            }
+        ]);
+        
+
+        //map category data
+        const categoryProducts = await Promise.all(
+            topCategories.map(async (category) => {
+                // Check if products exist and are an array
+                const topProductsInCategory = Array.isArray(category.products) ? category.products.slice(0, 5) : [];
+        
+                return {
+                    category: category._id,
+                    totalSold: category.totalSold,
+                    products: await Promise.all(topProductsInCategory.map(async (p) => {
+                        const totalSold = await orderModel.aggregate([
+                            { $match: { "products.product": p.productId, status: 'Delivered' } },
+                            { $unwind: "$products" },
+                            { $match: { "products.product": p.productId } },
+                            { $group: { _id: null, totalSold: { $sum: "$products.quantity" } } }
+                        ]).then(result => result[0]?.totalSold || 0);
+        
+                        return { name: p.name, totalSold };
+                    }))
+                };
+            })
+        );
+        
+
+        res.render('admin/adminDashboard',{
+            totalOrders,
+            totalRevenue:totalRevenue.toFixed(2),
+            totalProducts,
+            bestSellingProducts: bestSellingDetails,
+            topCategories: categoryProducts,
+            salesLabels: JSON.stringify(monthNames),
+            salesData: JSON.stringify(salesValues)
+        })
+
+    }catch(error){
+        console.log(error)
+    }
+
 }
+
+
 
 const showUsers = async (req, res) => {
 
@@ -500,5 +643,5 @@ module.exports = {
     orderDetails,
     changeOrderStatus,
     changeProductStatus,
-    updateReturnRequest
+    updateReturnRequest,
 }

@@ -131,12 +131,12 @@
                     <% } %>
 
                         <div class="d-flex justify-content-end mb-3" style="color: black;">
-                            <% if(order.status == 'Pending') { %>
+                            <% if(order.status=='Pending' ) { %>
                                 <button type="button" class="btn btn-primary"
                                     onclick="cancelBulkOrder(event,'<%= order.id %>')">Cancel order
                                 </button>
                                 <% }%>
-                                    
+
                                     <button type="button" onclick="backtoAccount(event)" class="btn btn-primary">Go back
                                     </button>
                         </div>
@@ -211,171 +211,193 @@
                                         <!-- New column for Status -->
                                         <div class="one-eight text-center">
                                             <div class="display-tc">
+                                                <% if(order.status == "Payment Pending"){ %>
+                                                    <p class="text-danger mt-1">*payment pending</p>
+                                                    <% }else{ %>
                                                 <span class="status">
                                                     <%= product.productStatus %>
                                                 </span>
+                                                <% } %>
                                             </div>
                                         </div>
 
-                                        <!-- Action Column with Return Logic -->
+                                        <!-- Action Column with Return and Cancellation Logic -->
                                         <div class="one-eight text-center">
                                             <div class="display-tc">
-                                                <% if (product.returnStatus=='Approved' ) { %>
-                                                    <p class="error-message text-success mt-1">Returned</p>
-                                                    <% } else if (product.returnStatus=='Rejected' ) { %>
-                                                        <p class="error-message text-danger mt-1">*Return Rejected</p>
-                                                        <% } else if (product.returnRequested) { %>
-                                                            <p class="error-message text-warning mt-1">*Request Sent for
-                                                                Return</p>
-                                                            <% } else if (product.productStatus=='Pending' ) { %>
-                                                                <button type="button" class="btn btn-primary"
-                                                                    onclick="cancelOrder(event, '<%= order.id %>', '<%= product.product.id %>')">Cancel</button>
-                                                                <% } else if (product.productStatus=='Delivered' ) { %>
-                                                                    <button type="button" class="btn btn-secondary"
-                                                                        onclick="returnSingleProduct(event, '<%= order.id %>', '<%= product.product.id %>')">Return</button>
-                                                                    <% } else if (product.productStatus=='Returned' ) {
-                                                                        %>
-                                                                        <p class="error-message text-success mt-1">
-                                                                            *Returned</p>
-                                                                        <% } else { %>
-                                                                            <p class="error-message text-danger mt-1">
-                                                                                *Cancelled</p>
-                                                                            <% } %>
+                                                <% if (product.cancelStatus==='Approved' ) { %>
+                                                    <p class="text-danger mt-1">*Cancelled</p>
+                                                    <% } else if (product.cancelStatus==='Rejected' ) { %>
+                                                        <p class="text-warning mt-1">*Cancellation Rejected</p>
+                                                        <% } else if (product.cancelRequested) { %>
+                                                            <p class="text-warning mt-1">*Cancellation Requested</p>
+                                                            <% } else if (product.returnStatus==='Approved' ) { %>
+                                                                <p class="text-success mt-1">*Returned</p>
+                                                                <% } else if (product.returnStatus==='Rejected' ) { %>
+                                                                    <p class="text-danger mt-1">*Return Rejected</p>
+                                                                    <% } else if (product.returnRequested) { %>
+                                                                        <p class="text-warning mt-1">*Return Requested
+                                                                        </p>
+                                                                        <% } else if (product.productStatus==='Pending' && order.status !== "Payment Pending") { %>
+                                                                            <button type="button"
+                                                                                class="btn btn-primary"
+                                                                                onclick="cancelOrder(event, '<%= order.id %>', '<%= product.product.id %>')">Cancel</button>
+                                                                            <% } else if
+                                                                                (product.productStatus==='Delivered' ) {
+                                                                                %>
+                                                                                <button type="button"
+                                                                                    class="btn btn-secondary"
+                                                                                    onclick="returnSingleProduct(event, '<%= order.id %>', '<%= product.product.id %>')">Return</button>
+                                                                                <% } else if
+                                                                                    (product.productStatus==='Returned'
+                                                                                    ) { %>
+                                                                                    <p class="text-success mt-1">
+                                                                                        *Returned</p>
+                                                                                    <% }  %>
                                             </div>
                                         </div>
+
                                     </div>
                                     <% }) %>
                             </div>
                         </div>
 
-                        <%if(order.status == "Payment Pending") {%>
-                        <button type="button" onclick="continueRazorpayPayment('<%= order.id %>','<%= order.razorpayId %>','<%= order.totalAmount %>')" class="btn btn-primary">Countinue Payment
-                        <%}%>
-                        </button>
+                        <%if(order.status=="Payment Pending" ) {%>
+                            <button type="button"
+                                onclick="continueRazorpayPayment('<%= order.id %>','<%= order.razorpayId %>','<%= order.totalAmount %>')"
+                                class="btn btn-primary">Countinue Payment
+                                <%}%>
+                            </button>
 
 
-                        <div class="row">
-                            <div class="col-md-4"></div>
-                            <div class="col-md-4"></div>
-                            <div class="col-md-4">
-                                <div class="cart-detail">
-                                    <h2>Order Total</h2>
-                                    <ul>
-                                        <li>
-                                            <ul>
-                                                <li>
-                                                    <span>Total</span>
-                                                    <span>
-                                                        <%= order.orginalAmount %>
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <span>Discount</span>
-                                                    <span>
-                                                        <%= order.orginalAmount - order.totalAmount%>
-                                                    </span>
-                                                </li>
+                            <div class="row">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                    <div class="cart-detail">
+                                        <h2>Order Total</h2>
+                                        <ul>
+                                            <li>
+                                                <ul>
+                                                    <li>
+                                                        <span>Total</span>
+                                                        <span>
+                                                            <%= order.orginalAmount %>
+                                                        </span>
+                                                    </li>
+                                                    <li>
+                                                        <span>Discount</span>
+                                                        <span>
+                                                            <%= order.orginalAmount - order.totalAmount%>
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <span><strong>Grand Total</strong></span>
+                                                <span><strong>
+                                                        <%= order.totalAmount %>
+                                                    </strong></span>
+                                            </li>
+                                        </ul>
+                                        <% if(order.status=='Delivered' ){ %>
+                                            <a href="/Invoice/<%= order._id %>" class="btn download-btn"
+                                                style="width: 150px;background-color: rgb(103, 103, 103);color:white;">
+                                                Download Invoice
+                                            </a>
+                                            <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <footer id="colorlib-footer" role="contentinfo">
+                                <div class="container">
+                                    <div class="row row-pb-md">
+                                        <div class="col footer-col colorlib-widget">
+                                            <h4>About Footwear</h4>
+                                            <p>Even the all-powerful Pointing has no control about the blind
+                                                texts it is an almost
+                                                unorthographic life</p>
+                                            <p>
+                                            <ul class="colorlib-social-icons">
+                                                <li><a href="#"><i class="icon-twitter"></i></a></li>
+                                                <li><a href="#"><i class="icon-facebook"></i></a></li>
+                                                <li><a href="#"><i class="icon-linkedin"></i></a></li>
+                                                <li><a href="#"><i class="icon-dribbble"></i></a></li>
                                             </ul>
-                                        </li>
-                                        <li>
-                                            <span><strong>Grand Total</strong></span>
-                                            <span><strong>
-                                                    <%= order.totalAmount %>
-                                                </strong></span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                                            </p>
+                                        </div>
+                                        <div class="col footer-col colorlib-widget">
+                                            <h4>Customer Care</h4>
+                                            <p>
+                                            <ul class="colorlib-footer-links">
+                                                <li><a href="#">Contact</a></li>
+                                                <li><a href="#">Returns/Exchange</a></li>
+                                                <li><a href="#">Gift Voucher</a></li>
+                                                <li><a href="#">Wishlist</a></li>
+                                                <li><a href="#">Special</a></li>
+                                                <li><a href="#">Customer Services</a></li>
+                                                <li><a href="#">Site maps</a></li>
+                                            </ul>
+                                            </p>
+                                        </div>
+                                        <div class="col footer-col colorlib-widget">
+                                            <h4>Information</h4>
+                                            <p>
+                                            <ul class="colorlib-footer-links">
+                                                <li><a href="#">About us</a></li>
+                                                <li><a href="#">Delivery Information</a></li>
+                                                <li><a href="#">Privacy Policy</a></li>
+                                                <li><a href="#">Support</a></li>
+                                                <li><a href="#">Order Tracking</a></li>
+                                            </ul>
+                                            </p>
+                                        </div>
 
+                                        <div class="col footer-col">
+                                            <h4>News</h4>
+                                            <ul class="colorlib-footer-links">
+                                                <li><a href="blog.html">Blog</a></li>
+                                                <li><a href="#">Press</a></li>
+                                                <li><a href="#">Exhibitions</a></li>
+                                            </ul>
+                                        </div>
 
-
-                        <footer id="colorlib-footer" role="contentinfo">
-                            <div class="container">
-                                <div class="row row-pb-md">
-                                    <div class="col footer-col colorlib-widget">
-                                        <h4>About Footwear</h4>
-                                        <p>Even the all-powerful Pointing has no control about the blind
-                                            texts it is an almost
-                                            unorthographic life</p>
-                                        <p>
-                                        <ul class="colorlib-social-icons">
-                                            <li><a href="#"><i class="icon-twitter"></i></a></li>
-                                            <li><a href="#"><i class="icon-facebook"></i></a></li>
-                                            <li><a href="#"><i class="icon-linkedin"></i></a></li>
-                                            <li><a href="#"><i class="icon-dribbble"></i></a></li>
-                                        </ul>
-                                        </p>
-                                    </div>
-                                    <div class="col footer-col colorlib-widget">
-                                        <h4>Customer Care</h4>
-                                        <p>
-                                        <ul class="colorlib-footer-links">
-                                            <li><a href="#">Contact</a></li>
-                                            <li><a href="#">Returns/Exchange</a></li>
-                                            <li><a href="#">Gift Voucher</a></li>
-                                            <li><a href="#">Wishlist</a></li>
-                                            <li><a href="#">Special</a></li>
-                                            <li><a href="#">Customer Services</a></li>
-                                            <li><a href="#">Site maps</a></li>
-                                        </ul>
-                                        </p>
-                                    </div>
-                                    <div class="col footer-col colorlib-widget">
-                                        <h4>Information</h4>
-                                        <p>
-                                        <ul class="colorlib-footer-links">
-                                            <li><a href="#">About us</a></li>
-                                            <li><a href="#">Delivery Information</a></li>
-                                            <li><a href="#">Privacy Policy</a></li>
-                                            <li><a href="#">Support</a></li>
-                                            <li><a href="#">Order Tracking</a></li>
-                                        </ul>
-                                        </p>
-                                    </div>
-
-                                    <div class="col footer-col">
-                                        <h4>News</h4>
-                                        <ul class="colorlib-footer-links">
-                                            <li><a href="blog.html">Blog</a></li>
-                                            <li><a href="#">Press</a></li>
-                                            <li><a href="#">Exhibitions</a></li>
-                                        </ul>
-                                    </div>
-
-                                    <div class="col footer-col">
-                                        <h4>Contact Information</h4>
-                                        <ul class="colorlib-footer-links">
-                                            <li>291 South 21th Street, <br> Suite 721 New York NY 10016
-                                            </li>
-                                            <li><a href="tel://1234567920">+ 1235 2355 98</a></li>
-                                            <li><a href="mailto:info@yoursite.com">info@yoursite.com</a>
-                                            </li>
-                                            <li><a href="#">yoursite.com</a></li>
-                                        </ul>
+                                        <div class="col footer-col">
+                                            <h4>Contact Information</h4>
+                                            <ul class="colorlib-footer-links">
+                                                <li>291 South 21th Street, <br> Suite 721 New York NY 10016
+                                                </li>
+                                                <li><a href="tel://1234567920">+ 1235 2355 98</a></li>
+                                                <li><a href="mailto:info@yoursite.com">info@yoursite.com</a>
+                                                </li>
+                                                <li><a href="#">yoursite.com</a></li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="copy">
-                                <div class="row">
-                                    <div class="col-sm-12 text-center">
-                                        <p>
-                                            <span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                                                Copyright &copy;
-                                                <script>document.write(new Date().getFullYear());</script>
-                                                All rights reserved | This
-                                                template is made with <i class="icon-heart" aria-hidden="true"></i> by
-                                                <a href="https://colorlib.com/" target="_blank">Colorlib</a>
-                                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                                            </span>
-                                            <span class="block">Demo Images: <a href="http://unsplash.co/"
-                                                    target="_blank">Unsplash</a>
-                                                , <a href="http://pexels.com/" target="_blank">Pexels.com</a></span>
-                                        </p>
+                                <div class="copy">
+                                    <div class="row">
+                                        <div class="col-sm-12 text-center">
+                                            <p>
+                                                <span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                                                    Copyright &copy;
+                                                    <script>document.write(new Date().getFullYear());</script>
+                                                    All rights reserved | This
+                                                    template is made with <i class="icon-heart" aria-hidden="true"></i>
+                                                    by
+                                                    <a href="https://colorlib.com/" target="_blank">Colorlib</a>
+                                                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                                                </span>
+                                                <span class="block">Demo Images: <a href="http://unsplash.co/"
+                                                        target="_blank">Unsplash</a>
+                                                    , <a href="http://pexels.com/" target="_blank">Pexels.com</a></span>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </footer>
+                            </footer>
             </div>
 
             <div class="gototop js-top">
@@ -410,144 +432,238 @@
 
             <!-- cancel single order -->
             <script>
-                function cancelOrder(event, orderId,  productId) {
-                    event.preventDefault()
+    function cancelOrder(event, orderId, productId) {
+        event.preventDefault();
 
-                    const data = {
-                        productId,
-                        orderId
-                    }
-
-
-
-                    Swal.fire({
-                        icon: "question",
-                        title: "Are you sure?",
-                        text: "",
-                        // showDenyButton: true,
-                        showCancelButton: true,
-                        confirmButtonColor: '#0056b3',
-                        confirmButtonText: "ok",
-                        // denyButtonText: `Don't save`
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            fetch('/cancelSingleProduct', {
-                                method: 'post',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(data)
-                            })
-                                .then(res => res.json())
-                                .then(data => {
-                                    console.log(data)
-                                    if (data.success == 2) {
-                                        Swal.fire({
-                                            icon: "success",
-                                            title: "order Cancelled",
-                                            text: "",
-                                            // showDenyButton: true,
-                                            showCancelButton: true,
-                                            confirmButtonColor: '#0056b3',
-                                            confirmButtonText: "ok",
-                                            // denyButtonText: `Don't save`
-                                        }).then(res => {
-                                            if (res.isConfirmed) {
-                                                window.location.href = '/orders'
-                                            }
-                                        })
-                                    } else if (data.success == 1) {
-                                        Swal.fire({
-                                            icon: "success",
-                                            title: "Order Cancelled",
-                                            text: "you'r money added to your wallet",
-                                            // showDenyButton: true,
-                                            // showCancelButton: true,
-                                            confirmButtonColor: '#0056b3',
-                                            confirmButtonText: "Ok",
-                                            // denyButtonText: `Don't save`
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = '/wallet'
-                                            }
-                                        })
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.log(error)
-                                })
+        Swal.fire({
+            icon: "question",
+            title: "Are you sure?",
+            html: `
+                <p style="margin-bottom: 10px;">Cancel your order! Select your reason:</p>
+                <div style="text-align: left; margin-left: 30px;">
+                    <label style="display: block; margin-bottom: 5px;">
+                        <input type="radio" id="reason1" name="cancelReason" value="Changed my mind" 
+                        style="width: 15px; height: 15px; vertical-align: middle; margin-right: 10px;">
+                        Changed my mind
+                    </label>
+                    <label style="display: block; margin-bottom: 5px;">
+                        <input type="radio" id="reason2" name="cancelReason" value="Found a better price" 
+                        style="width: 15px; height: 15px; vertical-align: middle; margin-right: 10px;">
+                        Found a better price
+                    </label>
+                    <label style="display: block; margin-bottom: 5px;">
+                        <input type="radio" id="reason3" name="cancelReason" value="Order delayed" 
+                        style="width: 15px; height: 15px; vertical-align: middle; margin-right: 10px;">
+                        Order delayed
+                    </label>
+                    <label style="display: block; margin-bottom: 5px;">
+                        <input type="radio" id="reason4" name="cancelReason" value="Other" 
+                        style="width: 15px; height: 15px; vertical-align: middle; margin-right: 10px;">
+                        Other
+                    </label>
+                    <input type="text" id="otherCancelReason" placeholder="If 'Other', please specify here" 
+                    style="display:none; margin-top:10px; width: 100%;" />
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonColor: '#0056b3',
+            confirmButtonText: "Submit",
+            willOpen: () => {
+                const otherReasonInput = document.getElementById('otherCancelReason');
+                document.querySelectorAll('input[name="cancelReason"]').forEach((radio) => {
+                    radio.addEventListener('change', (event) => {
+                        if (event.target.value === 'Other') {
+                            otherReasonInput.style.display = 'block';
+                        } else {
+                            otherReasonInput.style.display = 'none';
                         }
-                    })
+                    });
+                });
+            },
+            preConfirm: async () => {
+                const selectedReason = document.querySelector('input[name="cancelReason"]:checked');
+                let reason = selectedReason ? selectedReason.value : '';
 
-
-
+                if (reason === 'Other') {
+                    reason = document.getElementById('otherCancelReason').value.trim();
                 }
-            </script>
+
+                if (!selectedReason || (reason === 'Other' && !reason)) {
+                    Swal.showValidationMessage('Please select a reason for the cancellation');
+                    return null;
+                }
+
+                if (reason.length < 5) {
+                    Swal.showValidationMessage('The reason must be at least 5 characters long');
+                    return null;
+                }
+
+                try {
+                    const res = await fetch('/cancelSingleProduct', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            orderId: orderId,
+                            productId: productId,
+                            reason: reason
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success == 2) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Order Cancelled",
+                            confirmButtonColor: '#0056b3',
+                            confirmButtonText: "Ok",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/orders';
+                            }
+                        });
+                    } else if (data.success == 1) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Order Cancelled",
+                            text: "Your money has been added to your wallet.",
+                            confirmButtonColor: '#0056b3',
+                            confirmButtonText: "Ok",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/wallet';
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+
+                return reason;
+            }
+        });
+    }
+</script>
+
 
             <!-- cancel bulk order -->
 
             <script>
 
-                function cancelBulkOrder(event, orderId) {
+                function cancelBulkOrder(event, orderId,productId) {
                     event.preventDefault()
 
                     Swal.fire({
-                        icon: "question",
-                        title: "Are you sure?",
-                        text: "",
-                        // showDenyButton: true,
-                        showCancelButton: true,
-                        confirmButtonColor: '#0056b3',
-                        confirmButtonText: "ok",
-                        // denyButtonText: `Don't save`
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            fetch('/cancelOrder', {
-                                method: 'post',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ orderId })
-                            })
-                                .then(res => res.json())
-                                .then((data) => {
-                                    if (data.success == 2) {
-                                        Swal.fire({
-                                            icon: "success",
-                                            title: "order Cancelled",
-                                            text: "",
-                                            // showDenyButton: true,
-                                            showCancelButton: true,
-                                            confirmButtonColor: '#0056b3',
-                                            confirmButtonText: "ok",
-                                            // denyButtonText: `Don't save`
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = '/orders'
-                                            }
-                                        })
-                                    } else if (data.success == 1) {
-                                        Swal.fire({
-                                            icon: "success",
-                                            title: "Order Cancelled",
-                                            text: "you'r money added to your wallet",
-                                            // showDenyButton: true,
-                                            // showCancelButton: true,
-                                            confirmButtonColor: '#0056b3',
-                                            confirmButtonText: "Ok",
-                                            // denyButtonText: `Don't save`
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = '/wallet'
-                                            }
-                                        })
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.log(error)
-                                })
+            icon: "question",
+            title: "Are you sure?",
+            html: `
+                <p style="margin-bottom: 10px;">Cancel your order! Select your reason:</p>
+                <div style="text-align: left; margin-left: 30px;">
+                    <label style="display: block; margin-bottom: 5px;">
+                        <input type="radio" id="reason1" name="cancelReason" value="Changed my mind" 
+                        style="width: 15px; height: 15px; vertical-align: middle; margin-right: 10px;">
+                        Changed my mind
+                    </label>
+                    <label style="display: block; margin-bottom: 5px;">
+                        <input type="radio" id="reason2" name="cancelReason" value="Found a better price" 
+                        style="width: 15px; height: 15px; vertical-align: middle; margin-right: 10px;">
+                        Found a better price
+                    </label>
+                    <label style="display: block; margin-bottom: 5px;">
+                        <input type="radio" id="reason3" name="cancelReason" value="Order delayed" 
+                        style="width: 15px; height: 15px; vertical-align: middle; margin-right: 10px;">
+                        Order delayed
+                    </label>
+                    <label style="display: block; margin-bottom: 5px;">
+                        <input type="radio" id="reason4" name="cancelReason" value="Other" 
+                        style="width: 15px; height: 15px; vertical-align: middle; margin-right: 10px;">
+                        Other
+                    </label>
+                    <input type="text" id="otherCancelReason" placeholder="If 'Other', please specify here" 
+                    style="display:none; margin-top:10px; width: 100%;" />
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonColor: '#0056b3',
+            confirmButtonText: "Submit",
+            willOpen: () => {
+                const otherReasonInput = document.getElementById('otherCancelReason');
+                document.querySelectorAll('input[name="cancelReason"]').forEach((radio) => {
+                    radio.addEventListener('change', (event) => {
+                        if (event.target.value === 'Other') {
+                            otherReasonInput.style.display = 'block';
+                        } else {
+                            otherReasonInput.style.display = 'none';
                         }
-                    })
+                    });
+                });
+            },
+            preConfirm: async () => {
+                const selectedReason = document.querySelector('input[name="cancelReason"]:checked');
+                let reason = selectedReason ? selectedReason.value : '';
+
+                if (reason === 'Other') {
+                    reason = document.getElementById('otherCancelReason').value.trim();
+                }
+
+                if (!selectedReason || (reason === 'Other' && !reason)) {
+                    Swal.showValidationMessage('Please select a reason for the cancellation');
+                    return null;
+                }
+
+                if (reason.length < 5) {
+                    Swal.showValidationMessage('The reason must be at least 5 characters long');
+                    return null;
+                }
+
+                try {
+                    const res = await fetch('/cancelOrder', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            orderId: orderId,
+                            productId: productId,
+                            reason: reason
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success == 2) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Order Cancelled",
+                            confirmButtonColor: '#0056b3',
+                            confirmButtonText: "Ok",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/orders';
+                            }
+                        });
+                    } else if (data.success == 1) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Order Cancelled",
+                            text: "Your money has been added to your wallet.",
+                            confirmButtonColor: '#0056b3',
+                            confirmButtonText: "Ok",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/wallet';
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+
+                return reason;
+            }
+        });
 
 
 
@@ -744,11 +860,11 @@
             </script>
 
             <script>
-            function backtoAccount(event) {
-                event.preventDefault()
-                window.location.href = '/orders'
-            }
-        </script>
+                function backtoAccount(event) {
+                    event.preventDefault()
+                    window.location.href = '/orders'
+                }
+            </script>
 
 
 

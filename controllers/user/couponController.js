@@ -104,7 +104,7 @@ const applyCoupon = async (req, res) => {
 
         // Save the coupon usage (optional, based on your flow)
 
-        fetchCoupon.userList.push({ userId }); 
+        // fetchCoupon.userList.push({ userId }); 
         await fetchCoupon.save();
 
         res.send({

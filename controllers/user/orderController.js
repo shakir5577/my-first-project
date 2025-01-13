@@ -1,3 +1,6 @@
+
+const PDFDocument = require('pdfkit')
+
 const orderModel = require('../../models/orderModel')
 const userModel = require('../../models/userModel')
 const productModel = require('../../models/productModel')
@@ -204,9 +207,94 @@ const cancelOrder = async(req,res) => {
     }
 }
 
+
+const generateInvoice = async (req, res) => {
+    try {
+        console.log('Reached for generate pdf');
+        const orderId = req.params.orderId;
+
+        const order = await orderModel.findById(orderId).populate('user');
+        console.log('Order while generating PDF:', order);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        const user = order.user;
+        const address = order.shippingAddress;
+
+        if (!address) {
+            console.log('Error: Address not found');
+            return res.status(404).json({ success: false, message: 'Address not found' });
+        }
+
+        const invoiceNumber = `INV-${order._id}-${Date.now()}`;
+
+        // Initialize PDF document
+        const doc = new PDFDocument({ margin: 50 });
+        res.setHeader('Content-Disposition', `attachment; filename=${invoiceNumber}.pdf`);
+        res.setHeader('Content-Type', 'application/pdf');
+
+        // Pipe PDF to the response
+        doc.pipe(res);
+
+        // Invoice Title
+        doc.fontSize(20).text('Invoice', { align: 'center' });
+        doc.moveDown();
+
+        // Order Details
+        doc.fontSize(12)
+            .text(`Invoice Number: ${invoiceNumber}`)
+            .text(`Order Date: ${order.date || 'N/A'}`)
+            .text(`Status: ${order.status || 'N/A'}`)
+            .text(`Payment Method: ${order.paymentMethod || 'N/A'}`)
+            .text(`Payment Status: ${order.status || 'N/A'}`)
+            .moveDown();
+
+        // User Details
+        doc.text(`User: ${user.name || 'N/A'}`)
+            .text(`Email: ${user.email || 'N/A'}`)
+            .text(`Phone: ${user.number || 'N/A'}`)
+            .moveDown();
+
+        // Delivery Address
+        doc.fontSize(14).text('Delivery Address').moveDown(0.5);
+        doc.fontSize(12)
+            .text(` Name: ${address.name || 'N/A'}`)
+            .text(`Phone: ${address.number || 'N/A'}`)
+            .text(`Street Address: ${address.street || 'N/A'}`)
+            .text(`City: ${address.city || 'N/A'}`)
+            .text(`State: ${address.state || 'N/A'}`)
+            .text(`Zip: ${address.pin || 'N/A'}`)
+            .text(`Country: ${address.country || 'N/A'}`)
+            .moveDown();
+
+        // Products Section
+        doc.fontSize(14).text('Products', { underline: true }).moveDown(0.5);
+        order.products.forEach((product, index) => {
+            doc.fontSize(12)
+                .text(`${index + 1}. Product ID: ${product.product || 'N/A'}`)
+                .text(`   Quantity: ${product.quantity || 0}`)
+                .text(`   Price: ${product.price || 0}`)
+                .moveDown(0.5);
+        });
+
+        // Total Price
+        doc.fontSize(16).text(`Total Price: ${order.totalAmount || 0}`, { align: 'right' });
+
+        // Finalize PDF
+        doc.end();
+    } catch (error) {
+        console.error('Error generating invoice:', error.message);
+        return res.status(500).json({ success: false, message: 'Error generating invoice' });
+    }
+};
+
+
 module.exports = {
 
     placeOrder,
     orderComplete,
-    cancelOrder
+    cancelOrder,
+    generateInvoice
 }

@@ -50,6 +50,7 @@ router.get('/logout',session.isLogin,accountController.logout)
 router.post('/placeOrder',orderController.placeOrder)
 router.get('/orderComplete',session.isLogin,orderController.orderComplete)
 router.post('/cancelOrder',orderController.cancelOrder)
+router.get('/Invoice/:orderId',orderController.generateInvoice)
 router.post('/cancelSingleProduct',accountController.cancelSingleProduct)
 router.post('/returnSingleOrder',accountController.returnSingleOrder)
 

@@ -55,7 +55,7 @@ const orderWithWallet = async (req, res) => {
         const { addressId, coupon } = req.body;
         const { userId } = req.session;
 
-        if (!addressId || !coupon || !userId) {
+        if (!addressId || !userId) {
             console.log("Required data is missing.");
             return res.status(400).send({ error: "Invalid request data" });
         }

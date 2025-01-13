@@ -122,14 +122,14 @@
                         <div class="col-lg-2 col-6 col-md-3" style="display: none;" id="startDate">
 
                             <input type="date" placeholder="Type here" class="form-control" id="startDateInput"
-                                value="2024-07-10" />
+                                />
 
                         </div>
 
                         <div class="col-lg-2 col-6 col-md-3" style="display: none;" id="endDate">
 
                             <input type="date" placeholder="Type here" class="form-control" id="endDateInput"
-                                value="2024-07-31" onchange="customDate(event)" />
+                                 onchange="customDate(event)" />
 
                         </div>
                         <div class="card mb-4">
@@ -368,8 +368,8 @@
         function customDate(event){
             event.preventDefault()
 
-            const startDate = document.getElementById('startDate').value
-            const endDate = document.getElementById('endDate').value
+            const startDate = document.getElementById('startDateInput').value
+            const endDate = document.getElementById('endDateInput').value
 
             window.location.href = `/admin/salesReport?startDate=${startDate}&endDate=${endDate}`
         }

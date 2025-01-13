@@ -18,6 +18,8 @@ const orderSchema = new mongoose.Schema({
             quantity : {type :Number, required: true },
             price : {type: Number , required : true},
             productStatus: {type: String},
+            cancelRequested: {type: Boolean, default: false},
+            cancelReason: {type: String},
             returnRequested: { type: Boolean, default: false },
             returnStatus: { type: String, default: 'None' },
             returnReason: { type: String}
