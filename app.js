@@ -12,9 +12,7 @@ require('dotenv').config()
 require('./config/passport')
 //----------------------------------------------------
 const mongoose = require('mongoose');
-mongoose.connect("mongodb+srv://shakirkm808:nj3o7VuPByGZljdD@cluster0.gauoa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+mongoose.connect("mongodb+srv://shakirkm808:nj3o7VuPByGZljdD@cluster0.gauoa.mongodb.net/project?retryWrites=true&w=majority&appName=Cluster0", {
     serverSelectionTimeoutMS: 30000,
   })
   .then(() => console.log("Connected to Mongo DB"))
