@@ -12,7 +12,7 @@ require('dotenv').config()
 require('./config/passport')
 //----------------------------------------------------
 const mongoose = require('mongoose')
-mongoose.connect("mongodb://localhost:27017/project")
+mongoose.connect("mongodb+srv://shakirkm808:nj3o7VuPByGZljdD@cluster0.gauoa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
     .then(()=> console.log("connected with mongodb"))
     .catch(err => console.log("error connecting mongodb: ", err))
 
