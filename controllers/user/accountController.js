@@ -455,6 +455,26 @@ const changePassword = async (req, res) => {
     }
 }
 
+const showReferEarn = async (req, res, next) =>{
+
+    try{
+
+        const { userId } = req.session
+        // console.log(req.session)
+
+        let referalLink = 'localhost:7000/register?reff=' + userId
+
+        if(!referalLink){
+            console.log('referal link is not find')
+        }
+
+        res.render('user/referEarn',{referalLink:referalLink})
+
+    }catch(error){
+        next(error)
+    }
+}
+
 const logout = async (req, res, next) => {
 
     try {
@@ -480,5 +500,6 @@ module.exports = {
     logout,
     orderDetailes,
     cancelSingleProduct,
-    returnSingleOrder
+    returnSingleOrder,
+    showReferEarn
 }

@@ -12,7 +12,9 @@ const userSchema = mongoose.Schema({
     balance:{type:Number,default:0},
     createdAt:{type:Date,default:Date.now},
     isAdmin:{type:Boolean,default:false},
-    isBlock:{type:Boolean,default:false}
+    isBlock:{type:Boolean,default:false},
+    resetPasswordToken:{type:String},
+    resetPasswordExpires:{type:Date}
 
 });
 

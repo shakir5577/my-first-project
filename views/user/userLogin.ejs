@@ -104,12 +104,14 @@
                 <div class="form-group">
                     <label for="email">Email address</label>
 
-                    <% if(typeof messsage != 'undefined'){ %>
-                    <div id="mailError" class="text-danger"><%= messsage%></div>
-                    <% } %>
+                    <% if(typeof messsage !='undefined' ){ %>
+                        <div id="mailError" class="text-danger">
+                            <%= messsage%>
+                        </div>
+                        <% } %>
 
-                    <div id="mailError" class="text-danger"></div>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                            <div id="mailError" class="text-danger"></div>
+                            <input type="email" class="form-control" id="email" name="email" required>
                 </div>
                 <div class="form-group password-wrapper">
                     <label for="password">Password</label>
@@ -123,6 +125,7 @@
                 <div class="forgot-password text-right">
                     <a href="/forgot-password">Forgot your password?</a>
                 </div>
+
                 <button type="submit" class="btn btn-primary btn-block btn-login">Login</button>
             </form>
             <div class="text-center mt-3">
@@ -139,32 +142,61 @@
     </div>
 
     <!-- Forgot Password Modal -->
-<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Password</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="forgotPasswordForm">
-            <div class="mb-3">
-              <label for="email" class="form-label">Enter your email</label>
-              <input type="email" class="form-control" id="email" name="email" required>
+    <!-- <div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog"
+        aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="forgotPasswordForm">
+                        <div class="form-group">
+                            <label for="forgot-email">Enter your registered email</label>
+                            <input type="email" class="form-control" id="forgot-email" name="email" required />
+                            <small id="forgotEmailError" class="text-danger" style="display: none;">
+                                Please enter a valid email address.
+                            </small>
+                        </div>
+                        <div id="otpInstructions" class="form-group text-muted" style="display: none;">
+                            <p>
+                                Please check your email for the OTP. Enter it below to proceed.
+                            </p>
+                        </div>
+                        <div class="form-group" id="otpSection" style="display: none;">
+                            <label for="otp">Enter OTP</label>
+                            <input type="text" class="form-control" id="otp" name="otp" maxlength="6" required />
+                            <small id="otpError" class="text-danger" style="display: none;">
+                                Invalid OTP. Please try again.
+                            </small>
+                        </div> 
+                        <button type="button" id="sendOTPButton" class="btn btn-primary btn-block">
+                            Send OTP
+                        </button>
+                        <button type="button" id="verifyOTPButton" class="btn btn-success btn-block"
+                            style="display: none;">
+                            Verify OTP
+                        </button>
+                    </form>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
         </div>
-      </div>
-    </div>
-  </div>
-  
+    </div> -->
+
+
+
+
+
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <script>
         function togglePassword() {
@@ -241,7 +273,7 @@
                         Swal.fire({
                             icon: "error",
                             title: data.error,
-                            
+
                             confirmButtonText: "Ok",
                         });
                     } else if (data.success) {
@@ -252,7 +284,7 @@
                         }).then(() => {
                             window.location.href = '/home';
                         });
-                    }else if(!data.success){
+                    } else if (!data.success) {
                         Swal.fire({
                             icon: "error",
                             title: data.message,
@@ -273,6 +305,12 @@
                 });
         });
     </script>
+
+    <!-- <script>
+        function forgetPasswordModal(){
+
+        }
+    </script> -->
 </body>
 
 </html>

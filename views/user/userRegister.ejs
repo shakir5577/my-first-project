@@ -77,36 +77,39 @@
     <div class="register-container">
         <div class="register-image"></div>
         <div class="register-form">
-            <h3 class="text-center">Register for ShoeVault</h3>
-            <form id="registerForm">
-                <div class="form-group">
-                    <label for="username">Name</label>
-                    <div id="nameError" class="text-danger"></div>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                <h3 class="text-center">Register for ShoeVault</h3>
+                <input type="hidden" value="<%= reff %>" id="reffId">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="username">Name</label>
+                        <div id="nameError" class="text-danger"></div>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <div id="mailError" class="text-danger"></div>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile Phone</label>
+                        <div id="numberError" class="text-danger"></div>
+                        <input type="tel" class="form-control" id="mobile" name="mobile" maxlength="10" pattern="[0-9]*"
+                            required>
+                    </div>
+                    <div class="form-group password-wrapper">
+                        <label for="password">Password</label>
+                        <div id="passwordError" class="text-danger"></div>
+                        <input type="password" class="form-control" id="password" name="password" minlength="6"
+                            required>
+                        <span class="toggle-password" onclick="togglePassword()">
+                            <i class="fa fa-eye" id="eyeIcon"></i>
+                        </span>
+                    </div>
+                    <button class="btn btn-primary btn-block btn-register">Register</button>
+                </form>
+                <div class="text-center mt-3">
+                    <p>Already have an account? <a href="login">Login</a></p>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email address</label>
-                    <div id="mailError" class="text-danger"></div>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="mobile">Mobile Phone</label>
-                    <div id="numberError" class="text-danger"></div>
-                    <input type="tel" class="form-control" id="mobile" name="mobile" maxlength="10" pattern="[0-9]*" required>
-                </div>
-                <div class="form-group password-wrapper">
-                    <label for="password">Password</label>
-                    <div id="passwordError" class="text-danger"></div>
-                    <input type="password" class="form-control" id="password" name="password" minlength="6" required>
-                    <span class="toggle-password" onclick="togglePassword()">
-                        <i class="fa fa-eye" id="eyeIcon"></i>
-                    </span>
-                </div>
-                <button class="btn btn-primary btn-block btn-register">Register</button>
-            </form>
-            <div class="text-center mt-3">
-                <p>Already have an account? <a href="login">Login</a></p>
-            </div>
         </div>
     </div>
 
@@ -189,59 +192,73 @@
             return isValid;
         }
 
+        console.log(document.getElementById('registerForm'))
+
         document.getElementById('registerForm').addEventListener('input', formValidation);
 
         document.getElementById('registerForm').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent default form submission
 
-            if (!formValidation()) {
-                return; // Stop submission if form is not valid
-            }
+            if (formValidation()) {
 
-            const formData = {
-                username: document.getElementById('username').value,
-                email: document.getElementById('email').value,
-                mobile: document.getElementById('mobile').value,
-                password: document.getElementById('password').value,
-            };
+                console.log("validation success...")//! TO REMOVE
 
-            fetch('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    if (data.error) {
-                        Swal.fire({
-                            icon: "error",
-                            title: data.error,
-                            confirmButtonText: "Ok",
-                        });
-                    }
+                const reffDiv = document.getElementById('reffId')
 
-                    if (data.success) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Success",
-                            showCancelButton: true,
-                            confirmButtonText: "Verify OTP",
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '/otp';
-                            } else if (result.isDenied) {
-                                Swal.fire("Changes are not saved", "", "info");
-                            }
-                        });
-                    }
+                let refId
+
+                if (reffDiv) {
+                    refId = reffDiv.value
+                } else {
+                    refId = ''
+                }
+
+                const formData = {
+                    username: document.getElementById('username').value,
+                    email: document.getElementById('email').value,
+                    mobile: document.getElementById('mobile').value,
+                    password: document.getElementById('password').value,
+                    refId: refId
+                };
+
+                fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
                 })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
-        });
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        if (data.error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: data.error,
+                                confirmButtonText: "Ok",
+                            });
+                        }
+
+                        if (data.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Success",
+                                showCancelButton: true,
+                                confirmButtonText: "Verify OTP",
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '/otp';
+                                } else if (result.isDenied) {
+                                    Swal.fire("Changes are not saved", "", "info");
+                                }
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }
+            });
     </script>
 </body>
 

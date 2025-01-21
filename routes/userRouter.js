@@ -33,7 +33,14 @@ router.post('/decrementQuantity',userController.decrementQuantity)
 router.post('/incrementQuantity',userController.incrementQuantity)
 router.get('/checkOut',session.isLogin,userController.showCheckOut)
 router.get('/about',userController.showAbout)
-router.get('/search-products',userController.searchSortFilter)    
+router.get('/search-products',userController.searchSortFilter)
+router.post('/forgot-password',userController.forgotPassword)
+router.get('/reset-password/:token',userController.loadResetPassword)
+router.post('/reset-password',userController.resetPassword)
+
+router.get('/forgot-password', (req, res) => {
+    res.render('user/forgotPassword', { error: null, success: null });
+});
 
 router.get('/myAccount',session.isLogin,accountController.showMyaccount)
 router.get('/orders',session.isLogin,accountController.showOrders)
@@ -45,6 +52,7 @@ router.post('/deleteAddress',accountController.deleteAddress)
 router.get('/accountDetails',session.isLogin,accountController.showAccountDetails)
 router.post('/editAccount',accountController.editAccount)
 router.post('/changePassword',accountController.changePassword)
+router.get('/referEarn',session.isLogin,accountController.showReferEarn)
 router.get('/logout',session.isLogin,accountController.logout)
 
 router.post('/placeOrder',orderController.placeOrder)
@@ -76,6 +84,7 @@ router.get('/auth/google/callback',
     passportController.successGoogleLogin
 );
 router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+router.get('/*',userController.showErrorPage)
 
 
 

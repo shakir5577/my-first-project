@@ -77,13 +77,13 @@
         #colorlib-logo {
             font-size: 30px;
             font-weight: 700;
-            color: #2c3e50;
+            color: #503e2c;
         }
 
         /* Breadcrumbs */
         .breadcrumbs {
-            background-color:  #ffffff;
-            color: #fff;
+            background-color: #ffffff;
+            color:rgb(57, 49, 49);
             padding: 15px 0;
         }
 
@@ -206,35 +206,6 @@
         .colorlib-footer-links a:hover {
             color: #f1c40f;
         }
-
-        .dashboard-content {
-        height: 100%; /* Makes the content fill the available space */
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        background-color: #f9f9f9;
-    }
-
-    .coupon-item {
-        height: 300px; /* Fixed height for consistency */
-    }
-
-    .mb-3 {
-        margin-bottom: 1rem;
-    }
-
-    .row.equal-height > [class*='col-'] {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .row.equal-height .dashboard-content {
-        flex-grow: 1;
-    }
     </style>
 
 </head>
@@ -269,10 +240,9 @@
                                     <a href="/shop">shop</a>
                                 </li>
                                 <li><a href="about">About</a></li>
-                                <li class="active"><a href="myAccount">my account</a></li>
-                                <li class="cart"><a href="wishlist"><i class="icon-heart"></i></a>
-                                <li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a>
-                                </li>
+                                <li class="active"><a href="/myAccount">my account</a></li>
+                                <li class="cart"><a href="wishlist"><i class="icon-heart"></i></a></li>
+                                <li class="cart"><a href="cart"><i class="icon-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                     </div>
@@ -306,7 +276,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col">
-                        <p class="bread"><span><a href="index.html">my account</a></span> / <span>coupons</span></p>
+                        <p class="bread"><span><a href="index.html">my account</a></span> <span>/</span>profile</p>
                     </div>
                 </div>
             </div>
@@ -326,39 +296,30 @@
                                 <li><a href="/address">Address</a></li>
                                 <li><a href="/accountDetails">Account Details</a></li>
                                 <li><a href="#">Refer & Earn</a></li>
-                                <li><a href="coupon">Coupons</a></li>
-                                <li><a href="wallet">Wallet</a></li>
+                                <li><a href="/coupon">Coupons</a></li>
+                                <li><a href="/wallet">Wallet</a></li>
                                 <li><a href="#" id="logout-btn">Logout</a></li>
+                                <!-- <li><a href="logout.html">Logout</a></li> -->
                             </ul>
                         </div>
                     </div>
 
-                    <div class="col-md-9">
-                        <div class="profile-content">
-                            <div class="row">
-                                <% if (typeof coupons != 'undefined' && coupons.length > 0) { %>
-                                    <% coupons.forEach((val, index) => { %>
-                                        <!-- Coupon Block -->
-                                        <div class="col-md-4 mt-4">
-                                            <div class="card h-100 position-relative"> <!-- Card with relative positioning -->
-                                                <div class="card-body">
-                                                    <button class="btn btn-primary btn-sm position-absolute" style="top: 10px; right: 10px;" onclick="copyCode('<%= val.code %>')">Copy</button>
-                                                    <h4 class="card-title">Coupon</h4>
-                                                    <hr>
-                                                    <h6 class="mb-3">Name: <%= val.name %></h6>
-                                                    <h6 class="mb-3">Code: <%= val.code %></h6>
-                                                    <h6 class="mb-3">End Date: <%= val.endDate.toLocaleDateString('en-GB') %></h6>
-                                                    <h6 class="mb-3">Discount Amount: <%= val.discountAmount %></h6>
-                                                    <h6 class="mb-3">Description: <%= val.description %></h6>
-                                                    <hr>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <% }) %>
-                                <% } %>
+                    <div class="tab-pane" id="referAndEarn">
+                        <h4>Refer & Earn</h4>
+                        <div class="row mt-3">
+                            <div class="col-md-12 mb-3">
+                                <div class="card p-3">
+                                    <!-- Static referral link -->
+                                    <input type="hidden" value="<%= referalLink %>" id="referalLink">
+                                    <h5 id="inputForRef">
+                                        <a href onclick="generateRefLink(event)">Click here</a> 
+                                        to view your referral link!
+                                    </h5>
+                                </div>
                             </div>
                         </div>
                     </div>
+                                     
                 </div>
             </div>
         </div>
@@ -450,54 +411,9 @@
         <a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
     </div>
 
-
-    <script>
-    function copyCode(code) {
-        // Create a temporary text area to copy the code
-        const tempInput = document.createElement("input");
-        tempInput.value = code;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        tempInput.setSelectionRange(0, 99999); // For mobile devices
-        document.execCommand("copy");
-        document.body.removeChild(tempInput);
-
-        // SweetAlert to confirm the copy action
-        Swal.fire({
-            icon: 'success',
-            title: 'Copied!',
-            text: 'Coupon code "' + code + '" has been copied to clipboard.',
-            showConfirmButton: false,
-            timer: 1500
-        });
-    }
-</script>
-
-
-    <!-- logout -->
-
-    <script>
-        document.getElementById('logout-btn').addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent default action
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You will be logged out!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, logout!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // If user confirms, redirect to logout route
-                    window.location.href = '/logout';
-                }
-            });
-        });
-    </script>
-
+    <!-- sweet alert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- jQuery -->
     <script src="js/jquery.min.js"></script>
     <!-- popper -->
@@ -525,6 +441,76 @@
     <script src="js/google_map.js"></script>
     <!-- Main -->
     <script src="js/main.js"></script>
+
+
+    <!-- generate link -->
+    <script>
+        function generateRefLink(event) {
+            event.preventDefault();
+    
+            // Get the referral link
+            const referalLink = document.getElementById('referalLink').value;
+    
+            // Update the HTML to display the referral link and copy button
+            const inputForRef = document.getElementById('inputForRef');
+            inputForRef.innerHTML = `
+                <p>${referalLink}</p>
+                <hr>
+                <a href="#" onclick="copyLink(event, '${referalLink}')">Copy link</a>
+            `;
+        }
+    
+        function copyLink(event, link) {
+            event.preventDefault();
+    
+            // Create a temporary textarea element to copy the text
+            const tempInput = document.createElement('textarea');
+            tempInput.value = link;
+            document.body.appendChild(tempInput);
+    
+            // Select and copy the text
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+    
+            // Remove the temporary input element
+            document.body.removeChild(tempInput);
+    
+            // Display SweetAlert success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Copied!',
+                text: 'Referral link copied to clipboard.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>
+
+
+
+
+    <!-- logout function -->
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default action
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user confirms, redirect to logout route
+                    window.location.href = '/logout';
+                }
+            });
+        });
+    </script>
 
 </body>
 

@@ -25,7 +25,7 @@ const adminDashboard = async (req, res) => {
             {
                 $group: {
                     _id: { $month: "$date"},
-                    totalSales: { $sum: '$orginalAmount'}
+                    totalSales: { $sum: '$totalAmount'}
                 }
             },
             {

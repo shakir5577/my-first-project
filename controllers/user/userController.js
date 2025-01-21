@@ -9,6 +9,8 @@ const categoryModel = require('../../models/categoryModel')
 const cartModel = require('../../models/cartModel')
 const addressModel = require("../../models/addressModel")
 const couponModel = require('../../models/couponModel')
+const transactionModel = require('../../models/transactionSchema')
+const crypto = require('crypto')
 
 require('dotenv').config();
 
@@ -37,7 +39,9 @@ const loadRegister = async (req, res) => {
 
     try {
 
-        res.render("user/userRegister")
+        const{ reff } = req.query 
+
+        res.render("user/userRegister",{ reff: reff })
 
     } catch (error) {
 
@@ -49,6 +53,8 @@ const loadRegister = async (req, res) => {
 const loadLogin = async (req, res) => {
 
     try {
+
+        console.log('this is login')
 
         res.render("user/userLogin")
 
@@ -144,6 +150,29 @@ const userVerifyOtp = async (req, res, next) => {
             const otpVerifyUser = req.session.user;
             console.log(otpVerifyUser)
 
+            let balance;
+
+            if(otpVerifyUser.refId.length > 0){
+
+                const findUser = await userModel.findOne({ _id:otpVerifyUser.refId })
+                // console.log(findUser)
+                findUser.balance += 101
+                await findUser.save()
+
+                balance = 101
+
+                const refTransaction = new transactionModel({
+                    userId: otpVerifyUser.refId,
+                    amount: 101,
+                    type: 'refferal'
+                })
+
+                await refTransaction.save()
+
+            }else{
+
+                balance = 0
+            }
             const hashedPassword = await bcrypt.hash(otpVerifyUser.password, 10)
 
             const saveNewUser = new userModel({
@@ -152,11 +181,25 @@ const userVerifyOtp = async (req, res, next) => {
                 email: otpVerifyUser.email,
                 number: otpVerifyUser.mobile,
                 password: hashedPassword,
+                balance:balance
                 // isVerified : true
             })
 
             const saving = await saveNewUser.save();
             if (saving) {
+
+                // req.session.userId = saving.id
+
+                if( otpVerifyUser.refId.length > 0){
+
+                    const refTransactionNewUser = new transactionModel({
+                        userId : saving.id,
+                        amount : 101,
+                        type : 'refferal'
+                    })
+
+                    await refTransactionNewUser.save()
+                }
 
                 // req.session.userId = saving.id;
                 console.log("user saved successfully...");
@@ -235,6 +278,8 @@ const userVerify = async (req, res) => {
 
     try {
 
+        // console.log(req.body)
+        // return
         const { username, email, mobile, password } = req.body
 
         if (!username.trim()) {
@@ -743,6 +788,135 @@ const searchSortFilter = async (req, res) => {
 };
 
 
+const showErrorPage = async (req,res) => {
+
+    try{
+
+        res.render('user/404')
+
+    }catch(error){
+        console.log(error)
+    }
+}
+
+const forgotPassword = async (req,res) => {
+
+    try{
+
+        const { email } = req.body
+
+        let error = null
+        let success = null
+
+        if(!email){
+
+            error = 'user not find, email is required'
+            return res.render('user/forgotPassword',{ error,success })
+        }
+
+        const findUser = await userModel.findOne({ email })
+        if(!findUser){
+            error = 'user with this email does not exist'
+            return res.render('user/forgotPassword',{ error,success })
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex')
+        const tokenExpiry = Date.now() + 3600000
+        // console.log(resetToken)
+        findUser.resetPasswordToken = resetToken
+        findUser.resetPasswordExpires = tokenExpiry
+        await findUser.save()
+
+        const resetURL = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: findUser.email,
+            subject: 'Password Reset',
+            text: `You requested a password reset. Click the link to reset your password: ${resetURL}`
+        };
+        const sender = nodemailer.createTransport({
+
+            service: "gmail",
+            auth: {
+
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        })
+        await sender.sendMail(mailOptions)
+        success = 'password reset link has been sent to your email'
+        res.render('user/forgotPassword',{error,success})
+
+    }catch(error){
+        console.log(error)
+        error = 'An error occured while processing your request'
+        res.render('user/forgotPassword',{error,success:null})
+    }
+}
+
+const loadResetPassword = async (req,res) => {
+
+    try{
+
+        const resetToken = req.params.token
+        // console.log(resetToken)
+
+        const findUser = await userModel.findOne({
+            resetPasswordToken: resetToken,
+            resetPasswordExpires: { $gt: Date.now()}
+        })
+
+        if(!findUser){
+            return res.render('user/resetPassword',{ error: 'password reset token is invalid or has expired', token : null})
+        }
+
+        res.render('user/resetPassword', { token : resetToken, error : null })
+
+    }catch(error){
+        console.log(error)
+        res.status(500).send('server error')
+    }
+}
+
+const resetPassword = async (req,res) => {
+
+    try{
+
+        const { token, newPassword, confirmPassword } = req.body
+
+        if(!newPassword || !confirmPassword){
+            return res.render('user/resetPassword',{ error: 'all fields are required', token})
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.render('user/resetPassword', { error: 'Passwords do not match', token });
+        }
+
+        const findUser = await userModel.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() } // check if token is still valid
+        });
+
+        if (!findUser) {
+            return res.render('user/resetPassword', { error: 'Token is invalid or has expired', token });
+        }
+
+         // Hash the new password
+         const hashedPassword = await bcrypt.hash(newPassword, 10); 
+
+         // Update user's password
+         findUser.password = hashedPassword;
+         findUser.resetPasswordToken = undefined; // remove the token after use
+         findUser.resetPasswordExpires = undefined; // remove token expiry
+         await findUser.save();
+ 
+         res.redirect(`/login`)
+
+    }catch(error){
+        console.log(error)
+        res.status(500).send('Server Error');
+    }
+}
 
 
 
@@ -766,5 +940,9 @@ module.exports = {
     showCheckOut,
     resendOtp,
     showAbout,
-    searchSortFilter
+    searchSortFilter,
+    showErrorPage,
+    forgotPassword,
+    loadResetPassword,
+    resetPassword 
 }
