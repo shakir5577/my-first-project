@@ -11,6 +11,7 @@ const nocache = require("nocache")
 require('dotenv').config()
 require('./config/passport')
 //----------------------------------------------------
+const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGO_ATLAS, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
