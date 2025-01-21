@@ -142,7 +142,7 @@ const adminDashboard = async (req, res) => {
             })
         );
         
-
+        console.log(topCategories)
         res.render('admin/adminDashboard',{
             totalOrders,
             totalRevenue:totalRevenue.toFixed(2),
