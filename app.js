@@ -11,10 +11,13 @@ const nocache = require("nocache")
 require('dotenv').config()
 require('./config/passport')
 //----------------------------------------------------
-const mongoose = require('mongoose')
-mongoose.connect("mongodb+srv://shakirkm808:nj3o7VuPByGZljdD@cluster0.gauoa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-    .then(()=> console.log("connected with mongodb"))
-    .catch(err => console.log("error connecting mongodb: ", err))
+mongoose.connect(process.env.MONGO_ATLAS, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000,
+  })
+  .then(() => console.log("Connected to Mongo DB"))
+  .catch((error) => console.log("Error connecting to Mongo DB", error));
 
 //------------------------------------------------------    
 
