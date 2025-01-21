@@ -462,7 +462,7 @@ const showReferEarn = async (req, res, next) =>{
         const { userId } = req.session
         // console.log(req.session)
 
-        let referalLink = 'localhost:7000/register?reff=' + userId
+        let referalLink = 'shaaky.online/register?reff=' + userId
 
         if(!referalLink){
             console.log('referal link is not find')
