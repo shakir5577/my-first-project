@@ -75,16 +75,12 @@ app.use((req,res,next)=> {
 
 //--------------------------------------------------
 
+//use the admin route
 app.use('/admin',adminRouter)
-//use the user route
-app.use('/',userRouter);
-
 //----------------------
 
-//use the admin route
-
-
-
+//use the user route
+app.use('/',userRouter);
 //-------------------------
 
 
