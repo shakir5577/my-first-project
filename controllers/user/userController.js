@@ -347,11 +347,12 @@ const loadShop = async (req, res) => {
         const limit = 8;
 
         const skip = (currentPage - 1) * limit;
-
+        const findAllCategories = await categoryModel.find({ isBlock : false})
+        const unblockedCategoryNames = findAllCategories.map((category) => category.categoryName)
         const totalProducts = await productModel.countDocuments({ isBlock: false });
 
         const products = await productModel
-            .find({ isBlock: false })
+            .find({ isBlock: false, category: { $in:unblockedCategoryNames }, })
             .skip(skip)
             .limit(limit)
             .populate({
