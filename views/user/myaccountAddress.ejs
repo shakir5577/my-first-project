@@ -82,7 +82,7 @@
 
         /* Breadcrumbs */
         .breadcrumbs {
-            background-color:  #ffffff;
+            background-color: #ffffff;
             color: #fff;
             padding: 15px 0;
         }
@@ -90,7 +90,7 @@
         .breadcrumbs p.bread {
             margin: 0;
             font-size: 16px;
-            color:  #2c3e50;
+            color: #2c3e50;
         }
 
         .breadcrumbs p.bread a {
@@ -362,7 +362,7 @@
         </div>
 
         <!-- Modal Structure -->
-        <!-- add address modal -->
+        <!-- Add Address Modal -->
         <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -375,47 +375,54 @@
                     </div>
                     <div class="modal-body">
                         <!-- Add Address Form -->
-                        <form>
+                        <form id="addAddressForm">
                             <div class="form-group">
                                 <label for="name">Name</label>
                                 <input type="text" class="form-control" id="name" placeholder="Enter your name">
+                                <small id="nameError" class="text-danger"></small>
                             </div>
                             <div class="form-group">
                                 <label for="number">Number</label>
                                 <input type="text" class="form-control" id="number" placeholder="Enter your number">
+                                <small id="numberError" class="text-danger"></small>
                             </div>
                             <div class="form-group">
                                 <label for="street">Street</label>
                                 <input type="text" class="form-control" id="street" placeholder="Enter your street">
+                                <small id="streetError" class="text-danger"></small>
                             </div>
                             <div class="form-group">
                                 <label for="city">City</label>
                                 <input type="text" class="form-control" id="city" placeholder="Enter your city">
+                                <small id="cityError" class="text-danger"></small>
                             </div>
                             <div class="form-group">
                                 <label for="state">State</label>
                                 <input type="text" class="form-control" id="state" placeholder="Enter your state">
+                                <small id="stateError" class="text-danger"></small>
                             </div>
                             <div class="form-group">
                                 <label for="pin">Pin</label>
                                 <input type="text" class="form-control" id="pin" placeholder="Enter your pin code">
+                                <small id="pinError" class="text-danger"></small>
                             </div>
                             <div class="form-group">
                                 <label for="country">Country</label>
                                 <input type="text" class="form-control" id="country" placeholder="Enter your country">
+                                <small id="countryError" class="text-danger"></small>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="addAddress()">Add</button>
+                        <button type="button" class="btn btn-primary" onclick="validateAndAddAddress()">Add</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- 2nd modal -->
-        <!-- edit modal -->
+        <!-- Edit Address Modal -->
         <div class="modal fade" id="editaddressmodal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -427,43 +434,56 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!-- Add Address Form -->
-                        <form>
+                        <!-- Edit Address Form -->
+                        <form id="editAddressForm">
                             <div class="form-group">
                                 <input type="hidden" id="editid">
                                 <label for="name">Name</label>
-                                <input type="text" class="form-control" id="editname" placeholder="Enter your name">
+                                <input type="text" class="form-control" id="editname" placeholder="Enter your name"
+                                    required>
+                                <small class="text-danger" id="nameErrorEdit"></small>
                             </div>
                             <div class="form-group">
                                 <label for="number">Number</label>
-                                <input type="text" class="form-control" id="editnumber" placeholder="Enter your number">
+                                <input type="text" class="form-control" id="editnumber" placeholder="Enter your number"
+                                    required pattern="\d{10}" title="Please enter a valid 10-digit number">
+                                <small class="text-danger" id="numberErrorEdit"></small>
                             </div>
                             <div class="form-group">
                                 <label for="street">Street</label>
-                                <input type="text" class="form-control" id="editstreet" placeholder="Enter your street">
+                                <input type="text" class="form-control" id="editstreet" placeholder="Enter your street"
+                                    required>
+                                <small class="text-danger" id="streetErrorEdit"></small>
                             </div>
                             <div class="form-group">
                                 <label for="city">City</label>
-                                <input type="text" class="form-control" id="editcity" placeholder="Enter your city">
+                                <input type="text" class="form-control" id="editcity" placeholder="Enter your city"
+                                    required>
+                                <small class="text-danger" id="cityErrorEdit"></small>
                             </div>
                             <div class="form-group">
                                 <label for="state">State</label>
-                                <input type="text" class="form-control" id="editstate" placeholder="Enter your state">
+                                <input type="text" class="form-control" id="editstate" placeholder="Enter your state"
+                                    required>
+                                <small class="text-danger" id="stateErrorEdit"></small>
                             </div>
                             <div class="form-group">
                                 <label for="pin">Pin</label>
-                                <input type="text" class="form-control" id="editpin" placeholder="Enter your pin code">
+                                <input type="text" class="form-control" id="editpin" placeholder="Enter your pin code"
+                                    required pattern="\d{6}" title="Please enter a valid 6-digit pin code">
+                                <small class="text-danger" id="pinErrorEdit"></small>
                             </div>
                             <div class="form-group">
                                 <label for="country">Country</label>
                                 <input type="text" class="form-control" id="editcountry"
-                                    placeholder="Enter your country">
+                                    placeholder="Enter your country" required>
+                                <small class="text-danger" id="countryErrorEdit"></small>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="editAddress()">edit</button>
+                        <button type="button" class="btn btn-primary" onclick="validateAndEditAddress()">Edit</button>
                     </div>
                 </div>
             </div>
@@ -560,55 +580,95 @@
 
     <!-- add address -->
     <script>
-        function addAddress() {
+        function validateAndAddAddress() {
+            let isValid = true;
 
-            const userName = document.getElementById('name').value
-            const userNumber = document.getElementById('number').value
-            const userStreet = document.getElementById('street').value
-            const userCity = document.getElementById('city').value
-            const userState = document.getElementById('state').value
-            const userPin = document.getElementById('pin').value
-            const userCountry = document.getElementById('country').value
+            // Clear previous errors
+            document.querySelectorAll('.text-danger').forEach((el) => (el.innerText = ''));
 
-            // console.log(userName,userNumber,userStreet,userCity,userState,userPin,userCountry)
+            // Fetch form values
+            const userName = document.getElementById('name').value.trim();
+            const userNumber = document.getElementById('number').value.trim();
+            const userStreet = document.getElementById('street').value.trim();
+            const userCity = document.getElementById('city').value.trim();
+            const userState = document.getElementById('state').value.trim();
+            const userPin = document.getElementById('pin').value.trim();
+            const userCountry = document.getElementById('country').value.trim();
 
-            const addressData = {
-
-                userName: userName,
-                userNumber: userNumber,
-                userStreet: userStreet,
-                userCity: userCity,
-                userState: userState,
-                userPin: userPin,
-                userCountry: userCountry
-
+            // Validation rules
+            if (!userName) {
+                document.getElementById('nameError').innerText = 'Name is required';
+                isValid = false;
+            }
+            if (!userNumber) {
+                document.getElementById('numberError').innerText = 'Number is required';
+                isValid = false;
+            } else if (!/^\d{10}$/.test(userNumber)) {
+                document.getElementById('numberError').innerText = 'Number must be exactly 10 digits';
+                isValid = false;
+            }
+            if (!userStreet) {
+                document.getElementById('streetError').innerText = 'Street is required';
+                isValid = false;
+            }
+            if (!userCity) {
+                document.getElementById('cityError').innerText = 'City is required';
+                isValid = false;
+            }
+            if (!userState) {
+                document.getElementById('stateError').innerText = 'State is required';
+                isValid = false;
+            }
+            if (!userPin) {
+                document.getElementById('pinError').innerText = 'Pin code is required';
+                isValid = false;
+            } else if (!/^\d{6}$/.test(userPin)) {
+                document.getElementById('pinError').innerText = 'Pin code must be exactly 6 digits';
+                isValid = false;
+            }
+            if (!userCountry) {
+                document.getElementById('countryError').innerText = 'Country is required';
+                isValid = false;
             }
 
-            fetch('/addAddress', {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(addressData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+            // Submit if valid
+            if (isValid) {
+                const addressData = {
+                    userName,
+                    userNumber,
+                    userStreet,
+                    userCity,
+                    userState,
+                    userPin,
+                    userCountry,
+                };
 
-                        Swal.fire({
-                            title: "<span style='color: #3BB77E;'>Success!</span>",
-                            html: "<span style='color: black;'>new address added.</span>",
-                            icon: "success",
-                            confirmButtonColor: "#3BB77E",
-                            confirmButtonText: "OK"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload()
-                            }
-                        })
-                    }
+                fetch('/addAddress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(addressData),
                 })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: "<span style='color: #3BB77E;'>Success!</span>",
+                                html: "<span style='color: black;'>New address added.</span>",
+                                icon: 'success',
+                                confirmButtonColor: '#3BB77E',
+                                confirmButtonText: 'OK',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    });
+            }
         }
+
     </script>
 
     <!-- trigger modal -->
@@ -640,65 +700,99 @@
 
     <!-- edit address -->
     <script>
-        function editAddress() {
+        function validateAndEditAddress() {
+            // Clear previous error messages
+            document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
 
-            const addressId = document.getElementById('editid').value
-            const userName = document.getElementById('editname').value
-            const userNumber = document.getElementById('editnumber').value
-            const userStreet = document.getElementById('editstreet').value
-            const userCity = document.getElementById('editcity').value
-            const userState = document.getElementById('editstate').value
-            const userPin = document.getElementById('editpin').value
-            const userCountry = document.getElementById('editcountry').value
+            // Get form values
+            const addressId = document.getElementById('editid').value;
+            const userName = document.getElementById('editname').value.trim();
+            const userNumber = document.getElementById('editnumber').value.trim();
+            const userStreet = document.getElementById('editstreet').value.trim();
+            const userCity = document.getElementById('editcity').value.trim();
+            const userState = document.getElementById('editstate').value.trim();
+            const userPin = document.getElementById('editpin').value.trim();
+            const userCountry = document.getElementById('editcountry').value.trim();
 
+            let isValid = true;
 
-            const newAddressData = {
+            console.log('Validating form...');
+            console.log(addressId, userName, userNumber, userStreet, userCity, userState, userPin, userCountry)
 
-                addressId: addressId,
-                userName: userName,
-                userNumber: userNumber,
-                userStreet: userStreet,
-                userCity: userCity,
-                userState: userState,
-                userPin: userPin,
-                userCountry: userCountry
-
+            // Validation checks
+            if (userName === '') {
+                document.getElementById('nameErrorEdit').textContent = "Name is required.";
+                isValid = false;
+            }
+            if (!/^\d{10}$/.test(userNumber)) {
+                document.getElementById('numberErrorEdit').textContent = "Please enter a valid 10-digit number.";
+                isValid = false;
+            }
+            if (userStreet === '') {
+                document.getElementById('streetErrorEdit').textContent = "Street is required.";
+                isValid = false;
+            }
+            if (userCity === '') {
+                document.getElementById('cityErrorEdit').textContent = "City is required.";
+                isValid = false;
+            }
+            if (userState === '') {
+                document.getElementById('stateErrorEdit').textContent = "State is required.";
+                isValid = false;
+            }
+            if (!/^\d{6}$/.test(userPin)) {
+                document.getElementById('pinErrorEdit').textContent = "Please enter a valid 6-digit pin code.";
+                isValid = false;
+            }
+            if (userCountry === '') {
+                document.getElementById('countryErrorEdit').textContent = "Country is required.";
+                isValid = false;
             }
 
+            if (!isValid) return; // Stop if validation fails
+
+            // Prepare data for submission
+            const newAddressData = {
+                addressId,
+                userName,
+                userNumber,
+                userStreet,
+                userCity,
+                userState,
+                userPin,
+                userCountry
+            };
+
+            // Submit data
             fetch('/editAddress', {
                 method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newAddressData)
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-
                         Swal.fire({
                             title: "<span style='color: #3BB77E;'>Success!</span>",
-                            html: "<span style='color: black;'>address edited.</span>",
+                            html: "<span style='color: black;'>Address updated successfully.</span>",
                             icon: "success",
                             confirmButtonColor: "#3BB77E",
                             confirmButtonText: "OK"
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.reload()
+                                window.location.reload();
                             }
-                        })
+                        });
                     }
-                })
-
+                });
         }
     </script>
-
     <!-- delete address -->
     <script>
         function deleteAddress(id) {
 
             const addressId = { id: id }
-            
+
             Swal.fire({
                 title: "<span style='color: #3d5280;'>Are you sure?</span>",
                 // html: "<span style='color: black;'>address edited.</span>",
@@ -709,28 +803,28 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch('/deleteAddress', {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(addressId)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.success){
-                        Swal.fire({
-                            title: "<span style='color: #3BB77E;'>Success!</span>",
-                            html: "<span style='color: black;'>address removed.</span>",
-                            icon: "success",
-                            confirmButtonColor: "#3BB77E",
-                            confirmButtonText: "OK"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload()
+                        method: "post",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(addressId)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: "<span style='color: #3BB77E;'>Success!</span>",
+                                    html: "<span style='color: black;'>address removed.</span>",
+                                    icon: "success",
+                                    confirmButtonColor: "#3BB77E",
+                                    confirmButtonText: "OK"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.reload()
+                                    }
+                                })
                             }
                         })
-                    }
-                })
                 }
             })
         }

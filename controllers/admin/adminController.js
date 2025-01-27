@@ -554,6 +554,8 @@ const updateProduct = async (req, res) => {
 
 const changeProductStatus = async (req, res) => {
 
+    console.log('haaai')
+
     try{
         const { productId, newStatus, orderId } = req.body
 
@@ -562,14 +564,13 @@ const changeProductStatus = async (req, res) => {
         // findOrder.products.forEach(val => console.log(val.product.toString()))
 
         const find = findOrder.products.find(val => val.product.toString() == productId)
-
+        
         find.productStatus = newStatus
+
 
         const allCancelled = findOrder.products.every(p => p.productStatus === newStatus);
 
-        if (allCancelled) {
-            findOrder.orderStatus = newStatus;
-        }
+        findOrder.status = newStatus;
 
         await findOrder.save()
 

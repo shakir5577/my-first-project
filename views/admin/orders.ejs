@@ -274,7 +274,7 @@
                                         <th scope="col">Name</th>
                                         <th scope="col">Email</th>
                                         <th scope="col">Total</th>
-                                        <th scope="col">Status</th>
+                                        <th scope="col">quantity</th>
                                         <th scope="col">Date</th>
                                         <th scope="col" class="text-end">Action</th>
                                     </tr>
@@ -336,7 +336,7 @@
                                                 </td>
 
                                                 <td>
-                                                    <%= order.status %>
+                                                    <%= order.products.reduce((acc,val) => acc+val.quantity,0) %>
                                                 </td>
                                                 
 

@@ -442,73 +442,83 @@
         <a href="#" class="js-gotop"><i class="ion-ios-arrow-up"></i></a>
     </div>
 
-    <!-- edit accout details modal -->
-    <div class="modal fade" id="editAccount" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addAddressModalLabel">Change Account Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Add Address Form -->
-                    <form>
-                        <div class="form-group">
-                            <input type="hidden" id="id">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" placeholder="Enter your name">
-                        </div>
-                        <div class="form-group">
-                            <label for="number">Number</label>
-                            <input type="text" class="form-control" id="number" placeholder="Enter your number">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="editAccount()">edit</button>
-                </div>
+   <!-- Edit Account Modal -->
+<div class="modal fade" id="editAccount" tabindex="-1" aria-labelledby="editAccountLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAccountLabel">Edit Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAccountForm">
+                    <input type="hidden" id="id" name="id">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <div id="editNameError" class="text-danger"></div>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="number">Mobile Phone</label>
+                        <div id="editNumberError" class="text-danger"></div>
+                        <input type="tel" class="form-control" id="number" name="number" maxlength="10" pattern="[0-9]*" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="validateAndEditAccount()">Save Changes</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- change password modal -->
-    <div class="modal fade" id="changePassword" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addAddressModalLabel">Change your password</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- change password form -->
-                    <form>
-                        <div class="form-group">
-                            <input type="hidden" id="passwordChangeId">
-                            <label for="oldpassword">Old password</label>
-                            <input type="password" class="form-control" id="oldpassword"
-                                placeholder="Enter your old password">
-                        </div>
-                        <div class="form-group">
-                            <label for="newpassword">New password</label>
-                            <input type="password" class="form-control" id="newpassword"
-                                placeholder="Enter your new password">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="changePassword()">Add</button>
-                </div>
+
+   <!-- Change Password Modal -->
+<div class="modal fade" id="changePassword" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Change Your Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Change Password Form -->
+                <form>
+                    <input type="hidden" id="passwordChangeId">
+
+                    <!-- Old Password -->
+                    <div class="form-group">
+                        <label for="oldpassword">Old Password</label>
+                        <input type="password" class="form-control" id="oldpassword" placeholder="Enter your old password">
+                        <small id="oldPasswordError" class="text-danger"></small>
+                    </div>
+
+                    <!-- New Password -->
+                    <div class="form-group">
+                        <label for="newpassword">New Password</label>
+                        <input type="password" class="form-control" id="newpassword" placeholder="Enter your new password">
+                        <small id="newPasswordError" class="text-danger"></small>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label for="confirmpassword">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmpassword" placeholder="Confirm your new password">
+                        <small id="confirmPasswordError" class="text-danger"></small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="changePassword()">Change</button>
             </div>
         </div>
     </div>
+</div>
+
     <!-- edit account trigger modal -->
     <script>
         function triggerEditModal(id, name, number) {
@@ -541,91 +551,151 @@
     </script>
     <!-- edit account function -->
     <script>
-        function editAccount() {
-
-            const userId = document.getElementById('id').value
-            const userName = document.getElementById('name').value
-            const userNumber = document.getElementById('number').value
-
-            // console.log(userId,userName,userNumber)
-
-            const newAccountDetails = {
-
-                userId: userId,
-                userName: userName,
-                userNumber: userNumber
+        function validateAndEditAccount() {
+            // Clear previous error messages
+            document.getElementById('editNameError').innerText = "";
+            document.getElementById('editNumberError').innerText = "";
+    
+            // Get input values
+            const userId = document.getElementById('id').value.trim();
+            const userName = document.getElementById('name').value.trim();
+            const userNumber = document.getElementById('number').value.trim();
+    
+            let isValid = true;
+    
+            // Name validation
+            if (!userName) {
+                document.getElementById('editNameError').innerText = "Name is required";
+                isValid = false;
+            } else if (userName.length < 3) {
+                document.getElementById('editNameError').innerText = "Name must be at least 3 characters long";
+                isValid = false;
             }
-
-            // console.log(newAccountDetails)
-
-            fetch('/editAccount', {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newAccountDetails)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-
-                        Swal.fire({
-                            title: "<span style='color: #3BB77E;'>Success!</span>",
-                            html: "<span style='color: black;'>user profile edited.</span>",
-                            icon: "success",
-                            confirmButtonColor: "#3BB77E",
-                            confirmButtonText: "OK"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload()
-                            }
-                        })
-                    }
+    
+            // Mobile number validation
+            const mobilePattern = /^[0-9]{10}$/;
+            if (!userNumber) {
+                document.getElementById('editNumberError').innerText = "Mobile phone is required";
+                isValid = false;
+            } else if (!mobilePattern.test(userNumber)) {
+                document.getElementById('editNumberError').innerText = "Please enter a valid 10-digit mobile number";
+                isValid = false;
+            }
+    
+            if (isValid) {
+                // Prepare data for API request
+                const newAccountDetails = {
+                    userId: userId,
+                    userName: userName,
+                    userNumber: userNumber
+                };
+    
+                // Send API request
+                fetch('/editAccount', {
+                    method: "post",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newAccountDetails)
                 })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: "<span style='color: #3BB77E;'>Success!</span>",
+                                html: "<span style='color: black;'>User profile edited.</span>",
+                                icon: "success",
+                                confirmButtonColor: "#3BB77E",
+                                confirmButtonText: "OK"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
         }
     </script>
+    
 
     <!-- change password function -->
 
     <script>
-        function changePassword() {
+       function changePassword() {
+    // Clear previous error messages
+    document.getElementById('oldPasswordError').innerText = '';
+    document.getElementById('newPasswordError').innerText = '';
+    document.getElementById('confirmPasswordError').innerText = '';
 
-            const userId = document.getElementById('passwordChangeId').value.trim()
-            const oldPassword = document.getElementById('oldpassword').value
-            const newPassword = document.getElementById('newpassword').value
-            // console.log(oldPassword)
-            // console.log(newPassword)
-            // console.log(userId)
+    // Retrieve form values
+    const userId = document.getElementById('passwordChangeId').value.trim();
+    const oldPassword = document.getElementById('oldpassword').value.trim();
+    const newPassword = document.getElementById('newpassword').value.trim();
+    const confirmPassword = document.getElementById('confirmpassword').value.trim();
 
-            const passwordDetails = {
+    let isValid = true;
 
-                userId: userId,
-                oldPassword: oldPassword,
-                newPassword: newPassword
-            }
-            console.log(passwordDetails)
-            fetch('/changePassword', {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(passwordDetails)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.success){
-                        Swal.fire({
-                    title: "<span style='color: #3BB77E;'>Success!</span>",
-                    html: "<span style='color: black;'>Password changed successfully.</span>",
-                    icon: "success",
-                    confirmButtonColor: "#3BB77E",
-                    confirmButtonText: "OK"
+    // Validation for Old Password
+    if (!oldPassword) {
+        document.getElementById('oldPasswordError').innerText = 'Old password is required.';
+        isValid = false;
+    }
+
+    // Validation for New Password (Only Two Conditions)
+    if (!newPassword) {
+        document.getElementById('newPasswordError').innerText = 'Password is required.';
+        isValid = false;
+    } else if (newPassword.length < 6) {
+        document.getElementById('newPasswordError').innerText = 'Password must be at least 6 characters long.';
+        isValid = false;
+    }
+
+    // Validation for Confirm Password
+    if (!confirmPassword) {
+        document.getElementById('confirmPasswordError').innerText = 'Please confirm your new password.';
+        isValid = false;
+    } else if (newPassword !== confirmPassword) {
+        document.getElementById('confirmPasswordError').innerText = 'Passwords do not match.';
+        isValid = false;
+    }
+
+    // Stop further execution if validation fails
+    if (!isValid) return;
+
+    // Prepare data to send to the server
+    const passwordDetails = {
+        userId: userId,
+        oldPassword: oldPassword,
+        newPassword: newPassword
+    };
+
+    // Send request to server
+    fetch('/changePassword', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(passwordDetails)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: '<span style="color: #3BB77E;">Success!</span>',
+                    html: '<span style="color: black;">Password changed successfully.</span>',
+                    icon: 'success',
+                    confirmButtonColor: '#3BB77E',
+                    confirmButtonText: 'OK'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.reload();
                     }
                 });
-                    }else {
+            } else {
                 Swal.fire({
                     title: 'Error!',
                     text: data.message,
@@ -634,8 +704,9 @@
                     confirmButtonText: 'OK'
                 });
             }
-                })
-        }
+        });
+}
+
 
 
     </script>

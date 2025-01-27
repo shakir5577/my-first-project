@@ -148,12 +148,12 @@ const cancelSingleProduct = async (req, res) => {
         if(findOrder.paymentMethod == 'Razor Pay' || findOrder.paymentMethod == 'wallet') {
 
             const user = await userModel.findById(userId)
-            user.balance += findProduct.price
+            user.balance += findProduct.price * product.quantity
             await user.save()
 
             const transaction = new transactionModel({
                 userId : userId,
-                amount : findOrder.totalAmount,
+                amount : findProduct.price * product.quantity,
                 type : 'credit'
             })
 
@@ -212,7 +212,7 @@ const returnSingleOrder = async (req, res, next) => {
             return console.log("User not found.");
         }
 
-        user.balance += product.price; // Add the product price to user's balance
+        user.balance += product.price * product.quantity; // Add the product price to user's balance
         await user.save();
 
         await findOrder.save();

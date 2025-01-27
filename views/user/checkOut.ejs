@@ -299,47 +299,54 @@
 											<div class="form-group">
 												<label for="fname">Name</label>
 												<input type="text" id="name" class="form-control"
-													placeholder="Your name">
+												placeholder="Your name">
+												<small class="text-danger" id="nameError"></small>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="phone">Phone Number</label>
 												<input type="text" id="number" class="form-control"
-													placeholder="Phone number">
+												placeholder="Phone number">
+												<small class="text-danger" id="numberError"></small>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="street">Street</label>
 												<input type="text" id="street" class="form-control"
-													placeholder="Street">
+												placeholder="Street">
+												<small class="text-danger" id="streetError"></small>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="city">City</label>
 												<input type="text" id="city" class="form-control" placeholder="City">
+												<small class="text-danger" id="cityError"></small>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="zipcode">Zip/Postal Code</label>
 												<input type="text" id="pin" class="form-control"
-													placeholder="Zip/Postal Code">
+												placeholder="Zip/Postal Code">
+												<small class="text-danger" id="pinError"></small>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="state">State</label>
 												<input type="text" id="state" class="form-control" placeholder="State">
+												<small class="text-danger" id="stateError"></small>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="country">Country</label>
 												<input type="text" id="country" class="form-control"
-													placeholder="Country">
+												placeholder="Country">
+												<small class="text-danger" id="countryError"></small>
 											</div>
 										</div>
 									</div>
@@ -625,6 +632,9 @@
 				<script>
 					function addAddress(event) {
 						event.preventDefault()
+
+						document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
+
 						const userName = document.getElementById('name').value
 						const userNumber = document.getElementById('number').value
 						const userStreet = document.getElementById('street').value
@@ -634,6 +644,45 @@
 						const userCountry = document.getElementById('country').value
 
 						// console.log(userName,userNumber,userStreet,userCity,userState,userPin,userCountry)
+
+						let isValid = true;
+
+						if(!userName){
+							document.getElementById('nameError').textContent = "Name is required";
+							isValid = false
+						}
+
+						if(!/^\d{10}$/.test(userNumber)){
+							document.getElementById('numberError').textContent = "Please enter a valid 10 digits number";
+							isValid = false
+						}
+
+						if(!userStreet){
+							document.getElementById('streetError').textContent = "Street is required";
+							isValid = false
+						}
+
+						if(!userCity){
+							document.getElementById('cityError').textContent = "City is required";
+							isValid = false
+						}
+
+						if(!/^\d{6}$/.test(userPin)){
+							document.getElementById('pinError').textContent = "Please enter a valid 6 digits pin number"
+							isValid = false
+						}
+
+						if(!userState){
+							document.getElementById('stateError').textContent = "State is required";
+							isValid = false
+						}
+
+						if(!userCountry){
+							document.getElementById('CountryError').textContent = "Country is required";
+							isValid = false
+						}
+
+						if(!isValid) return
 
 						const addressData = {
 
