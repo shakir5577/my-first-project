@@ -21,8 +21,8 @@ mongoose.connect("mongodb+srv://shakirkm808:nj3o7VuPByGZljdD@cluster0.gauoa.mong
 //------------------------------------------------------    
 
 const app = express();                             
-app.use(express.urlencoded({ limit: '50mb',extended:true }))
-app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({extended:true }))
+app.use(express.json())
 
 //----------------------------------------
 
