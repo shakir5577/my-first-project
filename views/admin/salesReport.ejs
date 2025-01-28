@@ -232,9 +232,9 @@
                                         <% for (let i = 1; i <= totalPages; i++) { %>
                                             <!-- Page Number Links -->
                                             <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                                <a class="page-link" href="?page=<%= i %>&limit=<%= limit %>">
+                                                <a class="page-link" href="?page=<%= i %>&limit=<%= limit || 5 %>">
                                                     <%= i %>
-                                                </a>
+                                                </a>                                                
                                             </li>
                                         <% } %>
                         
