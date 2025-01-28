@@ -142,7 +142,7 @@ const adminDashboard = async (req, res) => {
             })
         );
         
-        // console.log(togCategories)
+        console.log(categoryProducts)
         res.render('admin/adminDashboard',{
             totalOrders,
             totalRevenue:totalRevenue.toFixed(2),
@@ -336,6 +336,7 @@ const updateReturnRequest = async (req, res, next) => {
 
 
 const verifyAdminLogin = async (req, res) => {
+    console.log('body: ', req.body)
 
     try {
 
@@ -361,8 +362,7 @@ const verifyAdminLogin = async (req, res) => {
         }
 
         req.session.admin = email;
-        res.redirect('/admin/Dashboard')
-
+        res.status(200).send({success: true})
     } catch (error) {
 
         console.log(error)

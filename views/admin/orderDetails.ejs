@@ -381,7 +381,7 @@
         function changeStatus(event, orderId) {
 
             event.preventDefault();
-            const status = document.getElementById('status').value
+            // const status = document.getElementById('status').value
 
             Swal.fire({
                 icon: "question",
@@ -394,36 +394,7 @@
                 // denyButtonText: `Don't save`
             }).then((res) => {
                 if (res.isConfirmed) {
-
-                    fetch('/admin/changeOrderStatus', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ orderId: orderId, newStatus: status })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: "<span style='color: #3BB77E;'>Success!</span>",
-                                    html: "<span style='color: black;'>Your changes have been saved successfully.</span>",
-                                    icon: "success",
-                                    confirmButtonColor: "#3BB77E", // Bootstrap's success color
-                                    confirmButtonText: "OK"
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = `/admin/orders`
-                                    }
-                                })
-
-                            }
-                        })
-                        .catch(err =>{
-                            console.log(err)
-                        })
-
-
+                    window.location.reload()
                 }
             })
 
