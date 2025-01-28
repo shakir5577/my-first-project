@@ -14,7 +14,7 @@
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+
     <!-- Template CSS -->
     <link href="assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
 
@@ -156,11 +156,11 @@
                                     <div class="mb-4">
                                         <label class="form-label">Category</label>
                                         <select class="form-select" id="category">
-                                            <% allCategories.forEach(category => { %>
-                                            <option>
-                                                <%= category.categoryName %>
-                                            </option>
-                                            <% }) %>
+                                            <% allCategories.forEach(category=> { %>
+                                                <option>
+                                                    <%= category.categoryName %>
+                                                </option>
+                                                <% }) %>
                                         </select>
                                     </div>
                                 </div>
@@ -249,12 +249,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
+
     <!-- <script src="https://unpkg.com/cropperjs"></script> -->
 
     <script>
 
-function validateProductDetails() {
+        function validateProductDetails() {
             let title = document.getElementById('product_name').value.trim();
             let description = document.getElementById('product_description').value.trim();
             let cost = document.getElementById('price').value.trim();
@@ -351,7 +351,7 @@ function validateProductDetails() {
             errorDiv.appendChild(errorParagraph);
         }
 
-    
+
         document.getElementById('product_name').addEventListener('input', validateProductDetails)
         document.getElementById('product_description').addEventListener('input', validateProductDetails)
         document.getElementById('price').addEventListener('input', validateProductDetails)
@@ -363,7 +363,7 @@ function validateProductDetails() {
             if (!validateProductDetails()) {
                 return console.log("Error validate edit products")
             }
-            
+
             const productName = document.getElementById("product_name").value
             const productDescription = document.getElementById("product_description").value
             const category = document.getElementById("category").value
@@ -392,31 +392,38 @@ function validateProductDetails() {
             }
 
             fetch('/admin/updateProduct', {
-
-                method: 'post',
-                body: formData
+                method: 'POST',
+                body: formData,
             })
-
-                .then(response => response.json())
-                .then(data => {
-
-                    if (data.success) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "<span style='color: black;'>update successfully!</span>",
-                        // showCancelButton: true,
-                        confirmButtonColor: '#3BB77E',
-                        confirmButtonText: 'Ok',
-
-                    }).then(res => {
-
-                        if (res.isConfirmed) {
-
-                            window.location.href = '/admin/products'
-                        }
-                    })
-                }
+                .then((response) => {
+                    if (!response.ok) {
+                        // Check for 413 or other errors
+                        throw new Error(`HTTP error! Status: ${ response.status }`);
+                    }
+                    return response.json();
                 })
+                .then((data) => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: "<span style='color: black;'>Update successful!</span>",
+                            confirmButtonColor: '#3BB77E',
+                            confirmButtonText: 'Ok',
+                        }).then((res) => {
+                            if (res.isConfirmed) {
+                                window.location.href = '/admin/products';
+                            }
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error.message); // Log the error
+                    Swal.fire({
+                        icon: 'error',
+                        title: "<span style='color: black;'>Error occurred!</span>",
+                        text: error.message,
+                    });
+                });
 
         }
     </script>
