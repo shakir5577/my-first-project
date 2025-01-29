@@ -162,33 +162,25 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <% fetchAllOrders.forEach((val,ind)=>{ %>
+                                            <% fetchAllOrders.forEach((val, ind) => { %>
                                                 <tr>
+                                                    <td><%= ind + 1 %></td>
+                                                    <td><b><%= val.shippingAddress.name %></b></td>
+                                                    <td><%= val.shippingAddress.email %></td>
+                                            
+                                                    <!-- Fix: Only Sum Delivered Products -->
                                                     <td>
-                                                        <%= ind + 1 %>
+                                                        <%= val.products.reduce((sum, product) => sum + (product.price || 0) * (product.quantity || 0), 0) %> 
                                                     </td>
-                                                    <td><b>
-                                                            <%= val.shippingAddress.name %>
-                                                        </b></td>
-                                                    <td>
-                                                        <%= val.shippingAddress.email %>
-                                                    </td>
-                                                    <td>
-                                                        <%= val.totalAmount %>
-                                                    </td>
+                                            
                                                     <td>
                                                         <%= val.orginalAmount - val.totalAmount  %>
                                                     </td>
-                                                    <td><span class="badge rounded-pill alert-success">Delivered</span>
-                                                    </td>
-                                                    <td>
-                                                        <%= val.date.toLocaleDateString('en-Gb') %>
-                                                    </td>
-                                                    <td>
-                                                        <%= val.paymentMethod %>
-                                                    </td>
+                                                    <td><span class="badge rounded-pill alert-success">Delivered</span></td>
+                                                    <td><%= val.date.toLocaleDateString('en-GB') %></td>
+                                                    <td><%= val.paymentMethod %></td>
                                                 </tr>
-                                                <% }) %>
+                                            <% }) %>
                                                     <!-- Additional static rows here -->
                                         </tbody>
                                     </table>

@@ -17,41 +17,52 @@ const adminDashboard = async (req, res) => {
 
     try{
 
-        const salesdata = await orderModel.aggregate([
-
+        const salesData = await orderModel.aggregate([
             {
-                $match: { status : 'Delivered' }
+                $match: { status: 'Delivered' }
             },
             {
                 $group: {
-                    _id: { $month: "$date"},
-                    totalSales: { $sum: '$totalAmount'}
+                    _id: { $month: "$date" },
+                    totalSales: { $sum: "$totalAmount" }
                 }
             },
             {
-                $sort: { _id:1 }
+                $sort: { _id: 1 }
             }
-        ])
+        ]);
+
+        // console.log('sales data: ', salesData)
+        
 
         //initiles all months
         const monthNames = ["Jan","Feb","Mar","Apr","May","Jun",'Jul',"Aug","Sep","Oct","Nov","Dec"]
         const salesValues = new Array(12).fill(0)
 
         //populate sales values based on data
-        salesdata.forEach(item => {
+        salesData.forEach(item => {
             salesValues[item._id - 1] = item.totalSales
         })
+
+        // console.log('sales value array: ', salesValues)
 
         //count total delivered orders
         const totalOrders = await orderModel.countDocuments({
             status : 'Delivered'
         })
 
+        // console.log('totalorder count: ', totalOrders)
+
+        
+
         //calculate total revenue
         const totalRevenue = salesValues.reduce((sum, value) => sum + value, 0)
+        // console.log('total rev: ', totalRevenue)
 
         //count total products
         const totalProducts = await productModel.countDocuments({})
+
+        // console.log('total products: ', totalProducts)
 
         //get best selling products
         const bestSellingProducts = await orderModel.aggregate([
@@ -76,11 +87,16 @@ const adminDashboard = async (req, res) => {
             }
         ])
 
+        // console.log('best sell: ', bestSellingProducts)
+        
+
         //fetch products details for best selling products
         const productIds = bestSellingProducts.map(p => p._id)
         const products = await productModel.find({ _id: { $in: productIds } }).select('productName')
+        // console.log('names of pro: ', products)
 
         //map product details to best selling data
+        // no need 
         const bestSellingDetails = bestSellingProducts.map(selling => {
             const product = products.find(p => p._id.toString() === selling._id.toString())
             return{
@@ -88,6 +104,8 @@ const adminDashboard = async (req, res) => {
                 count : selling.totalSold
             }
         })
+
+        // console.log('best selling details: ', bestSellingDetails)
 
         const topCategories = await orderModel.aggregate([
             {
@@ -105,9 +123,13 @@ const adminDashboard = async (req, res) => {
                 }
             },
             {
+                $unwind: "$productDetails"
+            },
+            {
                 $group: {
-                    _id: "$productDetails.category", // Assuming `category` is a field in your `products` collection
-                    totalSold: { $sum: "$products.quantity" }
+                    _id: "$productDetails.category",
+                    totalSold: { $sum: "$products.quantity" },
+                    products: { $push: { name: "$productDetails.productName", productId: "$productDetails._id" } }
                 }
             },
             {
@@ -117,7 +139,7 @@ const adminDashboard = async (req, res) => {
                 $limit: 5
             }
         ]);
-        
+         
 
         //map category data
         const categoryProducts = await Promise.all(
@@ -568,9 +590,9 @@ const changeProductStatus = async (req, res) => {
         find.productStatus = newStatus
 
 
-        const allCancelled = findOrder.products.every(p => p.productStatus === newStatus);
+        // const allCancelled = findOrder.products.every(p => p.productStatus === newStatus);
 
-        findOrder.status = newStatus;
+        // findOrder.status = newStatus;
 
         await findOrder.save()
 

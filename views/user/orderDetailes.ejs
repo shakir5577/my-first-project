@@ -211,13 +211,13 @@
                                         <!-- New column for Status -->
                                         <div class="one-eight text-center">
                                             <div class="display-tc">
-                                                <% if(order.status == "Payment Pending"){ %>
+                                                <% if(order.status=="Payment Pending" ){ %>
                                                     <p class="text-danger mt-1">*payment pending</p>
                                                     <% }else{ %>
-                                                <span class="status">
-                                                    <%= product.productStatus %>
-                                                </span>
-                                                <% } %>
+                                                        <span class="status">
+                                                            <%= product.productStatus %>
+                                                        </span>
+                                                        <% } %>
                                             </div>
                                         </div>
 
@@ -237,7 +237,8 @@
                                                                     <% } else if (product.returnRequested) { %>
                                                                         <p class="text-warning mt-1">*Return Requested
                                                                         </p>
-                                                                        <% } else if (product.productStatus==='Pending' && order.status !== "Payment Pending") { %>
+                                                                        <% } else if (product.productStatus==='Pending'
+                                                                            && order.status !=="Payment Pending" ) { %>
                                                                             <button type="button"
                                                                                 class="btn btn-primary"
                                                                                 onclick="cancelOrder(event, '<%= order.id %>', '<%= product.product.id %>')">Cancel</button>
@@ -252,7 +253,7 @@
                                                                                     ) { %>
                                                                                     <p class="text-success mt-1">
                                                                                         *Returned</p>
-                                                                                    <% }  %>
+                                                                                    <% } %>
                                             </div>
                                         </div>
 
@@ -299,12 +300,15 @@
                                                     </strong></span>
                                             </li>
                                         </ul>
-                                        <% if(order.status=='Delivered' ){ %>
+                                        <% if (order.products.some(product=> product.productStatus== "Delivered") &&
+                                            !order.products.every(product => product.productStatus === "Pending") &&
+                                            !order.products.every(product => product.productStatus === "Cancelled")) { %>
                                             <a href="/Invoice/<%= order._id %>" class="btn download-btn"
                                                 style="width: 150px;background-color: rgb(103, 103, 103);color:white;">
                                                 Download Invoice
                                             </a>
                                             <% } %>
+
                                     </div>
                                 </div>
                             </div>
@@ -432,13 +436,13 @@
 
             <!-- cancel single order -->
             <script>
-    function cancelOrder(event, orderId, productId) {
-        event.preventDefault();
+                function cancelOrder(event, orderId, productId) {
+                    event.preventDefault();
 
-        Swal.fire({
-            icon: "question",
-            title: "Are you sure?",
-            html: `
+                    Swal.fire({
+                        icon: "question",
+                        title: "Are you sure?",
+                        html: `
                 <p style="margin-bottom: 10px;">Cancel your order! Select your reason:</p>
                 <div style="text-align: left; margin-left: 30px;">
                     <label style="display: block; margin-bottom: 5px;">
@@ -465,100 +469,100 @@
                     style="display:none; margin-top:10px; width: 100%;" />
                 </div>
             `,
-            showCancelButton: true,
-            confirmButtonColor: '#0056b3',
-            confirmButtonText: "Submit",
-            willOpen: () => {
-                const otherReasonInput = document.getElementById('otherCancelReason');
-                document.querySelectorAll('input[name="cancelReason"]').forEach((radio) => {
-                    radio.addEventListener('change', (event) => {
-                        if (event.target.value === 'Other') {
-                            otherReasonInput.style.display = 'block';
-                        } else {
-                            otherReasonInput.style.display = 'none';
+                        showCancelButton: true,
+                        confirmButtonColor: '#0056b3',
+                        confirmButtonText: "Submit",
+                        willOpen: () => {
+                            const otherReasonInput = document.getElementById('otherCancelReason');
+                            document.querySelectorAll('input[name="cancelReason"]').forEach((radio) => {
+                                radio.addEventListener('change', (event) => {
+                                    if (event.target.value === 'Other') {
+                                        otherReasonInput.style.display = 'block';
+                                    } else {
+                                        otherReasonInput.style.display = 'none';
+                                    }
+                                });
+                            });
+                        },
+                        preConfirm: async () => {
+                            const selectedReason = document.querySelector('input[name="cancelReason"]:checked');
+                            let reason = selectedReason ? selectedReason.value : '';
+
+                            if (reason === 'Other') {
+                                reason = document.getElementById('otherCancelReason').value.trim();
+                            }
+
+                            if (!selectedReason || (reason === 'Other' && !reason)) {
+                                Swal.showValidationMessage('Please select a reason for the cancellation');
+                                return null;
+                            }
+
+                            if (reason.length < 5) {
+                                Swal.showValidationMessage('The reason must be at least 5 characters long');
+                                return null;
+                            }
+
+                            try {
+                                const res = await fetch('/cancelSingleProduct', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        orderId: orderId,
+                                        productId: productId,
+                                        reason: reason
+                                    })
+                                });
+
+                                const data = await res.json();
+
+                                if (data.success == 2) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Order Cancelled",
+                                        confirmButtonColor: '#0056b3',
+                                        confirmButtonText: "Ok",
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = '/orders';
+                                        }
+                                    });
+                                } else if (data.success == 1) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Order Cancelled",
+                                        text: "Your money has been added to your wallet.",
+                                        confirmButtonColor: '#0056b3',
+                                        confirmButtonText: "Ok",
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = '/wallet';
+                                        }
+                                    });
+                                }
+                            } catch (err) {
+                                console.error(err);
+                            }
+
+                            return reason;
                         }
                     });
-                });
-            },
-            preConfirm: async () => {
-                const selectedReason = document.querySelector('input[name="cancelReason"]:checked');
-                let reason = selectedReason ? selectedReason.value : '';
-
-                if (reason === 'Other') {
-                    reason = document.getElementById('otherCancelReason').value.trim();
                 }
-
-                if (!selectedReason || (reason === 'Other' && !reason)) {
-                    Swal.showValidationMessage('Please select a reason for the cancellation');
-                    return null;
-                }
-
-                if (reason.length < 5) {
-                    Swal.showValidationMessage('The reason must be at least 5 characters long');
-                    return null;
-                }
-
-                try {
-                    const res = await fetch('/cancelSingleProduct', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            orderId: orderId,
-                            productId: productId,
-                            reason: reason
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (data.success == 2) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Order Cancelled",
-                            confirmButtonColor: '#0056b3',
-                            confirmButtonText: "Ok",
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '/orders';
-                            }
-                        });
-                    } else if (data.success == 1) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Order Cancelled",
-                            text: "Your money has been added to your wallet.",
-                            confirmButtonColor: '#0056b3',
-                            confirmButtonText: "Ok",
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '/wallet';
-                            }
-                        });
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-
-                return reason;
-            }
-        });
-    }
-</script>
+            </script>
 
 
             <!-- cancel bulk order -->
 
             <script>
 
-                function cancelBulkOrder(event, orderId,productId) {
+                function cancelBulkOrder(event, orderId, productId) {
                     event.preventDefault()
 
                     Swal.fire({
-            icon: "question",
-            title: "Are you sure?",
-            html: `
+                        icon: "question",
+                        title: "Are you sure?",
+                        html: `
                 <p style="margin-bottom: 10px;">Cancel your order! Select your reason:</p>
                 <div style="text-align: left; margin-left: 30px;">
                     <label style="display: block; margin-bottom: 5px;">
@@ -585,85 +589,85 @@
                     style="display:none; margin-top:10px; width: 100%;" />
                 </div>
             `,
-            showCancelButton: true,
-            confirmButtonColor: '#0056b3',
-            confirmButtonText: "Submit",
-            willOpen: () => {
-                const otherReasonInput = document.getElementById('otherCancelReason');
-                document.querySelectorAll('input[name="cancelReason"]').forEach((radio) => {
-                    radio.addEventListener('change', (event) => {
-                        if (event.target.value === 'Other') {
-                            otherReasonInput.style.display = 'block';
-                        } else {
-                            otherReasonInput.style.display = 'none';
+                        showCancelButton: true,
+                        confirmButtonColor: '#0056b3',
+                        confirmButtonText: "Submit",
+                        willOpen: () => {
+                            const otherReasonInput = document.getElementById('otherCancelReason');
+                            document.querySelectorAll('input[name="cancelReason"]').forEach((radio) => {
+                                radio.addEventListener('change', (event) => {
+                                    if (event.target.value === 'Other') {
+                                        otherReasonInput.style.display = 'block';
+                                    } else {
+                                        otherReasonInput.style.display = 'none';
+                                    }
+                                });
+                            });
+                        },
+                        preConfirm: async () => {
+                            const selectedReason = document.querySelector('input[name="cancelReason"]:checked');
+                            let reason = selectedReason ? selectedReason.value : '';
+
+                            if (reason === 'Other') {
+                                reason = document.getElementById('otherCancelReason').value.trim();
+                            }
+
+                            if (!selectedReason || (reason === 'Other' && !reason)) {
+                                Swal.showValidationMessage('Please select a reason for the cancellation');
+                                return null;
+                            }
+
+                            if (reason.length < 5) {
+                                Swal.showValidationMessage('The reason must be at least 5 characters long');
+                                return null;
+                            }
+
+                            try {
+                                const res = await fetch('/cancelOrder', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        orderId: orderId,
+                                        productId: productId,
+                                        reason: reason
+                                    })
+                                });
+
+                                const data = await res.json();
+
+                                if (data.success == 2) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Order Cancelled",
+                                        confirmButtonColor: '#0056b3',
+                                        confirmButtonText: "Ok",
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = '/orders';
+                                        }
+                                    });
+                                } else if (data.success == 1) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Order Cancelled",
+                                        text: "Your money has been added to your wallet.",
+                                        confirmButtonColor: '#0056b3',
+                                        confirmButtonText: "Ok",
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = '/wallet';
+                                        }
+                                    });
+                                }
+                            } catch (err) {
+                                console.error(err);
+                            }
+
+                            return reason;
                         }
                     });
-                });
-            },
-            preConfirm: async () => {
-                const selectedReason = document.querySelector('input[name="cancelReason"]:checked');
-                let reason = selectedReason ? selectedReason.value : '';
-
-                if (reason === 'Other') {
-                    reason = document.getElementById('otherCancelReason').value.trim();
-                }
-
-                if (!selectedReason || (reason === 'Other' && !reason)) {
-                    Swal.showValidationMessage('Please select a reason for the cancellation');
-                    return null;
-                }
-
-                if (reason.length < 5) {
-                    Swal.showValidationMessage('The reason must be at least 5 characters long');
-                    return null;
-                }
-
-                try {
-                    const res = await fetch('/cancelOrder', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            orderId: orderId,
-                            productId: productId,
-                            reason: reason
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (data.success == 2) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Order Cancelled",
-                            confirmButtonColor: '#0056b3',
-                            confirmButtonText: "Ok",
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '/orders';
-                            }
-                        });
-                    } else if (data.success == 1) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Order Cancelled",
-                            text: "Your money has been added to your wallet.",
-                            confirmButtonColor: '#0056b3',
-                            confirmButtonText: "Ok",
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '/wallet';
-                            }
-                        });
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-
-                return reason;
-            }
-        });
 
 
 

@@ -131,78 +131,78 @@ const placeOrder = async (req, res) => {
 };
 
 
-const orderComplete = async (req,res) => {
+const orderComplete = async (req, res) => {
 
-    try{
+    try {
 
         res.render('user/orderComplete')
 
 
-    }catch(error){
+    } catch (error) {
         console.log(error)
     }
 }
 
-const cancelOrder = async(req,res) => {
+const cancelOrder = async (req, res) => {
 
-    try{
+    try {
 
         const { orderId } = req.body
         const { userId } = req.session
 
-        if(!orderId){
+        if (!orderId) {
             return res.status(400).send("order ID is required")
         }
 
         const findOrder = await orderModel.findById(orderId)
 
-        if(!findOrder){
+        if (!findOrder) {
             return res.statud(400).send("order not found")
         }
 
         findOrder.status = 'Cancelled'
 
-        for( const productOrder of findOrder.products) {
+        for (const productOrder of findOrder.products) {
             productOrder.productStatus = 'Cancelled'
 
             //update the stock of the product
 
             const product = await productModel.findById(productOrder.product)
-            if(product){
+            if (product) {
                 product.stock += productOrder.quantity
                 await product.save()
 
-            }else{
+            } else {
                 return res.status(404).send("product not found")
             }
         }
 
         const updateReturn = await findOrder.save()
 
-        if( findOrder.paymentMethod === 'Razor Pay' || findOrder.paymentMethod === 'wallet'){
+        if (findOrder.paymentMethod === 'Razor Pay' || findOrder.paymentMethod === 'wallet') {
 
             const user = await userModel.findById(userId)
             user.balance += findOrder.totalAmount
             await user.save()
 
             const transaction = new transactionModel({
-                userId : userId,
-                amount : findOrder.totalAmount,
-                type : 'credit'
+                userId: userId,
+                amount: findOrder.totalAmount,
+                type: 'credit'
             })
 
             await transaction.save()
 
-            res.send({ success: 1, message: 'Order returned, balance credited, and stock updated'})
-            
-        } else if(updateReturn) {
+            res.send({ success: 1, message: 'Order returned, balance credited, and stock updated' })
+
+        } else if (updateReturn) {
             res.send({ success: 2, message: 'Order returned successfully and stock updated' })
 
-        }else{
+        } else {
             res.send(500).send('failed to update order status')
         }
-        
-    }catch(error){
+
+    } catch (error) {
         console.log(error)
     }
 }
@@ -246,9 +246,9 @@ const generateInvoice = async (req, res) => {
         doc.fontSize(12)
             .text(`Invoice Number: ${invoiceNumber}`)
             .text(`Order Date: ${order.date || 'N/A'}`)
-            .text(`Status: ${order.status || 'N/A'}`)
+            // .text(`Status: ${order.status || 'N/A'}`)
             .text(`Payment Method: ${order.paymentMethod || 'N/A'}`)
-            .text(`Payment Status: ${order.status || 'N/A'}`)
+            // .text(`Payment Status: ${order.status || 'N/A'}`)
             .moveDown();
 
         // User Details
@@ -271,16 +271,22 @@ const generateInvoice = async (req, res) => {
 
         // Products Section
         doc.fontSize(14).text('Products', { underline: true }).moveDown(0.5);
-        order.products.forEach((product, index) => {
+
+        const deliveredProducts = order.products.filter(product => product.productStatus === "Delivered");
+
+        deliveredProducts.forEach((product, index) => {
             doc.fontSize(12)
                 .text(`${index + 1}. Product ID: ${product.product || 'N/A'}`)
                 .text(`   Quantity: ${product.quantity || 0}`)
                 .text(`   Price: ${product.price || 0}`)
                 .moveDown(0.5);
         });
-
-        // Total Price
-        doc.fontSize(16).text(`Total Price: ${order.totalAmount || 0}`, { align: 'right' });
+        
+        // Calculate total price of only delivered products
+        const deliveredTotalPrice = deliveredProducts.reduce((sum, product) => sum + (product.price || 0) * (product.quantity || 0), 0);
+        
+        // Display total price
+        doc.fontSize(16).text(`Total Price: ${deliveredTotalPrice}`, { align: 'right' });
 
         // Finalize PDF
         doc.end();

@@ -49,32 +49,47 @@ const showSalesReport = async (req, res) => {
         }
 
         const fetchAllOrders = await orderModel
-            .find({ status: 'Delivered', ...dateFilter })
-            .sort({ date: -1 })
-            .limit(limit)
-            .skip(skip)
-            .populate({ path: 'products' });
-
-        const totalOrders = await orderModel.countDocuments({
-            status: 'Delivered',
-            ...dateFilter,
-        });
-
-        const totalPrice = fetchAllOrders.reduce(
-            (acc, order) => acc + (order.totalAmount || 0),
+        .find({ ...dateFilter }) // Get all orders matching the date filter
+        .sort({ date: -1 })
+        .limit(limit)
+        .skip(skip)
+        .populate({ path: 'products' });
+    
+    // Filter orders where at least one product has status "Delivered"
+    const deliveredOrders = fetchAllOrders
+        .map(order => {
+            // Filter only delivered products
+            const deliveredProducts = order.products.filter(product => product.productStatus === 'Delivered');
+    
+            return {
+                ...order.toObject(), // Convert Mongoose object to plain JS object
+                products: deliveredProducts, // Keep only delivered products
+            };
+        })
+        .filter(order => order.products.length > 0); // Keep only orders that have delivered products
+    
+    // Calculate total price only for delivered products
+    const totalPrice = deliveredOrders.reduce((acc, order) => {
+        const deliveredProductTotal = order.products.reduce(
+            (sum, product) => sum + (product.price || 0) * (product.quantity || 0),
             0
         );
-
-        const totalPages = Math.ceil(totalOrders / limit);
-
-        res.render('admin/salesReport', {
-            fetchAllOrders,
-            totalOrders,
-            totalPrice,
-            currentPage: page,
-            totalPages,
-            limit,
-        });
+    
+        return acc + deliveredProductTotal;
+    }, 0);
+    
+    // Get the total number of orders where at least one product is delivered
+    const totalOrders = deliveredOrders.length;
+    const totalPages = Math.ceil(totalOrders / limit);
+    
+    res.render('admin/salesReport', {
+        fetchAllOrders: deliveredOrders, // Now contains only orders with delivered products
+        totalOrders,
+        totalPrice,
+        currentPage: page,
+        totalPages,
+        limit,
+    });
     } catch (error) {
         console.error('Error in showSalesReport:', error.message);
         res.status(500).render('errorPage', { errorMessage: 'Internal Server Error' });
