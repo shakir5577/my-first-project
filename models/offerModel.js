@@ -7,7 +7,8 @@ const offerSchema = new mongoose.Schema({
     categoryId: { type: mongoose.Schema.Types.ObjectId,ref: 'categories' },
     discount: { type: Number, required: true, min: 0 },
     startDate: { type: Date },
-    endDate: { type: Date }
+    endDate: { type: Date },
+    createdAt: {type: Date, default: Date.now}
 })
 
 const offer = mongoose.model('offer',offerSchema)

@@ -233,21 +233,15 @@
                                     <div class="mb-4">
                                         <label class="form-label">Images</label>
                                         <div id="errorMessagesImage" class="text-danger"></div>
-                                        <input class="form-control" type="file" id="image1" name="images"
-                                            required>
-                                        <img id="preview1"
-                                            style="width: 100px; height: 100px; margin-top: 10px; display: none;"
-                                            alt="Image Preview" onclick="startCrop('preview1')" src="" />
-                                        <input class="form-control" type="file" id="image2" name="images"
-                                            onchange="triggerCropModal(event, 'preview2')">
-                                        <img id="preview2"
-                                            style="width: 100px; height: 100px; margin-top: 10px; display: none;"
-                                            alt="Image Preview" src="" />
-                                        <input class="form-control" type="file" id="image3" name="images"
-                                            onchange="triggerCropModal(event, 'preview3')">
-                                        <img id="preview3"
-                                            style="width: 100px; height: 100px; margin-top: 10px; display: none;"
-                                            alt="Image Preview" src="" />
+                                
+                                        <input class="form-control" type="file" id="image1" name="images" required>
+                                        <img id="preview1" style="width: 100px; height: 100px; margin-top: 10px; display: none;" alt="Image Preview" />
+                                
+                                        <input class="form-control" type="file" id="image2" name="images">
+                                        <img id="preview2" style="width: 100px; height: 100px; margin-top: 10px; display: none;" alt="Image Preview" />
+                                
+                                        <input class="form-control" type="file" id="image3" name="images">
+                                        <img id="preview3" style="width: 100px; height: 100px; margin-top: 10px; display: none;" alt="Image Preview" />
                                     </div>
                                 </div>
 
@@ -307,11 +301,27 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- <script src="https://unpkg.com/cropperjs"></script> -->
     <script defer src="https://cdn.crop.guide/loader/l.js?c=GHRCRK"></script>
-    
+
 
 </body>
 
 <script>
+
+    function previewFile(event, previewId) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                document.getElementById(previewId).src = reader.result;
+                document.getElementById(previewId).style.display = "block";
+            };
+        }
+    }
+
+    document.getElementById("image1").addEventListener("change", (e) => previewFile(e, "preview1"));
+    document.getElementById("image2").addEventListener("change", (e) => previewFile(e, "preview2"));
+    document.getElementById("image3").addEventListener("change", (e) => previewFile(e, "preview3"));
 
     function validateProductDetails() {
         let title = document.getElementById('productTitle').value.trim();
@@ -353,8 +363,8 @@
         }
 
         //product price validation
-        var minPrice = 0;
-        var maxPrice = 200000;
+        var minPrice = 1000;
+        var maxPrice = 10000;
 
         if (cost === '') {
             displayErrorPrice('*Product price is required.')
@@ -363,10 +373,10 @@
             displayErrorPrice('*Product price must be a positive number.')
             return false;
         } else if (cost < minPrice) {
-            displayErrorPrice(`*Product price must be at least $${minPrice.toFixed(2)}.`)
+            displayErrorPrice(`*Product price must be at least ${minPrice.toFixed(2)}.`)
             return false;
         } else if (cost > maxPrice) {
-            displayErrorPrice(`*Product price must be less than or equal to $${maxPrice.toFixed(2)}.`)
+            displayErrorPrice(`*Product price must be less than or equal to ${maxPrice.toFixed(2)}.`)
             return false;
         }
 

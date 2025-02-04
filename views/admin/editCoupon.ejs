@@ -230,8 +230,8 @@
 
 
             // Amount validation
-            const minPrice = 100;
-            const maxPrice = 500000;
+            const minPrice = 3000;
+            const maxPrice = 200000;
 
             if (amount === '') {
                 displayErrorAmount('*Price is required.');
@@ -239,11 +239,16 @@
             } else if (isNaN(amount) || amount <= 0) {
                 displayErrorAmount('*Price must be a positive number.');
                 return false;
+            } else if (amount < 100 || amount > 500) {
+                displayErrorAmount('*Price must be between 100 and 500.');
+                return false;
             }
 
 
             // Date validation
             const dateFormat = /^\d{4}-\d{2}-\d{2}$/;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate comparison
 
             if (!dateFormat.test(startDate) || !isValidDate(startDate)) {
                 displayErrorStDate('*Invalid start date (YYYY-MM-DD).');
@@ -255,26 +260,38 @@
                 return false;
             }
 
-            if (new Date(startDate) > new Date(endDate)) {
+            // Convert input dates to Date objects
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            // Ensure start date is today or in the future
+            if (start < today) {
+                displayErrorStDate('*Start date cannot be in the past.');
+                return false;
+            }
+
+            // Ensure end date is after or the same as start date
+            if (start > end) {
                 displayErrorEndDate('*End date must be after or the same as the start date.');
                 return false;
             }
 
 
-            // Min Purchase Amount validation
-            if (minPurchaseAmount === '') {
+             // Min Purchase Amount validation
+             if (minPurchaseAmount === '') {
                 displayErrorminPurchaseAmount('*Minimum purchase amount is required.');
                 return false;
             } else if (isNaN(minPurchaseAmount) || minPurchaseAmount <= 0) {
                 displayErrorminPurchaseAmount('*Minimum purchase amount must be a positive number.');
                 return false;
             } else if (minPurchaseAmount < minPrice) {
-                displayErrorminPurchaseAmount(`*Minimum purchase amount must be at least $${minPrice.toFixed(2)}.`);
+                displayErrorminPurchaseAmount(`*Minimum purchase amount must be at least ${minPrice.toFixed(2)}.`);
                 return false;
             } else if (minPurchaseAmount > maxPrice) {
-                displayErrorminPurchaseAmount(`*Minimum purchase amount must be less than or equal to $${maxPrice.toFixed(2)}.`);
+                displayErrorminPurchaseAmount(`*Minimum purchase amount must be less than or equal to ${maxPrice.toFixed(2)}.`);
                 return false;
             }
+
 
 
             // Description validation

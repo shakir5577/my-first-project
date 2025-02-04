@@ -155,14 +155,16 @@
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label">Category</label>
-                                        <select class="form-select" id="category">
-                                            <% allCategories.forEach(category=> { %>
-                                                <option>
+                                        <select class="form-select" id="category" name="category">
+                                            <% allCategories.forEach(category => { %>
+                                                <option value="<%= category.categoryName %>" 
+                                                    <% if (category.categoryName === product.category) { %> selected <% } %>>
                                                     <%= category.categoryName %>
                                                 </option>
-                                                <% }) %>
+                                            <% }) %>
                                         </select>
                                     </div>
+                                    
                                 </div>
                             </div>
                             <hr class="mb-4 mt-0">
@@ -205,13 +207,30 @@
                                 <div class="col-md-9">
                                     <div class="mb-4">
                                         <label class="form-label">Images</label>
-                                        <img src="<%= product.images[0] %>" alt="">
-                                        <input class="form-control" id="image1" type="file">
-                                        <img src="<%= product.images[1] %>" alt="">
-                                        <input class="form-control" id="image2" type="file">
-                                        <img src="<%= product.images[2] %>" alt="">
-                                        <input class="form-control" id="image3" type="file">
+
+                                        <!-- Display current product images -->
+                                        <div>
+                                            <img id="previewImage1" src="<%= product.images[0] %>" alt="Image 1"
+                                                class="img-fluid" width="100" height="100" />
+                                            <input class="form-control" id="image1" type="file"
+                                                onchange="previewImage(event, 'previewImage1')">
+                                        </div>
+
+                                        <div>
+                                            <img id="previewImage2" src="<%= product.images[1] %>" alt="Image 2"
+                                                class="img-fluid" width="100" height="100" />
+                                            <input class="form-control" id="image2" type="file"
+                                                onchange="previewImage(event, 'previewImage2')">
+                                        </div>
+
+                                        <div>
+                                            <img id="previewImage3" src="<%= product.images[2] %>" alt="Image 3"
+                                                class="img-fluid" width="100" height="100" />
+                                            <input class="form-control" id="image3" type="file"
+                                                onchange="previewImage(event, 'previewImage3')">
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -254,6 +273,22 @@
 
     <script>
 
+        // Function to display image preview
+        function previewImage(event, previewElementId) {
+            const file = event.target.files[0]; // Get the selected file
+            const reader = new FileReader(); // Create a FileReader to read the file
+
+            reader.onload = function (e) {
+                // Set the source of the preview image to the file content
+                document.getElementById(previewElementId).src = e.target.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file); // Read the file as a data URL (for preview)
+            }
+        }
+
+
         function validateProductDetails() {
             let title = document.getElementById('product_name').value.trim();
             let description = document.getElementById('product_description').value.trim();
@@ -285,8 +320,8 @@
             }
 
             //product price validation
-            var minPrice = 0;
-            var maxPrice = 200000;
+            var minPrice = 1000;
+            var maxPrice = 10000;
 
             if (cost === '') {
                 displayErrorPrice('*Product price is required.')
@@ -295,10 +330,10 @@
                 displayErrorPrice('*Product price must be a positive number.')
                 return false;
             } else if (cost < minPrice) {
-                displayErrorPrice(`*Product price must be at least $${minPrice.toFixed(2)}.`)
+                displayErrorPrice(`*Product price must be at least ${minPrice.toFixed(2)}.`)
                 return false;
             } else if (cost > maxPrice) {
-                displayErrorPrice(`*Product price must be less than or equal to $${maxPrice.toFixed(2)}.`)
+                displayErrorPrice(`*Product price must be less than or equal to ${maxPrice.toFixed(2)}.`)
                 return false;
             }
 
@@ -398,7 +433,7 @@
                 .then((response) => {
                     if (!response.ok) {
                         // Check for 413 or other errors
-                        throw new Error(`HTTP error! Status: ${ response.status }`);
+                        throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     return response.json();
                 })

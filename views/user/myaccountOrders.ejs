@@ -92,7 +92,7 @@
         }
 
         .breadcrumbs p.bread a {
-            color: #f1c40f;
+            color: #2c3e50;
             text-decoration: none;
         }
 
@@ -111,7 +111,7 @@
         }
 
         .profile-sidebar h3 {
-            color: #f1c40f;
+            color:  #ecf0f1;
             font-weight: 600;
             margin-bottom: 20px;
         }
@@ -160,8 +160,8 @@
         }
 
         .dashboard-overview th {
-            background-color: #f1c40f;
-            color: #2c3e50;
+            background-color:  #34495e;
+            color: #ecf0f1;
             padding: 10px;
             border-radius: 5px;
         }
@@ -172,8 +172,8 @@
 
         /* Buttons */
         .btn-primary {
-            background-color: #f1c40f;
-            color: #000000;
+            background-color: #34495e;;
+            color:  #ecf0f1;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
@@ -308,7 +308,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Order ID</th>
+                                            <th>Order No</th>
                                             <th>Date</th>
                                             <th>Total Products</th>
                                             <th>Total</th>
@@ -316,25 +316,56 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <% if(typeof orders !='undefined' ) {%>
-                                            <% orders.forEach((val, ind)=> { %>
-                                        <tr>
-                                            <td><%= ind + 1 %></td>
-                                            <td><%= val.date.toLocaleDateString() %></td>
-                                            <td class="text-center"><%= val.products.reduce((acc,value)=>acc+value.quantity,0) %></td>
-                                            <td><%= val.totalAmount %></td>
-                                            <td><a href="/orderDetailes?id=<%= val.id %>" class="btn btn-primary">View</a></td>
-                                        </tr>
-                                        <% }) %>
+                                        <% if (orders && orders.length > 0) { %>
+                                            <% orders.forEach((val, ind) => { %>
+                                                <tr>
+                                                    <td><%= (currentPage - 1) * 5 + ind + 1 %></td>
+                                                    <td><%= new Date(val.date).toLocaleDateString('en-GB') %></td>
+                                                    <td class="text-center">
+                                                        <%= val.products.reduce((acc, value) => acc + value.quantity, 0) %>
+                                                    </td>
+                                                    <td><%= val.totalAmount %></td>
+                                                    <td>
+                                                        <a href="/orderDetailes?id=<%= val.id %>" class="btn btn-primary">View</a>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="5" class="text-center">No orders found.</td>
+                                            </tr>
                                         <% } %>
                                     </tbody>
                                 </table>
+                    
+                                <!-- Pagination Controls -->
+                                <div class="text-center">
+                                    <nav>
+                                        <ul class="pagination">
+                                            <% if (currentPage > 1) { %>
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo;</a>
+                                                </li>
+                                            <% } %>
+                    
+                                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                                </li>
+                                            <% } %>
+                    
+                                            <% if (currentPage < totalPages) { %>
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page=<%= currentPage + 1 %>">&raquo;</a>
+                                                </li>
+                                            <% } %>
+                                        </ul>
+                                    </nav>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                    
 
 		<footer id="colorlib-footer" role="contentinfo">
 			<div class="container">

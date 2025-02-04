@@ -125,7 +125,7 @@ const createOrder = async (req, res) => {
                     console.log("Product not found");
                     continue;
                 }
-                product.stock -= item.quantity;
+                // product.stock -= item.quantity;
                 await product.save();
             }
 

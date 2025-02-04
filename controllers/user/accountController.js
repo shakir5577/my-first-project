@@ -21,22 +21,37 @@ const showMyaccount = async (req, res) => {
 }
 
 const showOrders = async (req, res) => {
-
     try {
+        const { userId } = req.session;
 
-        const { userId } = req.session
-        const findOrder = await orderModel.find({ user: userId }).sort({date: -1})
-        // console.log(findOrder)
+        if (!userId) {
+            console.log("User not found in session");
+        }
 
-        res.render('user/myaccountOrders', { orders: findOrder })
+        const page = parseInt(req.query.page) || 1; 
+        const limit = 5; 
+        const skip = (page - 1) * limit;
 
+        const totalOrders = await orderModel.countDocuments({ user: userId }); 
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        const findOrder = await orderModel.find({ user: userId })
+            .sort({ date: -1 }) 
+            .skip(skip)
+            .limit(limit);
+
+        res.render('user/myaccountOrders', {
+            orders: findOrder,
+            currentPage: page,
+            totalPages
+        });
 
     } catch (error) {
-
         console.log(error);
-
+        res.status(500).send("Internal Server Error");
     }
-}
+};
+
 const orderDetailes = async (req, res) => {
     try {
         const { id } = req.query;

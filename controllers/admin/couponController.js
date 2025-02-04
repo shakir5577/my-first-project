@@ -10,7 +10,7 @@ const showCoupon = async (req,res) => {
         const limit = 5
         const skip = (page - 1) * limit
 
-        const findAllCoupons = await couponModel.find().sort({ createdAt : 1 }).limit(limit).skip(skip)
+        const findAllCoupons = await couponModel.find().sort({ createdAt: -1 }).limit(limit).skip(skip)
         const totalCoupons = await couponModel.countDocuments();
         const totalPages = Math.ceil(totalCoupons / limit)
 
@@ -128,11 +128,11 @@ const editCoupon = async (req,res) => {
 
         const existingCoupon = await couponModel.findOne({name:name})
 
-        if(existingCoupon){
+        // if(existingCoupon){
 
-            console.log("another coupon with with this name already exist")
-            return res.send({ error: "another coupon with with this name already exist"})
-        }
+        //     console.log("another coupon with with this name already exist")
+        //     return res.send({ error: "another coupon with with this name already exist"})
+        // }
 
         const updatedCoupon = await couponModel.findByIdAndUpdate(
 

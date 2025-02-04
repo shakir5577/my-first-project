@@ -6,34 +6,44 @@ const addressModel = require('../../models/addressModel')
 const cartModel = require('../../models/cartModel')
 const couponModel = require('../../models/couponModel')
 
-const loadWallet = async (req,res) => {
+const loadWallet = async (req, res) => {
+    try {
+        const { userId } = req.session;
 
-    try{
-
-        const { userId } = req.session
-
-        if(!userId){
-            console.log("cant find userid at loadWallet")
+        if (!userId) {
+            console.log("Can't find userId at loadWallet");
         }
 
-        const fetchUser = await userModel.findById(userId)
-        // console.log(fetchUser)
-
-        if(!fetchUser){
-            console.log("user not find...")
+        const fetchUser = await userModel.findById(userId);
+        if (!fetchUser) {
+            console.log("User not found...");
         }
 
-        const transactions = await transactionModel.find({ userId : userId }).sort({ date: -1 })
-        // console.log(transactions)
+        const page = parseInt(req.query.page) || 1; 
+        const limit = 5; 
+        const skip = (page - 1) * limit;
 
+        const totalTransactions = await transactionModel.countDocuments({ userId: userId });
+        const totalPages = Math.ceil(totalTransactions / limit); 
 
-        
-        res.render('user/wallet',{transactions:transactions,user:fetchUser})
+        const transactions = await transactionModel.find({ userId: userId })
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit);
 
-    }catch(error){
-        console.log(error)
+        res.render('user/wallet', {
+            transactions,
+            user: fetchUser,
+            currentPage: page,
+            totalPages
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Internal Server Error");
     }
-}
+};
+
 
 const loadmyAccountWallet = async (req,res) => {
 

@@ -185,6 +185,8 @@ const adminDashboard = async (req, res) => {
 
 const showUsers = async (req, res) => {
 
+   try{
+
     const page = parseInt(req.query.page) || 1
     const limit = 5
     const skip = (page - 1) * limit
@@ -194,45 +196,76 @@ const showUsers = async (req, res) => {
     const totalPages = Math.ceil(totalUsers / limit);
 
     res.render('admin/users', { allUsers: allUsers,currentPage: page, totalPages })
+
+   }catch(error){
+    console.log(error)
+   }
 }
 
 const showCategories = async (req, res) => {
 
-    const allCategories = await categoryModel.find()
-    res.render('admin/categories', { allCategories: allCategories })
+    try{
+
+    const page = parseInt(req.query.page) || 1
+    const limit = 5
+    const skip = (page - 1) * limit
+
+
+    const allCategories = await categoryModel.find().sort({ createdAt: -1 }).limit(limit).skip(skip)
+    const totalCategories = await categoryModel.countDocuments()
+    const totalPages = Math.ceil( totalCategories / limit )
+
+    res.render('admin/categories', { allCategories: allCategories, currentPage: page, totalPages })
+
+    }catch(error){
+    console.log(error)
+    }
 }
 
 const showProducts = async (req, res) => {
+
+    try{
 
     const page = parseInt(req.query.page) || 1
     const limit = 8
     const skip = (page - 1) * limit
 
     const allProducts = await productModel.find().sort({ createdAt: -1 }).limit(limit).skip(skip);
-    const totalProducts = await userModel.countDocuments();
+    const totalProducts = await productModel.countDocuments();
     const totalPages = Math.ceil(totalProducts / limit);
     res.render('admin/products', { allProducts: allProducts,currentPage: page, totalPages })
+
+    }catch(error){
+    console.log(error)
+    }
 }
 
 const loadCreateProduct = async (req, res) => {
 
+    try{
+
     const allCategories = await categoryModel.find()
     res.render('admin/createProduct', { allCategories: allCategories })
+
+    }catch(error){
+    console.log(error)
+    }
 
 }
 
 const showEditproduct = async (req, res) => {
 
+   try{
     const product = await productModel.findById(req.query.id)
 
 
     const allCategories = await categoryModel.find()
 
-    // console.log(product)
-
-    // console.log(req.query.id)
-
     res.render('admin/editProduct', { product: product, allCategories:allCategories })
+
+   }catch(error){
+    console.log(error)
+   }
 }
 
 const showOrders = async(req,res) => {
@@ -285,7 +318,7 @@ const orderDetails = async (req,res) => {
 
 const updateReturnRequest = async (req, res, next) => {
     try {
-        console.log('hhhhhha')
+        // console.log('hhhhhha')
         const { orderId, productId, status } = req.body;
 
         if (!orderId || !productId || !status) {
@@ -395,6 +428,7 @@ const verifyAdminLogin = async (req, res) => {
 
 const blockUser = async (req, res) => {
 
+   try{
     console.log(req.body)
 
     const findUser = await userModel.findOne({ _id: req.body.userId })
@@ -402,6 +436,10 @@ const blockUser = async (req, res) => {
     await findUser.save()
 
     res.send({ success: "user status changed succesfully" })
+
+   }catch(error){
+    console.log(error)
+   }
 
 }
 
@@ -442,9 +480,11 @@ const createCategory = async (req, res) => {
 
 const blockCategory = async (req, res) => {
 
+   try{
     console.log(req.body)
 
     const findCategory = await categoryModel.findOne({ _id: req.body.categoryId })
+
 
     console.log(findCategory)
 
@@ -452,6 +492,10 @@ const blockCategory = async (req, res) => {
     await findCategory.save()
 
     res.send({ success: true })
+
+   }catch(error){
+    console.log(error)
+   }
 }
 
 const updateCategory = async (req, res) => {
@@ -515,6 +559,7 @@ const createProducts = async (req, res) => {
 
 const blockProduct = async (req, res) => {
 
+   try{
     console.log(req.body)
 
     const findProduct = await productModel.findOne({ _id: req.body.productId })
@@ -525,6 +570,10 @@ const blockProduct = async (req, res) => {
     await findProduct.save()
 
     res.send({ success: true })
+
+   }catch(error){
+    console.log(error)
+   }
 }
 
 const updateProduct = async (req, res) => {
@@ -576,7 +625,7 @@ const updateProduct = async (req, res) => {
 
 const changeProductStatus = async (req, res) => {
 
-    console.log('haaai')
+    // console.log('haaai')
 
     try{
         const { productId, newStatus, orderId } = req.body
@@ -642,6 +691,18 @@ const changeOrderStatus = async (req,res) => {
     }
 }
 
+const adminLogout = async (req,res,next) => {
+
+    try{
+        
+        const dstry = req.adminCheck.destroy()
+        res.redirect('/admin')
+
+    }catch(error){
+        next(error)
+    }
+}
+
 
 
 
@@ -667,4 +728,5 @@ module.exports = {
     changeOrderStatus,
     changeProductStatus,
     updateReturnRequest,
+    adminLogout
 }

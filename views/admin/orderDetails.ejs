@@ -143,7 +143,7 @@
         <section class="content-main">
             <div class="content-header">
                 <div>
-                    <h2 class="content-title card-title">Order detail</h2>
+                    <h2 class="content-title card-title">Order details</h2>
                     <!-- <p>Details for Order ID: 3453012</p> -->
                 </div>
             </div>
@@ -273,16 +273,25 @@
 
                                                 <td>
                                                     <input type="hidden" value="<%= val.productStatus %>" id="productStatus<%= val.product.id %>">
-                                                    <select class="form-select d-inline-block" style="width: 110px;" 
-                                                        id="productStatusOption<%= val.product.id %>"
-                                                        onchange="changeProductStatus('<%= val.product.id %>', '<%= orderDetails.id %>')"
-                                                        <%= val.productStatus !== 'Pending' ? 'disabled' : '' %>> 
-                                                
-                                                        <option value="Pending" <%= val.productStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                                        <option value="Delivered" <%= val.productStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                        <option value="Cancelled" <%= val.productStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                                        <option value="Returned" <%= val.productStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
-                                                    </select>
+                                                    <%
+                                                    // Check if status is Cancelled or Returned
+                                                    if (val.productStatus === 'Cancelled' || val.productStatus === 'Returned') {
+                                                    %>
+                                                        <!-- Show status as text when it's Cancelled or Returned -->
+                                                        <div class="form-control" style="width: 110px;" disabled>
+                                                            <%= val.productStatus %>
+                                                        </div>
+                                                    <% } else { %>
+                                                        <!-- Show dropdown with only Pending and Delivered options -->
+                                                        <select class="form-select d-inline-block" style="width: 110px;" 
+                                                            id="productStatusOption<%= val.product.id %>"
+                                                            onchange="changeProductStatus('<%= val.product.id %>', '<%= orderDetails.id %>')"
+                                                            <%= val.productStatus !== 'Pending' ? 'disabled' : '' %>>
+                                                            
+                                                            <option value="Pending" <%= val.productStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                                            <option value="Delivered" <%= val.productStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                        </select>
+                                                    <% } %>
                                                 </td>
                                                 
 

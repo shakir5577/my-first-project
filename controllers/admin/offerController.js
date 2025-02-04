@@ -5,18 +5,32 @@ const offerModel = require('../../models/offerModel')
 
 
 const showOffer = async (req,res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
 
-    try{
+        const fetchOffers = await offerModel.find({})
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .skip(skip)
+            .populate('productId')
+            .populate('categoryId');
 
-        const fetchOffers = await offerModel.find({}).populate('productId').populate('categoryId')
+        const totalOffers = await offerModel.countDocuments();
+        const totalPages = Math.ceil(totalOffers / limit);
 
-        res.render('admin/offer',{ offers: fetchOffers })
+        res.render('admin/offer', { 
+            offers: fetchOffers,
+            currentPage: page,
+            totalPages,
+            limit
+        });
 
-    }catch(error){
-
-        console.log(error)
+    } catch(error) {
+        console.log(error);
     }
-}
+};
 
 const showCreateOffer = async (req,res) => {
 

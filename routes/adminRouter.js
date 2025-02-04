@@ -67,6 +67,7 @@ router.post('/createOffers',offerController.createOffer)
 router.post('/deleteOffer',offerController.deleteOffer)
 
 router.get('/salesReport',adminCheck.isLogin,salesController.showSalesReport)
+router.get('/adminLogout',adminCheck.isLogin,adminController.adminLogout)
 
 
 
