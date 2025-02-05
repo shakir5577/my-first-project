@@ -391,40 +391,34 @@ const updateReturnRequest = async (req, res, next) => {
 
 
 const verifyAdminLogin = async (req, res) => {
-    console.log('body: ', req.body)
+    console.log('body: ', req.body);
 
     try {
-
-        const { email, password } = req.body
-
-        const findAdmin = await userModel.findOne({ email: email })
+        const { email, password } = req.body;
+        const findAdmin = await userModel.findOne({ email: email });
 
         if (!findAdmin) {
-
-            return console.log("error: Admin not found")
+            return res.status(404).json({ success: false, message: "Access denied. Not an admin."});
         }
 
         if (!findAdmin.isAdmin) {
-
-            return console.log("Error : Admin not found")
+            return res.status(403).json({ success: false, message: "Access denied. Not an admin." });
         }
 
-        const adminPassword = await bcrypt.compare(password, findAdmin.password)
+        const adminPassword = await bcrypt.compare(password, findAdmin.password);
 
         if (!adminPassword) {
-
-            return console.log("Error : Incorrect password")
+            return res.status(401).json({ success: false, message: "Incorrect password" });
         }
 
         req.session.admin = email;
-        res.status(200).send({success: true})
+        res.status(200).json({ success: true });
     } catch (error) {
-
-        console.log(error)
+        console.error(error);
+        res.status(500).json({ success: false, message: "Server error. Please try again later." });
     }
+};
 
-
-}
 
 const blockUser = async (req, res) => {
 
@@ -691,17 +685,21 @@ const changeOrderStatus = async (req,res) => {
     }
 }
 
-const adminLogout = async (req,res,next) => {
+const adminLogout = async (req, res, next) => {
+    try {
 
-    try{
-        
-        const dstry = req.adminCheck.destroy()
-        res.redirect('/admin')
-
-    }catch(error){
-        next(error)
+        // Destroy the session
+        req.session.destroy((err) => {
+            if (err) {
+                next(err);
+            } else {
+                res.redirect('/admin');
+            }
+        });
+    } catch (error) {
+        next(error);
     }
-}
+};
 
 
 

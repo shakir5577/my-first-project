@@ -84,6 +84,9 @@ const showSalesReport = async (req, res) => {
             currentPage: page,
             totalPages,
             limit,
+            startDate: req.query.startDate || '',  
+            endDate: req.query.endDate || '',      
+            type: req.query.type || ''            
         });
     } catch (error) {
         console.error('Error in showSalesReport:', error.message);

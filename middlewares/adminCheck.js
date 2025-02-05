@@ -14,10 +14,10 @@ const isLogin = async (req, res, next) => {
 
 const isLogout = async (req, res, next) => {
     try{
-        if(!req.session.userId){
+        if(!req.session.admin){
             next()
         }else{
-            res.redirect('/')
+            res.redirect('/admin/dashboard')
         }
     }catch(error){
         console.log(error)

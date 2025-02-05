@@ -77,39 +77,38 @@
     <div class="register-container">
         <div class="register-image"></div>
         <div class="register-form">
-                <h3 class="text-center">Register for ShoeVault</h3>
-                <input type="hidden" value="<%= reff %>" id="reffId">
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label for="username">Name</label>
-                        <div id="nameError" class="text-danger"></div>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email address</label>
-                        <div id="mailError" class="text-danger"></div>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="mobile">Mobile Phone</label>
-                        <div id="numberError" class="text-danger"></div>
-                        <input type="tel" class="form-control" id="mobile" name="mobile" maxlength="10" pattern="[0-9]*"
-                            required>
-                    </div>
-                    <div class="form-group password-wrapper">
-                        <label for="password">Password</label>
-                        <div id="passwordError" class="text-danger"></div>
-                        <input type="password" class="form-control" id="password" name="password" minlength="6"
-                            required>
-                        <span class="toggle-password" onclick="togglePassword()">
-                            <i class="fa fa-eye" id="eyeIcon"></i>
-                        </span>
-                    </div>
-                    <button class="btn btn-primary btn-block btn-register">Register</button>
-                </form>
-                <div class="text-center mt-3">
-                    <p>Already have an account? <a href="login">Login</a></p>
+            <h3 class="text-center">Register for ShoeVault</h3>
+            <input type="hidden" value="<%= reff %>" id="reffId">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">Name</label>
+                    <div id="nameError" class="text-danger"></div>
+                    <input type="text" class="form-control" id="username" name="username" required>
                 </div>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <div id="mailError" class="text-danger"></div>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile Phone</label>
+                    <div id="numberError" class="text-danger"></div>
+                    <input type="tel" class="form-control" id="mobile" name="mobile" maxlength="10" pattern="[0-9]*"
+                        required>
+                </div>
+                <div class="form-group password-wrapper">
+                    <label for="password">Password</label>
+                    <div id="passwordError" class="text-danger"></div>
+                    <input type="password" class="form-control" id="password" name="password" minlength="6" required>
+                    <span class="toggle-password" onclick="togglePassword()">
+                        <i class="fa fa-eye" id="eyeIcon"></i>
+                    </span>
+                </div>
+                <button class="btn btn-primary btn-block btn-register">Register</button>
+            </form>
+            <div class="text-center mt-3">
+                <p>Already have an account? <a href="login">Login</a></p>
+            </div>
         </div>
     </div>
 
@@ -161,12 +160,15 @@
             }
 
             // Email validation
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; 
             if (!email) {
                 document.getElementById('mailError').innerText = "Email is required";
                 isValid = false;
             } else if (!emailPattern.test(email)) {
                 document.getElementById('mailError').innerText = "Please enter a valid email address";
+                isValid = false;
+            } else if (!email.endsWith('.com')) {
+                document.getElementById('mailError').innerText = "Email should end with .com";
                 isValid = false;
             }
 
@@ -257,8 +259,8 @@
                     .catch((error) => {
                         console.error('Error:', error);
                     });
-                }
-            });
+            }
+        });
     </script>
 </body>
 

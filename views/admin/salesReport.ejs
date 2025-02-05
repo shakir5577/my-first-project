@@ -121,15 +121,14 @@
                         </div>
                         <div class="col-lg-2 col-6 col-md-3" style="display: none;" id="startDate">
 
-                            <input type="date" placeholder="Type here" class="form-control" id="startDateInput"
-                                />
+                            <input type="date" placeholder="Type here" class="form-control" id="startDateInput" />
 
                         </div>
 
                         <div class="col-lg-2 col-6 col-md-3" style="display: none;" id="endDate">
 
                             <input type="date" placeholder="Type here" class="form-control" id="endDateInput"
-                                 onchange="customDate(event)" />
+                                onchange="customDate(event)" />
 
                         </div>
                         <div class="card mb-4">
@@ -162,25 +161,37 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <% fetchAllOrders.forEach((val, ind) => { %>
+                                            <% fetchAllOrders.forEach((val, ind)=> { %>
                                                 <tr>
-                                                    <td><%= ind + 1 %></td>
-                                                    <td><b><%= val.shippingAddress.name %></b></td>
-                                                    <td><%= val.shippingAddress.email %></td>
-                                            
+                                                    <td>
+                                                        <%= ind + 1 %>
+                                                    </td>
+                                                    <td><b>
+                                                            <%= val.shippingAddress.name %>
+                                                        </b></td>
+                                                    <td>
+                                                        <%= val.shippingAddress.email %>
+                                                    </td>
+
                                                     <!-- Fix: Only Sum Delivered Products -->
                                                     <td>
-                                                        <%= val.products.reduce((sum, product) => sum + (product.price || 0) * (product.quantity || 0), 0) %> 
+                                                        <%= val.products.reduce((sum, product)=> sum + (product.price ||
+                                                            0) * (product.quantity || 0), 0) %>
                                                     </td>
-                                            
+
                                                     <td>
-                                                        <%= val.orginalAmount - val.totalAmount  %>
+                                                        <%= val.orginalAmount - val.totalAmount %>
                                                     </td>
-                                                    <td><span class="badge rounded-pill alert-success">Delivered</span></td>
-                                                    <td><%= val.date.toLocaleDateString('en-GB') %></td>
-                                                    <td><%= val.paymentMethod %></td>
+                                                    <td><span class="badge rounded-pill alert-success">Delivered</span>
+                                                    </td>
+                                                    <td>
+                                                        <%= val.date.toLocaleDateString('en-GB') %>
+                                                    </td>
+                                                    <td>
+                                                        <%= val.paymentMethod %>
+                                                    </td>
                                                 </tr>
-                                            <% }) %>
+                                                <% }) %>
                                                     <!-- Additional static rows here -->
                                         </tbody>
                                     </table>
@@ -211,38 +222,37 @@
                         <div class="pagination-area mt-15 mb-50" id="pagination">
                             <nav aria-label="Page navigation example">
                                 <ul class="pagination justify-content-start">
-                                    <% if (totalPages > 1) { %>
-                                        <% if (currentPage > 1) { %>
-                                            <!-- Previous Page Link -->
+                                    <% if (totalPages> 1) { %>
+                                        <% if (currentPage> 1) { %>
                                             <li class="page-item">
-                                                <a class="page-link" href="?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+                                                <a class="page-link"
+                                                    href="?page=<%= currentPage - 1 %>&limit=<%= limit %><%= startDate ? '&startDate=' + startDate : '' %><%= endDate ? '&endDate=' + endDate : '' %><%= type ? '&type=' + type : '' %>">
                                                     <i class="material-icons md-chevron_left"></i>
                                                 </a>
                                             </li>
-                                        <% } %>
-                        
-                                        <% for (let i = 1; i <= totalPages; i++) { %>
-                                            <!-- Page Number Links -->
-                                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                                <a class="page-link" href="?page=<%= i %>&limit=<%= limit || 5 %>">
-                                                    <%= i %>
-                                                </a>                                                
-                                            </li>
-                                        <% } %>
-                        
-                                        <% if (currentPage < totalPages) { %>
-                                            <!-- Next Page Link -->
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page=<%= currentPage + 1 %>&limit=<%= limit %>">
-                                                    <i class="material-icons md-chevron_right"></i>
-                                                </a>
-                                            </li>
-                                        <% } %>
-                                    <% } %>
+                                            <% } %>
+
+                                                <% for (let i=1; i <=totalPages; i++) { %>
+                                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                        <a class="page-link"
+                                                            href="?page=<%= i %>&limit=<%= limit %><%= startDate ? '&startDate=' + startDate : '' %><%= endDate ? '&endDate=' + endDate : '' %><%= type ? '&type=' + type : '' %>">
+                                                            <%= i %>
+                                                        </a>
+                                                    </li>
+                                                    <% } %>
+
+                                                        <% if (currentPage < totalPages) { %>
+                                                            <li class="page-item">
+                                                                <a class="page-link"
+                                                                    href="?page=<%= currentPage + 1 %>&limit=<%= limit %><%= startDate ? '&startDate=' + startDate : '' %><%= endDate ? '&endDate=' + endDate : '' %><%= type ? '&type=' + type : '' %>">
+                                                                    <i class="material-icons md-chevron_right"></i>
+                                                                </a>
+                                                            </li>
+                                                            <% } %>
+                                                                <% } %>
                                 </ul>
                             </nav>
                         </div>
-                        
         </section>
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
@@ -303,69 +313,73 @@
         })
 
         function exportToExcel() {
-    // Get the table element
-    var table = document.querySelector('.table');
+            // Get the table element
+            var table = document.querySelector('.table');
 
-    // Convert the table rows to an Array of Arrays representing rows and cells
-    var rows = Array.from(table.querySelectorAll('tr')).map(row =>
-        Array.from(row.querySelectorAll('td, th')).map(cell => cell.innerText)
-    );
+            // Convert the table rows to an Array of Arrays representing rows and cells
+            var rows = Array.from(table.querySelectorAll('tr')).map(row =>
+                Array.from(row.querySelectorAll('td, th')).map(cell => cell.innerText)
+            );
 
-    // Create a new workbook
-    var wb = XLSX.utils.book_new();
+            // Create a new workbook
+            var wb = XLSX.utils.book_new();
 
-    // Add worksheet with table data
-    var ws = XLSX.utils.aoa_to_sheet(rows);
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+            // Add worksheet with table data
+            var ws = XLSX.utils.aoa_to_sheet(rows);
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
-    // Add the overall summary after the table
-    var summaryRows = [
-        [], // Blank row
-        ['Overall Summary'], // Title
-        ['Total Sales Count:', '<%= totalOrders %>'], // Total sales count
-        ['Total Order Amount:', '₹<%= totalPrice %>'] // Total order amount
-    ];
+            // Add the overall summary after the table
+            var summaryRows = [
+                [], // Blank row
+                ['Overall Summary'], // Title
+                ['Total Sales Count:', '<%= totalOrders %>'], // Total sales count
+                ['Total Order Amount:', '₹<%= totalPrice %>'] // Total order amount
+            ];
 
-    // Append the summary to the sheet
-    XLSX.utils.sheet_add_aoa(ws, summaryRows, { origin: -1 });
+            // Append the summary to the sheet
+            XLSX.utils.sheet_add_aoa(ws, summaryRows, { origin: -1 });
 
-    // Write the Excel file
-    XLSX.writeFile(wb, 'sales_report.xlsx');
-}
+            // Write the Excel file
+            XLSX.writeFile(wb, 'sales_report.xlsx');
+        }
 
     </script>
 
     <script>
-        function triggerDateInputs(event){
-            event.preventDefault()
+        function triggerDateInputs(event) {
+            event.preventDefault();
 
-            const input = document.getElementById('dateInput').value
-            let dateRange
+            const input = document.getElementById('dateInput').value;
 
-            if( input == 'Custom'){
+            // Get current pagination parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = urlParams.get('page') || 1;
+            const limit = urlParams.get('limit') || 5;
 
-                document.getElementById('startDate').style.display = 'block'
-                document.getElementById('endDate').style.display = 'block'
+            if (input == 'Custom') {
+                document.getElementById('startDate').style.display = 'block';
+                document.getElementById('endDate').style.display = 'block';
+            } else {
+                document.getElementById('startDate').style.display = 'none';
+                document.getElementById('endDate').style.display = 'none';
 
-            }else{
-
-                document.getElementById('startDate').style.display = 'none'
-                document.getElementById('endDate').style.display = 'none'
-
-                window.location.href = `/admin/salesReport?type=${input}`
+                window.location.href = `/admin/salesReport?type=${input}&page=${page}&limit=${limit}`;
             }
-
         }
 
-        function customDate(event){
-            event.preventDefault()
+        function customDate(event) {
+            event.preventDefault();
 
-            const startDate = document.getElementById('startDateInput').value
-            const endDate = document.getElementById('endDateInput').value
+            const startDate = document.getElementById('startDateInput').value;
+            const endDate = document.getElementById('endDateInput').value;
 
-            window.location.href = `/admin/salesReport?startDate=${startDate}&endDate=${endDate}`
+            // Get current pagination parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = urlParams.get('page') || 1;
+            const limit = urlParams.get('limit') || 5;
+
+            window.location.href = `/admin/salesReport?startDate=${startDate}&endDate=${endDate}&page=${page}&limit=${limit}`;
         }
-
     </script>
 
 

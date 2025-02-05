@@ -30,7 +30,7 @@ const adminCheck = require('../middlewares/adminCheck')
 
 
 
-router.get('/',adminController.adminLogin)
+router.get('/',adminCheck.isLogout,adminController.adminLogin)
 router.post('/', adminController.verifyAdminLogin)
 router.get('/Dashboard',adminCheck.isLogin,adminController.adminDashboard)
 router.get('/users',adminCheck.isLogin,adminController.showUsers)

@@ -228,8 +228,8 @@
             if (!email) {
                 document.getElementById('mailError').innerText = "Email is required";
                 return false;
-            } else if (!emailPattern.test(email)) {
-                document.getElementById('mailError').innerText = "Please enter a valid email address";
+            } else if (!emailPattern.test(email) || !email.endsWith('.com')) {
+                document.getElementById('mailError').innerText = "Please enter your registered email adress";
                 return false;
             }
 
