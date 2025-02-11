@@ -26,6 +26,8 @@ const loadWallet = async (req, res) => {
         const totalTransactions = await transactionModel.countDocuments({ userId: userId });
         const totalPages = Math.ceil(totalTransactions / limit); 
 
+        const order = await orderModel.find()
+
         const transactions = await transactionModel.find({ userId: userId })
             .sort({ date: -1 })
             .skip(skip)
@@ -35,7 +37,8 @@ const loadWallet = async (req, res) => {
             transactions,
             user: fetchUser,
             currentPage: page,
-            totalPages
+            totalPages,
+            order
         });
 
     } catch (error) {
@@ -190,7 +193,8 @@ const orderWithWallet = async (req, res) => {
             const transaction = new transactionModel({
                 userId: userId,
                 amount: totalAmount,
-                type: 'debit'
+                type: 'debit',
+                orderId: saveOrder.id
             });
             await transaction.save();
 

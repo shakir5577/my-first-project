@@ -7,6 +7,7 @@ const addressModel = require('../../models/addressModel')
 const couponModel = require('../../models/couponModel')
 const orderModel = require('../../models/orderModel')
 const productModel = require('../../models/productModel')
+const categoryModel = require('../../models/categoryModel')
 require('dotenv').config()
 
 const instance = new Razorpay({
@@ -47,6 +48,24 @@ const createOrder = async (req, res) => {
 
         if (!products) {
             return console.log('Cant find products');
+        }
+
+        for (const item of products.items) {
+            const product = item.productId;
+
+            const findProduct = await productModel.findById(product);
+            if (findProduct?.isBlock) {
+                return res.status(400).send({ error: `Product ${findProduct.productName} is currently unavailable` });
+            }
+
+            console.log(findProduct)
+
+            const categoryDoc = await categoryModel.findOne({ categoryName: findProduct.category });
+            console.log(categoryDoc)
+
+            if (categoryDoc && categoryDoc.isBlock) {
+                return res.status(400).send({ error: `Category ${categoryDoc.categoryName} is currently unavailable` });
+            }
         }
 
         const currentDate = new Date();
@@ -143,7 +162,7 @@ const createOrder = async (req, res) => {
 
 const verifyPayment = async (req, res) => {
     try {
-        console.log(req.body)
+        console.log(req.body);
 
         const {
             razorpayPaymentId,
@@ -152,7 +171,7 @@ const verifyPayment = async (req, res) => {
             orderId
         } = req.body;
 
-        const order = await orderModel.findById(orderId).populate('products.product')
+        const order = await orderModel.findById(orderId).populate('products.product');
 
         if (!order) {
             return res.status(400).json({ success: false, message: "Order not found" });
@@ -163,37 +182,105 @@ const verifyPayment = async (req, res) => {
             .digest('hex');
 
         if (generatedSignature === razorpaySignature) {
-
-            order.status = "Pending";
-            await order.save()
-
+            // Loop through each product in the order
             for (let item of order.products) {
+                // Retrieve the product details by ID
                 const product = await productModel.findById(item.product._id);
 
                 if (!product) {
-                    return console.log("Product not found:");
+                    return res.status(400).json({ success: false, message: "Product not found" });
                 }
 
+                // Check if the product itself is blocked
+                // if (product.isBlock) {
+                //     return res.status(400).json({ 
+                //         success: false, 
+                //         message: `Product ${product.productName} is blocked` 
+                //     });
+                // }
+
+                // // Now, check if the category is blocked by querying the categories collection
+                // const category = await categories.findOne({ categoryName: product.category });
+                // if (category && category.isBlock) {
+                //     return res.status(400).json({ 
+                //         success: false, 
+                //         message: `Category ${category.categoryName} is blocked` 
+                //     });
+                // }
+
+                // Reduce product stock if validations pass
                 product.stock -= item.quantity;
                 await product.save();
             }
 
-            const cart = await cartModel.findOne({ userId: order.myUsers});
+            // Update order status and clear the user's cart
+            order.status = "Pending";
+            await order.save();
+
+            const cart = await cartModel.findOne({ userId: order.myUsers });
             if (cart) {
                 cart.items = [];
                 await cart.save();
             }
 
-            res.status(200).json({ success: true, orderId: order._id });
+            return res.status(200).json({ success: true, orderId: order._id });
         } else {
-            res.status(500).json({ success: false, message: 'Payment verification failed' });
+            return res.status(500).json({ success: false, message: 'Payment verification failed' });
         }
     } catch (error) {
-       console.log(error)
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Server error" });
     }
+};
+
+const checkList = async (req, res) => {
+    try{
+        const {
+            orderId
+        } = req.body
+
+        const order = await orderModel.findById(orderId).populate('products.product');
+
+        if (!order) {
+            return res.status(400).json({ success: false, message: "Order not found" });
+        }
+
+        for (let item of order.products) {
+            // Retrieve the product details by ID
+            const product = await productModel.findById(item.product._id);
+
+            if (!product) {
+                return res.status(400).json({ success: false, message: "Product not found" });
+            }
+
+            // Check if the product itself is blocked
+            if (product.isBlock) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `Product ${product.productName} is blocked` 
+                });
+            }
+
+            // Now, check if the category is blocked by querying the categories collection
+            const category = await categoryModel.findOne({ categoryName: product.category });
+            if (category && category.isBlock) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `Category ${category.categoryName} is blocked` 
+                });
+            }
+        }
+
+    }catch(err){
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+    res.status(200).json({success: true, message: 'products and category\'s are fine'})
 }
+
+
 
 module.exports = {
     createOrder,
     verifyPayment,
+    checkList
 }

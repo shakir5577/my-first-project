@@ -169,7 +169,8 @@ const cancelSingleProduct = async (req, res) => {
             const transaction = new transactionModel({
                 userId : userId,
                 amount : findProduct.price * product.quantity,
-                type : 'credit'
+                type : 'credit',
+                orderId
             })
 
             await transaction.save()

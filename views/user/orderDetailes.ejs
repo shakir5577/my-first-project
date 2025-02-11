@@ -680,10 +680,34 @@
 
 
             <script>
-                function continueRazorpayPayment(orderId, razorpayId, totalAmount) {
+               async function continueRazorpayPayment(orderId, razorpayId, totalAmount) {
 
                     console.log(razorpayId, totalAmount)
 
+                    let success = true
+
+                 await fetch('/checkLIst', {
+                        method: 'POST',
+                        headers:  { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({orderId: orderId})
+                    }).then(res => res.json())
+                    .then(data => {
+                       if(!data.success){
+                        success = false
+                        Swal.fire({
+                                            icon: 'Error',
+                                            title: 'sorry ',
+                                            text: data.message,
+                                            timer: 3000,
+                                            timerProgressBar: true,
+                                            willClose: () => {
+                                                // window.location.href = '/orderComplete';
+                                            }
+                                        });
+                       }
+                    })
+
+                    if(!success) return
 
 
                     const options = {
@@ -708,6 +732,7 @@
                                 .then(res => res.json())
                                 .then(paymentData => {
                                     console.log(paymentData)
+                                    return 
                                     if (paymentData.success) {
                                         Swal.fire({
                                             icon: 'success',

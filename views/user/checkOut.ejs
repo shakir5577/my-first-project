@@ -862,7 +862,7 @@
 				<script src="https://checkout.razorpay.com/v1/checkout.js"></script> <!-- Razorpay Library -->
 
 				<script>
-					function placeOrder(event) {
+				function placeOrder(event) {
 						event.preventDefault();  // Prevent the default action of the link
 
 						const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
@@ -891,15 +891,24 @@
 							initiateRazorpayPayment(addressId, couponApplied);
 
 							// Razorpay Integration Function
-							function initiateRazorpayPayment(addressId, coupon) {
-								fetch('/createOrder', {  // Backend API to create Razorpay order
+						 function initiateRazorpayPayment(addressId, coupon) {
+							 fetch('/createOrder', {  // Backend API to create Razorpay order
 									method: 'POST',
 									headers: { 'Content-Type': 'application/json' },
 									body: JSON.stringify({ addressId, coupon })
 								})
 									.then(response => response.json())
 									.then(data => {
-										console.log(data)
+										console.log('aaaa', data)
+
+										if(data.error){
+											Swal.fire({
+												icon: 'error',
+												title: 'Payment Verification Failed',
+												text: data.error
+											});
+											return
+										}
 					
 										if (data.success) {
 											const options = {

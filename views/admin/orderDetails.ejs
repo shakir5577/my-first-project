@@ -273,6 +273,7 @@
 
                                                 <td>
                                                     <input type="hidden" value="<%= val.productStatus %>" id="productStatus<%= val.product.id %>">
+                                                    
                                                     <%
                                                     // Check if status is Cancelled or Returned
                                                     if (val.productStatus === 'Cancelled' || val.productStatus === 'Returned') {
@@ -282,17 +283,22 @@
                                                             <%= val.productStatus %>
                                                         </div>
                                                     <% } else { %>
-                                                        <!-- Show dropdown with only Pending and Delivered options -->
+                                                        <!-- Show dropdown with all necessary statuses -->
                                                         <select class="form-select d-inline-block" style="width: 110px;" 
                                                             id="productStatusOption<%= val.product.id %>"
                                                             onchange="changeProductStatus('<%= val.product.id %>', '<%= orderDetails.id %>')"
-                                                            <%= val.productStatus !== 'Pending' ? 'disabled' : '' %>>
+                                                            <%= val.productStatus === 'Delivered' || val.productStatus === 'Cancelled' ? 'disabled' : '' %>>
                                                             
                                                             <option value="Pending" <%= val.productStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                                            <option value="Confirmed" <%= val.productStatus === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                                                            <option value="Processing" <%= val.productStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                                            <option value="Shipped" <%= val.productStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                                             <option value="Delivered" <%= val.productStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                            <option value="Cancelled" <%= val.productStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
                                                         </select>
                                                     <% } %>
                                                 </td>
+                                                
                                                 
 
 

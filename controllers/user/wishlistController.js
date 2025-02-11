@@ -57,6 +57,11 @@ const addToWishlist = async (req,res) => {
             return res.status(404).json({ success: false, message: 'product not found' })
         }
 
+        if(product.price < 500 && product.stock < 5){
+
+            return res.status(404).json({ success: false, message: 'cant add to wishlist' })
+        }
+
         const existingProduct = wishlist.items.findIndex(item => item.productId.equals(productId))
         if( existingProduct >= 0){
 

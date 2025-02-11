@@ -355,7 +355,8 @@ const updateReturnRequest = async (req, res, next) => {
             const transaction = new transactionModel({
                 userId: findUser.id,
                 amount: product.price * product.quantity, // Total amount credited back to the user
-                type: 'credit'
+                type: 'credit',
+                orderId
             });
 
             await transaction.save();

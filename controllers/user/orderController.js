@@ -48,7 +48,15 @@ const placeOrder = async (req, res) => {
         const currentDate = new Date();
         let originalAmount = products.items.reduce((acc, item) => acc + (item.quantity * item.price), 0);
 
-        const productsDetails = products.items.map((item) => {
+        for (const item of products.items) {
+            const product = item.productId;
+            const findProduct = await productModel.findById(product);
+            if (findProduct?.isBlock) {
+                return res.status(400).send({ error: `Product ${findProduct.productName} is currently unavailable` });
+            }
+        }
+
+        const productsDetails = products.items.map(async (item) => {
             const product = item.productId;
             let discountAmount = 0;
 
@@ -70,6 +78,7 @@ const placeOrder = async (req, res) => {
                 productStatus: 'Pending'
             };
         });
+
 
         let totalAmount = productsDetails.reduce((acc, item) => acc + (item.quantity * item.price), 0);
         // console.log(totalAmount)
@@ -188,7 +197,8 @@ const cancelOrder = async (req, res) => {
             const transaction = new transactionModel({
                 userId: userId,
                 amount: findOrder.totalAmount,
-                type: 'credit'
+                type: 'credit',
+                orderId
             })
 
             await transaction.save()

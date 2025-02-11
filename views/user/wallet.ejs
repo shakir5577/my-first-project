@@ -149,8 +149,14 @@
 											<td><%= new Date(val.date).toLocaleDateString('en-GB') %></td>
 											<td><%= new Date(val.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) %></td>
 											<td><span class="price"><%= val.amount %></span></td>
-											<td><span class="type"><%= val.type %></span></td>
+											<td><span class="type">the amount <%= val.type%> from <a style="color: blue; text-decoration: underline;" href onclick="orderDetails(event, '<%=val.orderId%>')"><%=val.orderId%></a></span></td>
 										</tr>
+										<script>
+											function orderDetails(event, id){
+												event?.preventDefault()
+												window.location.href = `/orderDetailes/?id=${id}`
+											}
+										</script>
 									<% }) %>
 								<% } else { %>
 									<tr>

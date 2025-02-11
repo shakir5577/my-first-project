@@ -71,6 +71,7 @@ router.post('/applyCoupon',couponController.applyCoupon)
 
 router.post('/createOrder',razorpayController.createOrder)
 router.post('/verifyPayment',razorpayController.verifyPayment)
+router.post('/checkLIst', razorpayController.checkList)
 
 router.get('/walletHistory',session.isLogin,walletController.loadWallet)
 router.get('/wallet',session.isLogin,walletController.loadmyAccountWallet)
